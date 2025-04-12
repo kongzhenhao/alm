@@ -1,0 +1,11 @@
+*.class
+*.settings
+*.project
+*.classpath
+*/.settings
+*/target
+target/
+*/bin
+/.idea
+*.iml
+*/LOG_PATH_IS_UNDEFINED

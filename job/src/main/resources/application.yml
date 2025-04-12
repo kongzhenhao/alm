@@ -1,0 +1,73 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 100
+    min-spare-threads: 10
+    #设置链接超时时间为5s
+    connection-timeout: 5000
+  port: 8080
+  #优雅停机配置
+  shutdown: graceful
+
+#swagger配置
+swagger:
+  enable: true
+
+#mybatis-plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*Mapper.xml, classpath*:mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.xl.alm.job.*.entity
+  global-config:
+    db-config:
+      id-type: AUTO
+      update-strategy: NOT_NULL
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    local-cache-scope: STATEMENT
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 40s
+  #  mvc 路径解析配置
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  #微服务名称：汇易达规范要求与工程名保持一致
+  application:
+    name: alm-job
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: alm-job
+
+#密码加密配置
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
+financeId:
+  load:
+    # 达到此比例情况，加载备用号池
+    percent: 80
+  #系统号
+  system:
+    num: 10001
+
+logging:
+  level:
+    io.lettuce.core.protocol: error
