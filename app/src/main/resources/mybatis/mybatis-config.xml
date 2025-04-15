@@ -19,5 +19,6 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	</settings>
     <mappers>
         <package name="com.xl.alm.app.mapper"/>
+        <package name="com.jd.lightning.*.mapper"/>
     </mappers>
 </configuration>

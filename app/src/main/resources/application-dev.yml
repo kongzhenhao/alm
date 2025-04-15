@@ -6,7 +6,7 @@ spring:
       # 主库数据源
       master:
         driverClassName: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/alm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+        url: jdbc:mysql://localhost:3306/alm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
         username: alm
         password: 123456
       # 初始连接数
@@ -69,7 +69,7 @@ logging:
 financeId:
   #数据库配置
   datasource:
-    url: jdbc:mysql://localhost:3306/alm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/alm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
     type: mysql
     driver: com.mysql.cj.jdbc.Driver
     user: alm
