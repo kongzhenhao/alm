@@ -19,7 +19,8 @@ import java.util.List;
  * @author AI Assistant
  */
 @RestController
-@RequestMapping("/sample")
+// 这里xxx是模块名
+@RequestMapping("/xxx/sample")
 public class SampleController extends BaseController {
 
     @Autowired
@@ -28,7 +29,7 @@ public class SampleController extends BaseController {
     /**
      * 查询折现因子列表
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:list')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:list')")
     @GetMapping("/list")
     public TableDataInfo list(SampleEntity sampleEntity) {
         startPage();
@@ -39,7 +40,7 @@ public class SampleController extends BaseController {
     /**
      * 获取折现因子详细信息
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:query')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:query')")
     @GetMapping(value = "/{id}")
     public Result getInfo(@PathVariable("id") Long id) {
         return Result.success(sampleService.selectSampleEntityById(id));
@@ -48,7 +49,7 @@ public class SampleController extends BaseController {
     /**
      * 根据条件查询折现因子
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:query')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:query')")
     @GetMapping("/condition")
     public Result getByCondition(
             @RequestParam("accountPeriod") String accountPeriod,
@@ -63,7 +64,7 @@ public class SampleController extends BaseController {
     /**
      * 批量新增折现因子
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:add')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:add')")
     @Log(title = "折现因子", businessType = BusinessType.INSERT)
     @PostMapping("/batchAdd")
     public Result batchAdd(@RequestBody List<SampleEntity> sampleEntityList) {
@@ -73,7 +74,7 @@ public class SampleController extends BaseController {
     /**
      * 删除指定账期的折现因子
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:remove')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:remove')")
     @Log(title = "折现因子", businessType = BusinessType.DELETE)
     @DeleteMapping("/period/{accountPeriod}")
     public Result removeByPeriod(@PathVariable String accountPeriod) {
@@ -83,7 +84,7 @@ public class SampleController extends BaseController {
     /**
      * 删除折现因子
      */
-    @PreAuthorize("@ss.hasPermi('alm:sample:remove')")
+    @PreAuthorize("@ss.hasPermi('xxx:sample:remove')")
     @Log(title = "折现因子", businessType = BusinessType.DELETE)
     @DeleteMapping("/{id}")
     public Result remove(@PathVariable Long id) {
