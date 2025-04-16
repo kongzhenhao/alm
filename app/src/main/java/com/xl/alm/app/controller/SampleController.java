@@ -118,7 +118,7 @@ public class SampleController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('dur:liability:export')")
     @Log(title = "折现因子", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(HttpServletResponse response, SampleQuery query) {
         ExcelUtil<SampleDTO> util = new ExcelUtil<>(SampleDTO.class);
         List<SampleDTO> list = sampleService.selectSampleDtoList(query);
@@ -129,7 +129,7 @@ public class SampleController extends BaseController {
      * 获取折现因子模板Excel
      */
     @PreAuthorize("@ss.hasPermi('xxx:sample:template:export')")
-    @GetMapping("/exportTemplate")
+    @PostMapping("/exportTemplate")
     public void exportTemplate(HttpServletResponse response) {
         ExcelUtil<SampleDTO> util = new ExcelUtil<>(SampleDTO.class);
         util.exportTemplateExcel(response, "折现因子");
