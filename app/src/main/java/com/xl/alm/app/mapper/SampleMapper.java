@@ -1,6 +1,8 @@
 package com.xl.alm.app.mapper;
 
+import com.xl.alm.app.dto.SampleDTO;
 import com.xl.alm.app.entity.SampleEntity;
+import com.xl.alm.app.query.SampleQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,10 +19,10 @@ public interface SampleMapper {
     /**
      * 查询折现因子列表
      *
-     * @param discountFactor 折现因子查询条件
+     * @param sampleQuery 折现因子查询条件
      * @return 折现因子列表
      */
-    List<SampleEntity> selectSampleEntityList(SampleEntity discountFactor);
+    List<SampleEntity> selectSampleEntityList(SampleQuery sampleQuery);
 
     /**
      * 用id查询折现因子列表
@@ -50,10 +52,18 @@ public interface SampleMapper {
     /**
      * 批量插入折现因子数据
      *
-     * @param discountFactorList 折现因子列表
+     * @param entityList 折现因子列表
      * @return 影响行数
      */
-    int batchInsertSampleEntity(List<SampleEntity> discountFactorList);
+    int batchInsertSampleEntity(List<SampleEntity> entityList);
+
+    /**
+     * 更新折现因子数据
+     *
+     * @param entity 折现因子
+     * @return 结果
+     */
+    int updateSampleEntity(SampleEntity entity);
 
     /**
      * 删除指定账期的折现因子数据
