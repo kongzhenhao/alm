@@ -5,7 +5,6 @@ import com.jd.lightning.common.core.controller.BaseController;
 import com.jd.lightning.common.core.domain.Result;
 import com.jd.lightning.common.core.page.TableDataInfo;
 import com.jd.lightning.common.enums.BusinessType;
-import com.xl.alm.app.dto.LiabilityCashFlowDTO;
 import com.xl.alm.app.dto.SampleDTO;
 import com.xl.alm.app.query.SampleQuery;
 import com.xl.alm.app.service.SampleService;
