@@ -34,6 +34,14 @@ public class SampleDTO {
      */
     private String designType;
 
+    public String getIsShortTerm() {
+        return isShortTerm;
+    }
+
+    public void setIsShortTerm(String isShortTerm) {
+        this.isShortTerm = isShortTerm;
+    }
+
     /**
      * 是否为中短期险种
      */

@@ -183,26 +183,25 @@ public class SampleServiceImpl implements SampleService {
                     dto.setUpdateBy(username);
                     updateSampleDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
-                            .append(" 因子类型 ").append(dto.getFactorType())
-                            .append(" 久期类型 ").append(dto.getDurationType())
-                            .append(" 设计类型 ").append(dto.getDesignType())
-                            .append(" 是否中短期险种 ").append(dto.getIsShortTerm()).append(" 更新成功");
                 } else {
                     failureNum++;
+                    if (failureNum <= 10) {
+                        failureMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
+                                .append(" 因子类型 ").append(dto.getFactorType())
+                                .append(" 久期类型 ").append(dto.getDurationType())
+                                .append(" 设计类型 ").append(dto.getDesignType())
+                                .append(" 是否中短期险种 ").append(dto.getIsShortTerm()).append(" 已存在");
+                    }
+                }
+            } catch (Exception e) {
+                failureNum++;
+                if (failureNum <= 10) {
                     failureMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
                             .append(" 因子类型 ").append(dto.getFactorType())
                             .append(" 久期类型 ").append(dto.getDurationType())
                             .append(" 设计类型 ").append(dto.getDesignType())
-                            .append(" 是否中短期险种 ").append(dto.getIsShortTerm()).append(" 已存在");
+                            .append(" 是否中短期险种 ").append(dto.getIsShortTerm()).append(" 数据处理异常");
                 }
-            } catch (Exception e) {
-                failureNum++;
-                failureMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
-                        .append(" 因子类型 ").append(dto.getFactorType())
-                        .append(" 久期类型 ").append(dto.getDurationType())
-                        .append(" 设计类型 ").append(dto.getDesignType())
-                        .append(" 是否中短期险种 ").append(dto.getIsShortTerm()).append(" 数据处理异常");
                 log.error("导入折现因子数据异常", e);
             }
         }
