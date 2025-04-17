@@ -1,0 +1,10 @@
+## 开发环境
+- 操作系统：Windows 11
+- 前端框架：Vue 2.6.12 + RuoYi 3.8.2
+
+# Workspace
+- 项目根目录为D:/git/alm
+- app模块路径为D:/git/alm/app
+- web模块路径为D:/git/alm/web
+- job模块路径为D:/git/alm/job
+- docs模块路径为D:/git/alm/docs
