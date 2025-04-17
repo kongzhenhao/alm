@@ -172,12 +172,6 @@ public class SampleServiceImpl implements SampleService {
                     list.add(dto);
                     batchInsertSampleDto(list);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
-                            .append(" 因子类型 ").append(dto.getFactorType())
-                            .append(" 久期类型 ").append(dto.getDurationType())
-                            .append(" 设计类型 ").append(dto.getDesignType())
-                            .append(" 是否中短期险种 ").append(dto.getIsShortTerm())
-                            .append(" 导入成功");
                 } else if (updateSupport) {
                     dto.setId(existDto.getId());
                     dto.setUpdateBy(username);
