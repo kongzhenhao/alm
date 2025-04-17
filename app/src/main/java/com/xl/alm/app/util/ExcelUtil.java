@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,18 +67,22 @@ public class ExcelUtil<T> {
      */
     public void exportExcel(List<T> list, String sheetName, HttpServletResponse response) {
         try {
+            // 处理数据，确保每个单元格的内容不超过32767字符
+            List<T> processedList = new ArrayList<>();
+            for (T item : list) {
+                processedList.add(processLongFields(item));
+            }
+
             String fileName = URLEncoder.encode(sheetName, "UTF-8");
-            response.setContentType("application/vnd.ms-excel");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setCharacterEncoding("utf-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
 
-            ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream(), clazz).build();
-            WriteSheet writeSheet = EasyExcel.writerSheet(sheetName).build();
-            excelWriter.write(list, writeSheet);
-            excelWriter.finish();
-        } catch (IOException e) {
+            // 使用标准的EasyExcel写入方式
+            EasyExcel.write(response.getOutputStream(), clazz).sheet(sheetName).doWrite(processedList);
+        } catch (Exception e) {
             log.error("导出Excel异常", e);
-            throw new ServiceException("导出Excel失败");
+            throw new ServiceException("导出Excel失败: " + e.getMessage());
         }
     }
 
@@ -90,13 +95,19 @@ public class ExcelUtil<T> {
      */
     public void exportExcel(List<T> list, String sheetName, String filePath) {
         try {
-            ExcelWriter excelWriter = EasyExcel.write(filePath, clazz).build();
-            WriteSheet writeSheet = EasyExcel.writerSheet(sheetName).build();
-            excelWriter.write(list, writeSheet);
-            excelWriter.finish();
+            // 处理数据，确保每个单元格的内容不超过32767字符
+            List<T> processedList = new ArrayList<>();
+            for (T item : list) {
+                processedList.add(processLongFields(item));
+            }
+
+            // 使用直接写入方式
+            EasyExcel.write(filePath, clazz)
+                    .sheet(sheetName)
+                    .doWrite(processedList);
         } catch (Exception e) {
             log.error("导出Excel异常", e);
-            throw new ServiceException("导出Excel失败");
+            throw new ServiceException("导出Excel失败: " + e.getMessage());
         }
     }
 
@@ -107,6 +118,66 @@ public class ExcelUtil<T> {
      * @param str 模板名称
      */
     public void exportTemplateExcel(HttpServletResponse response, String str) {
-        exportExcel(new ArrayList<>(), str, response);
+        try {
+            // 创建一个空实例作为模板
+            T instance = clazz.newInstance();
+            List<T> templateList = new ArrayList<>();
+            templateList.add(instance);
+
+            // 导出模板
+            exportExcel(templateList, str + "模板", response);
+        } catch (Exception e) {
+            log.error("导出模板异常", e);
+            throw new ServiceException("导出模板失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理长文本字段，确保不超过Excel单元格最大长度限制
+     *
+     * @param item 原始数据项
+     * @return 处理后的数据项
+     */
+    @SuppressWarnings("unchecked")
+    private T processLongFields(T item) {
+        if (item == null) {
+            return null;
+        }
+
+        try {
+            // 创建一个新实例
+            T newItem = (T) item.getClass().newInstance();
+
+            // 获取所有字段
+            Field[] fields = item.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object value = field.get(item);
+
+                // 如果是字符串类型且不为空
+                if (value instanceof String && value != null) {
+                    String strValue = (String) value;
+
+                    // 如果超过32767字符（Excel单元格限制）
+                    if (strValue.length() > 32767) {
+                        // 截断并添加提示
+                        String truncated = strValue.substring(0, 32700) + "... (内容过长已截断)";
+                        field.set(newItem, truncated);
+                    } else {
+                        field.set(newItem, value);
+                    }
+                } else {
+                    // 非字符串类型直接复制
+                    field.set(newItem, value);
+                }
+            }
+
+            return newItem;
+        } catch (Exception e) {
+            log.error("处理长文本字段异常", e);
+            // 如果处理失败，返回原始项
+            return item;
+        }
     }
 }
