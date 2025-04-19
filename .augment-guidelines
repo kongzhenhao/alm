@@ -1,7 +1,8 @@
 ## 开发环境
 - 操作系统：Windows 11
-- Java SDK 1.8
+- 开发语言：Java SDK 1.8
 - 前端框架：Vue 2.6.12 + RuoYi 3.8.2
+- Java框架：Spring Boot 2.7.18
 
 # Workspace
 - 项目根目录为D:/git/alm
