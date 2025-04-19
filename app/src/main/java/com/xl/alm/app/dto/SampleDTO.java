@@ -1,8 +1,7 @@
 package com.xl.alm.app.dto;
 
+import com.jd.lightning.common.core.domain.BaseDTO;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * 折现因子DTO
@@ -10,10 +9,7 @@ import java.util.Date;
  * @author AI Assistant
  */
 @Data
-public class SampleDTO {
-
-    private Long id;
-
+public class SampleDTO extends BaseDTO {
     /**
      * 账期，格式YYYYMM
      */
@@ -51,27 +47,6 @@ public class SampleDTO {
      * 因子值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}
      */
     private String factorValSet;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
-
     /**
      * 是否删除，0：否，1：是
      */
