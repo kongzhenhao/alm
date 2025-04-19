@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_liability_cash_flow` (
   `insurance_sub_type` varchar(50) NOT NULL COMMENT '险种细类',
   `cash_val_set` varchar(65535) NOT NULL COMMENT '现金流值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `cash_flow_type`, `duration_type`, `design_type`, `is_short_term`, `actuarial_code`)
@@ -31,7 +33,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_discount_curve` (
   `duration_type` char(2) NOT NULL COMMENT '久期类型,01:修正久期,02:有效久期',
   `curve_val_set` varchar(65535) NOT NULL COMMENT '曲线值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `curve_type`, `duration_type`)
@@ -45,7 +49,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_discount_factor` (
   `duration_type` char(2) NOT NULL COMMENT '久期类型,01:修正久期,02:有效久期',
   `factor_val_set` varchar(65535) NOT NULL COMMENT '因子值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `factor_type`, `duration_type`)
@@ -62,7 +68,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_liability_cash_flow_summary` (
   `cash_val_set` varchar(65535) NOT NULL COMMENT '现金流值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `present_cash_val_set` varchar(65535) NOT NULL COMMENT '现金流现值值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `cash_flow_type`, `duration_type`, `design_type`, `is_short_term`)
@@ -78,7 +86,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_liability_duration_summary` (
   `is_short_term` char(1) NOT NULL DEFAULT 'N' COMMENT '是否为中短期险种',
   `duration_val_set` varchar(65535) NOT NULL COMMENT '久期值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `cash_flow_type`, `duration_type`, `design_type`, `is_short_term`)
@@ -93,7 +103,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_sub_account_liability_present_value` (
   `design_type` varchar(50) NOT NULL COMMENT '设计类型',
   `present_cash_val_set` varchar(65535) NOT NULL COMMENT '现金流现值值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `cash_flow_type`, `duration_type`, `design_type`)
@@ -108,7 +120,9 @@ CREATE TABLE IF NOT EXISTS `t_dur_sub_account_liability_duration` (
   `design_type` varchar(50) NOT NULL COMMENT '设计类型',
   `duration_val_set` varchar(65535) NOT NULL COMMENT '久期值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
   `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`account_period`, `cash_flow_type`, `duration_type`, `design_type`)
