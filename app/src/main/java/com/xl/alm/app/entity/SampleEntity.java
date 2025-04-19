@@ -12,6 +12,7 @@ import java.util.Date;
  */
 @Data
 public class SampleEntity extends BaseEntity {
+    private Long id;
     /**
      * 账期，格式YYYYMM
      */

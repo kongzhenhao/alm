@@ -10,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class SampleDTO extends BaseDTO {
+    private Long id;
     /**
      * 账期，格式YYYYMM
      */
