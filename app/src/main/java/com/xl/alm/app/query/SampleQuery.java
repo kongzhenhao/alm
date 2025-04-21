@@ -13,6 +13,7 @@ import java.util.Date;
  */
 @Data
 public class SampleQuery extends BaseQuery {
+    private Long id;
     /**
      * 账期，格式YYYYMM
      */
