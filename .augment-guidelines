@@ -12,11 +12,6 @@
 - docs模块路径：D:/git/alm/docs
 
 # 通用规范
-- 创建代码文件时文件名使用驼峰格式，首字母小写
-    - 正确示例：liabilityCashFlow
-    - 错误示例：liability_Cash_Flow
-    - 错误示例：LiabilityCashFlow
-- 生成代码时再次检查，避免漏生成代码
 - *Controller的@RequestMapping注解路径要用`模块名`+小写类名前缀*部分作为路径，多个单词间用斜杠(/)分隔
     - 正确示例：类名LiabilityCashFlowController，@RequestMapping路径为/dur/liability/cash/flow，这里dur为模块名
     - 错误示例：/dur/liability-cash-flow
@@ -25,7 +20,4 @@
     - 正确示例：由类名LiabilityCashFlowController生成`web/src/views/dur/liability/cash/flow/index.vue`目录和文件名，这里dur是模块，index是vue文件名
     - 错误示例：web/src/views/dur/LiabilityCashFlow.vue
     - 错误示例：web/src/views/liability-cash-flow.vue
-- Controller方法返回类型使用com.jd.lightning.common.core.domain.Result
-
-# Agent执行
-- Agent给出的计划使用默认设置自动执行
+- Controller方法返回类型必须使用com.jd.lightning.common.core.domain.Result
