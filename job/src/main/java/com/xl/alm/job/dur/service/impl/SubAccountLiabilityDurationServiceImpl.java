@@ -1,7 +1,5 @@
 package com.xl.alm.job.dur.service.impl;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
 import com.xl.alm.job.dur.entity.LiabilityDurationSummaryEntity;
 import com.xl.alm.job.dur.entity.SubAccountLiabilityDurationEntity;
@@ -13,16 +11,16 @@ import com.xl.alm.job.dur.mapper.SubAccountLiabilityPresentValueMapper;
 import com.xl.alm.job.dur.service.SubAccountLiabilityDurationService;
 import com.xl.alm.job.dur.util.ValueSetUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
-import org.apache.commons.math3.linear.FieldMatrix;
-import org.apache.commons.math3.util.BigReal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 分账户负债久期汇总服务实现类

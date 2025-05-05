@@ -42,7 +42,6 @@ public class SubAccountLiabilityDurationServiceTest {
         assertNotNull(queryResult);
         assertEquals(dto.getAccountPeriod(), queryResult.getAccountPeriod());
         assertEquals(dto.getCashFlowType(), queryResult.getCashFlowType());
-        assertEquals(dto.getBpType(), queryResult.getBpType());
         assertEquals(dto.getDurationType(), queryResult.getDurationType());
         assertEquals(dto.getDesignType(), queryResult.getDesignType());
         assertEquals(dto.getDurationValSet(), queryResult.getDurationValSet());
@@ -63,7 +62,7 @@ public class SubAccountLiabilityDurationServiceTest {
         
         // 条件查询
         SubAccountLiabilityDurationDTO queryResult = subAccountLiabilityDurationService.selectSubAccountLiabilityDurationDtoByCondition(
-                dto.getAccountPeriod(), dto.getCashFlowType(), dto.getBpType(), dto.getDurationType(), dto.getDesignType());
+                dto.getAccountPeriod(), dto.getCashFlowType(), dto.getDurationType(), dto.getDesignType());
         assertNotNull(queryResult);
         assertEquals(dto.getAccountPeriod(), queryResult.getAccountPeriod());
     }
@@ -147,7 +146,6 @@ public class SubAccountLiabilityDurationServiceTest {
         SubAccountLiabilityDurationDTO dto = new SubAccountLiabilityDurationDTO();
         dto.setAccountPeriod("202301");
         dto.setCashFlowType("01");
-        dto.setBpType("01");
         dto.setDurationType("01");
         dto.setDesignType("测试设计类型");
         dto.setDurationValSet("{\"1\":{\"date\":\"2025-01-01\",\"val\":0.25},\"2\":{\"date\":\"2025-01-02\",\"val\":0.35}}");
