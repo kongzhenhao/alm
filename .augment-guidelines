@@ -21,3 +21,6 @@
     - 错误示例：web/src/views/dur/LiabilityCashFlow.vue
     - 错误示例：web/src/views/liability-cash-flow.vue
 - Controller方法返回类型必须使用com.jd.lightning.common.core.domain.Result
+
+# 输出语言
+- 输出语言为中文

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.DiscountFactorMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.DiscountFactorEntity" id="DiscountFactorEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="factorType" column="factor_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="factorValSet" column="factor_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectDiscountFactorEntityVo">
+        select id, account_period, factor_type, bp_type, duration_type, factor_val_set, 
+               create_time, create_by, update_time, update_by, is_del
+        from t_dur_discount_factor
+    </sql>
+
+    <!-- 查询折现因子列表 -->
+    <select id="selectDiscountFactorEntityListByPeriod" parameterType="String" resultMap="DiscountFactorEntityResult">
+        <include refid="selectDiscountFactorEntityVo"/>
+        where account_period = #{accountPeriod} and is_del = 0
+    </select>
+
+    <!-- 根据账期、因子类型、基点类型和久期类型查询折现因子 -->
+    <select id="selectDiscountFactorEntityByCondition" resultMap="DiscountFactorEntityResult">
+        <include refid="selectDiscountFactorEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            and factor_type = #{factorType}
+            and bp_type = #{bpType}
+            and duration_type = #{durationType}
+            and is_del = 0
+        </where>
+    </select>
+</mapper>

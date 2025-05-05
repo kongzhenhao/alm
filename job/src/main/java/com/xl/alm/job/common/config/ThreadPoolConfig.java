@@ -11,9 +11,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 @Configuration
 public class ThreadPoolConfig {
-    //定义线程池
+    // 定义线程池
     @Bean("customThreadPool")
-    public Executor customThreadPool(){
+    public Executor customThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         /** 核心线程数（默认线程数） */
         executor.setCorePoolSize(100);
@@ -26,7 +26,7 @@ public class ThreadPoolConfig {
         executor.setWaitForTasksToCompleteOnShutdown(true);
         /** 线程池名前缀 */
         executor.setThreadNamePrefix("custom-task-thread-");
-        //拒绝策略：缓存队列满了之后由调用线程处理，一般是主线程
+        // 拒绝策略：缓存队列满了之后由调用线程处理，一般是主线程
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         executor.initialize();
         return executor;

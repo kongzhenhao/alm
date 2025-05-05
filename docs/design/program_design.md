@@ -98,7 +98,7 @@ erDiagram
 | 字段名             | 数据类型 | 长度  | 允许空 | 唯一索引 | 默认值 | 说明                                                         |
 | ------------------ | -------- | ----- | ------ | -------- | ------ | ------------------------------------------------------------ |
 | **account_period** | varchar  | 6     | 否     | 是       | 无     | 账期,格式YYYYMM                                             |
-| **curve_type**     | char     | 2     | 否     | 是       | 无     | 曲线类型,01:中档,02:低档                                     |
+| **curve_type**     | char     | 2     | 否     | 是       | 无     | 曲线类型,02:中档,01:低档                                     |
 | **bp_type**         | char     | 2     | 否     | 是       | 无     | 基点类型,01:+50bp,02:-50bp,03:0bp  |
 | **duration_type**  | char     | 2     | 否     | 是       | 无     | 久期类型,01:修正久期,02:有效久期                             |
 | curve_val_set      | varchar  | 65535 | 否     | 否       | 无     | 曲线值集,分为1273项,格式{"0":{"date":"2025-01-01","value":0.25},"1":{"date":"2025-01-02","value":0.35},...,"1272":{"date":"2025-12-01","value":0.15}} |
@@ -108,7 +108,7 @@ erDiagram
 | 字段名                | 数据类型 | 长度 | 允许空 | 唯一索引 | 默认值            | 说明                     |
 | --------------------- | -------- | ---- | ------ | ---- | ----------------- | ------------------------ |
 | **account_period**    | varchar  | 6    | 否     | 是  | 无                | 账期,格式YYYYMM         |
-| **factor_type**     | char  | 2  | 否     | 是  | 无                | 因子类型,01:中档,02:低档 |
+| **factor_type**     | char  | 2  | 否     | 是  | 无                | 因子类型,02:中档,01:低档 |
 | **bp_type**         | char     | 2     | 否     | 是       | 无     | 基点类型,01:+50bp,02:-50bp,03:0bp  |
 | **duration_type** | char | 2 | 否 | 是 | 无 | 久期类型,01:修正久期,02:有效久期 |
 | factor_val_set | varchar | 65535 | 否     | 否   | 无                | 因子值集,分为1273项,格式{"0":{"date":"2025-01-01","value":0.25},"1":{"date":"2025-01-02","value":0.35},...,"1272":{"date":"2025-12-01","value":0.15}} |
@@ -435,64 +435,6 @@ flowchart TD
 ```
 
 ##### 4.1.3.1.3 用例描述
-##### 4.1.3.1.3.1 导入负债现金流数据(UC0001)
-
-|   用例标识   | 用例描述             |
-| :----------: | ------------------ |
-| 类型 | 服务 |
-|   用例名称   | 导入负债现金流数据                     |
-|   功能描述   | 导入负债现金流数据 |
-|    参与者    | 资产管理部人员     |
-|    原型图    | PT0001             |
-|    关联表    | TB0001             |
-|    前置用例    | |
-```mermaid
-flowchart TD
-    A[用户点击负债现金流菜单,跳转至负债现金流列表页] --> B[点击导入按钮,弹出导入窗口页]
-    B --> C[下载Excel模板]
-    C --> D[基于Excel模板填写待导入数据]
-    D --> E[点击导入按钮,选择对应Excel文件点确认]
-    E --> F[页面调用IF0001接口上传Excel内容]
-    F --> G[导入完成后,列表页显示导入记录信息]
-```
-##### 4.1.3.1.3.2 导入折现曲线数据(UC0002)
-|   用例标识   | 用例描述             |
-| :----------: | ------------------------------------ |
-| 类型 | 服务 |
-|   用例名称   | 导入折现曲线数据                     |
-|   功能描述   | 导入折现曲线数据 |
-|    参与者    | 资产管理部人员                       |
-|    原型图    | PT0002                               |
-|    关联表    | TB0002                               |
-|    前置用例    | |
-```mermaid
-flowchart TD
-    A[用户点击折现曲线菜单,跳转至折现曲线列表页] --> B[点击导入按钮,弹出导入窗口页]
-    B --> C[下载Excel模板]
-    C --> D[基于Excel模板填写待导入数据]
-    D --> E[点击导入按钮,选择对应Excel文件点确认]
-    E --> F[页面调用IF0002接口上传Excel内容]
-    F --> G[导入完成后,列表页显示导入记录信息]
-```
-##### 4.1.3.1.3.3 导入折现因子数据(UC0003)
-|   用例标识   | 用例描述             |
-| :----------: | ------------------------------------ |
-| 类型 | 服务 |
-|   用例名称   | 导入折现因子数据                     |
-|   功能描述   | 导入折现因子数据 |
-|    参与者    | 资产管理部人员                       |
-|    原型图    | PT0003                               |
-|    关联表    | TB0003                               |
-|    前置用例    | |
-```mermaid
-flowchart TD
-    A[用户点击折现因子菜单,跳转至折现因子列表页] --> B[点击导入按钮,弹出导入窗口页]
-    B --> C[下载Excel模板]
-    C --> D[基于Excel模板填写待导入数据]
-    D --> E[点击导入按钮,选择对应Excel文件点确认]
-    E --> F[页面调用IF0003接口上传Excel内容]
-    F --> G[导入完成后,列表页显示导入记录信息]
-```
 ##### 4.1.3.1.3.4 负债现金流汇总及现值计算(UC0005)
 |   用例标识   | 用例描述             |
 | :----------: | ------------------------------------ |
@@ -521,25 +463,17 @@ flowchart TD
 定义:
 cash[i]代表现金流valueMap中value的第i个序号对应的value值
 fac[j]是因子HashMap中value的第j个序号对应的值,提取现金流valueMap的key的account_period,cash_flow_type,bp_type,duration_type信息,其中cash_flow_type转为factor_type查询因子HashMap并找到对应的value信息,factor_type设置值的逻辑如下:
-- design_type为"传统险","分红险","万能险"同时is_short_term为Y时factor_type为02
-- design_type为"万能险"同时is_short_term为N时factor_type为02
-- 其他情况factor_type为01
+- design_type为"传统险","分红险","万能险"同时is_short_term为Y时factor_type为01
+- design_type为"万能险"同时is_short_term为N时factor_type为01
+- 其他情况factor_type为02
 present_value[i]是通过cash和fac向量计算出来的现金流现值第i个序号对应的值:
-a. **present_value[0]**
-- `A` 的子向量: 全部元素 `[cash0, cash1, ..., cash1272]`
-- `B^T` 的子向量: 全部元素 `[fac0, fac1, ..., fac1272]`
-- 公式: present_value[1]=∑[j=1,1272]cash*[j]*×fac[j]
-
-b. **present_value[1]**
-- `A` 的子向量: 从第 2 个元素开始到末尾 `[cash1, cash2, ..., cash1272]`
-- `B^T` 的子向量: 从第 1 个元素开始到第 1271 个元素 `[fac1, fac2, ..., fac1271]`
-- 公式: present_value[2]=∑[j=2,1272]cash*[j]*×fac[j-1]
-
-c. **present_value[i]**（通用公式）
-- `A` 的子向量: 从第 `i` 个元素开始到末尾 `[cash_i, cash_{i+1}, ..., cash_{1272}]`
-- `B^T` 的子向量: 从第 0 个元素开始到第 `1272-i` 个元素 `[fac0, fac1, ..., fac_{1272-i}]`
-- 公式: present_value[i]=∑[j=i,1272]cash[j]×fac[j−i+1],i从0开始
-- 精度：计算过程数值的小数位留8位，四舍五入
+**present_value[i]**（通用公式）
+- 公式1(如果现金流类型为`流入`的情况): present_value[i]=∑[j=i+1,1272]cash[j]×fac[j−i-1],i从0开始至1272,最后present_value[1272]=0
+- 公式2(如果现金流类型为`流出`的情况): present_value[i]=∑[j=i,1272]cash[j]×fac[j−i],i从0开始
+- 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
+- 即使计算后的present_value[i]值小于等于0也要保存
+- 计算过程不要用Double类型,要用BigDecimal类型保证计算精度
+- present_value计算参考com.xl.alm.job.dur.BigDecimalMatrixExample类实现
 
 **步骤4.** 数据入表
 (1) 通过以上过程,把每个现金流和现金流现值记录保存到TB0005表里,其中present_cash_val_set中date数值按序号取dateMap的value值
@@ -571,21 +505,28 @@ a. 定义:
 - 现金流现值[i] = TB0005表present_cash_val_set[i].valueue
 - 折现因子[i] = 因子HashMap中value的第i个序号对应的值,提取现金流[i]的account_period,cash_flow_type,bp_type,duration_type信息,其中cash_flow_type转- 为factor_type查询因子HashMap并找到对应的value信息
 - 折现率[i] = 曲线HashMap中value的第i个序号对应的值,提取现金流[i]的account_period,cash_flow_type,bp_type,duration_type信息,其中cash_flow_type转为factor_type查询因子HashMap并找到对应的value信息
-- duration_value[i] = 现金流金额[i] * 折现因子[i] * (i/12) /(1+折现率[i])/现金流现值[i]
+- 公式1(cash_flow_type为01,即`流入`时)：duration_value[i]=(∑[j=i+1,1272]现金流金额[j]*折现因子[j-i-1]*(j-1/12) /(1+折现率[j-i-1]))/现金流现值[i],i从0开始至1272,最后duration_value[1272]=0,如果现金流现值[i]为0,则duration_value[i]为0
+- 公式2(cash_flow_type为02,即`流出`时)：duration_value[i]=(∑[j=i,1272]现金流金额[j]*折现因子[j-i]*(j/12) /(1+折现率[j-i]))/现金流现值[i],i从0开始至1272,如果现金流现值[i]为0,则duration_value[i]为0
 - 久期值值集,格式为{"0":{"date":现金流汇记录的cash_val_set[0].date,"value":duration_value[0]},"1":{"date":现金流汇记录的cash_val_set[1].date,"value":duration_value[1]},...,"1272":{"date":现金流汇记录的cash_val_set[1272].date,"value":duration_value[1272]}}
-- 精度：计算过程数值的小数位留8位，四舍五入
+- 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
+- 即使计算后的duration_value[i]值小于等于0也要保存
+- 计算过程不要用Double类型,要用BigDecimal类型保证计算精度
+- duration_value计算参考com.xl.alm.job.dur.BigDecimalMatrixExample类实现
 
-b. 久期数据入库：
+b. 修正久期数据入库：
 - 负债久期其他字段来自现金流汇总信息，同时久期值值集写入此久期实体
 - 所有记录遍历完成后,所有久期记录写入TB0007表
 
-(2) 按账期读取TB0005表duration_type为有效久期的数据,通过以下步骤计算出久期值值集
-a. 找到基点类型为"+50bp","-50bp","0bp"的记录,分别标记为A,B,C,然后按以下公式进行计算久期值
-- 公式: duration_value[i] = (A.present_cash_val_set[i].value - B.present_cash_val_set[i].value)/0.01/C.present_cash_val_set[i].value
+(2) 计算有效久期
+- 按账期读取TB0005表duration_type为有效久期,bp_type为+50bp的记录,数据集标注为A
+- 按账期读取TB0005表duration_type为有效久期,bp_type为-50bp的记录,数据集标注为B
+- 按账期读取TB0005表duration_type为修正久期,bp_type为0bp的记录,数据集标注为C
+- A数据集,B数据集与C数据集通过cash_flow_type,design_type,is_short_term字段进行关联,形成一张表数据
+- 公式: duration_value[i]=(B.present_cash_val_set[i].value-A.present_cash_val_set[i].value)/0.01/C.present_cash_val_set[i].value,i从0开始至1272
 - 久期值值集,格式为{"0":{"date":现金流汇记录的cash_val_set[0].date,"value":duration_value[0]},"1":{"date":现金流汇记录的cash_val_set[1].date,"value":duration_value[1]},...,"1272":{"date":现金流汇记录的cash_val_set[1272].date,"value":duration_value[1272]}}
-- 精度：计算过程数值的小数位留8位，四舍五入
+- 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
 
-b. 久期数据入库
+b. 有效久期数据入库
 负债久期其他字段来自现金流汇总信息，同时久期值值集写入此久期实体
 所有记录遍历完成后,所有久期记录写入TB0007表
 
@@ -609,6 +550,8 @@ b. 久期数据入库
 (3) 所有记录遍历汇总完成后,数据写入TB0008表
 - 负债现金流现值汇总值集,格式为{"0":{"date":dateMap[0].value,"value":valueMap[0].value},"0":{"date":dateMap[0].value,"value":valueMap[0].value},...,"1272":{"date":dateMap[1272].value,"value":valueMap[1272].value}}
 - 负债现金流现值汇总的account_period,cash_flow_type,bp_type,duration_type,design_type信息从valueMap的key中提取
+- 即使计算后的valueMap[i]值小于等于0也要保存
+- 计算过程不要用Double类型,要用BigDecimal类型保证计算精度
 - 最后写入TB0008表
 
 ##### 4.1.3.1.3.7 分账户负债久期汇总(UC0008)
@@ -624,18 +567,29 @@ b. 久期数据入库
 | 前置用例 | UC0006             |
 
 **步骤1.** 修正久期汇总
+
 (1) 按account_period=传入参数,cash_flow_type,duration_type=01,design_type,is_short_term作为关联条件，关联TB0005和TB0007表查出TB0005表的present_cash_val_set和TB0007表的duration_val_set字段信息
+
 (2) 查出来的数据记录按is_short_term类型分别存储到2个Map中,Y类型放到shortTermMap(key为cash_flow_type|duration_type,value为数据记录),N类型放到noneShortTermMap(key为cash_flow_type|duration_type,value为数据记录)
+
 (3) 遍历shortTermMap，从shortTermMap和noneShortTermMap中按对应key分别取出数据记录，其中从shortTermMap提取的记录记为A,从noneShortTermMap中提取的记录记为B，并按以下公式计算出修正久期汇总值值集
 - 公式：duration_summary_value[i] = ((A.present_cash_val_set[i].value * A.duration_val_set[i].value) + (B.present_cash_val_set[i].value * B.duration_val_set[i].value)) / (A.present_cash_val_set[i].value + B.present_cash_val_set[i].value)
 - 久期汇总值值集,格式为{"0":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[0]},"1":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[1]},...,"1272":{"date":A.present_cash_val_set[1272].date,"value":duration_summary_value[1272]}}
-- 精度：计算过程数值的小数位留8位，四舍五入
+- 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
+- 即使计算后的duration_summary_value[i]值小于等于0也要保存
+- 计算过程不要用Double类型,要用BigDecimal类型保证计算精度
+
 (4) 所有记录遍历汇总完成后,数据写入TB0009表
 
 **步骤2.** 有效久期汇总
+
 (1) 按账期读取TB0008表duration_type为有效久期的数据,通过以下步骤计算出久期汇总值值集
+
 a. 找到基点类型为"+50bp","-50bp","0bp"的记录,分别标记为A,B,C,然后按以下公式进行计算久期汇总值
 - 公式: duration_summary_value[i] = (A.present_cash_val_set[i].value - B.present_cash_val_set[i].value)/0.01/C.present_cash_val_set[i].value
 - 久期汇总值值集,格式为{"0":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[0]},"1":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[1]},...,"1272":{"date":A.present_cash_val_set[1272].date,"value":duration_summary_value[1272]}}
-- 精度：计算过程数值的小数位留8位，四舍五入
+- 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
+- 即使计算后的duration_summary_value[i]值小于等于0也要保存
+- 计算过程不要用Double类型,要用BigDecimal类型保证计算精度
+
 (2) 所有记录遍历汇总完成后,数据写入TB0009表

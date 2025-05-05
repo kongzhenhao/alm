@@ -17,7 +17,7 @@ swagger:
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*Mapper.xml, classpath*:mapper/*Mapper.xml
   #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: com.xl.alm.job.*.entity
+  typeAliasesPackage: com.xl.alm.job.*.entity,com.xl.alm.job.*.dto
   global-config:
     db-config:
       id-type: AUTO

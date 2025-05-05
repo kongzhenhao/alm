@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.LiabilityCashFlowMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.LiabilityCashFlowEntity" id="LiabilityCashFlowEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="isShortTerm" column="is_short_term"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="insuranceMainType" column="insurance_main_type"/>
+        <result property="insuranceSubType" column="insurance_sub_type"/>
+        <result property="cashValSet" column="cash_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectLiabilityCashFlowEntityVo">
+        select id, account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term, 
+               actuarial_code, business_code, product_name, insurance_main_type, insurance_sub_type,
+               cash_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_liability_cash_flow
+    </sql>
+
+    <!-- 查询负债现金流列表 -->
+    <select id="selectLiabilityCashFlowEntityListByPeriod" parameterType="String" resultMap="LiabilityCashFlowEntityResult">
+        <include refid="selectLiabilityCashFlowEntityVo"/>
+        where account_period = #{accountPeriod} and is_del = 0
+    </select>
+
+    <!-- 根据账期、现金流类型、基点类型、久期类型查询负债现金流列表 -->
+    <select id="selectLiabilityCashFlowEntityListByCondition" resultMap="LiabilityCashFlowEntityResult">
+        <include refid="selectLiabilityCashFlowEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            <if test="cashFlowType != null and cashFlowType != ''">
+                and cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="bpType != null and bpType != ''">
+                and bp_type = #{bpType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                and duration_type = #{durationType}
+            </if>
+            and is_del = 0
+        </where>
+    </select>
+</mapper>
