@@ -203,13 +203,9 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="久期值集" prop="durationValSet">
-              <duration-value-set v-model="form.durationValSet" @change="handleDurationValSetChange" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <el-form-item label="久期值集" prop="durationValSet">
+          <el-input v-model="form.durationValSet" type="textarea" placeholder="请输入久期值集" :rows="10" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -271,11 +267,9 @@ import {
   importSubAccountLiabilityDuration
 } from "@/api/dur/sub/account/liability/duration";
 import { getToken } from "@/utils/auth";
-import DurationValueSet from "@/components/DurationValueSet";
 
 export default {
   name: "SubAccountLiabilityDuration",
-  components: { DurationValueSet },
   dicts: ['dur_cash_flow_type', 'dur_duration_type'],
   data() {
     return {
@@ -481,10 +475,7 @@ export default {
     submitFileForm() {
       this.$refs.upload.submit();
     },
-    // 处理久期值集变更
-    handleDurationValSetChange(val) {
-      this.form.durationValSet = val;
-    },
+
     /** 查看久期值集按钮操作 */
     handleViewDurationValSet(row) {
       try {
