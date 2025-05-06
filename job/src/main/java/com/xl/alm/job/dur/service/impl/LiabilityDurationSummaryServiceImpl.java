@@ -1,5 +1,6 @@
 package com.xl.alm.job.dur.service.impl;
 
+import com.xl.alm.job.dur.constant.CalculationConstant;
 import com.xl.alm.job.dur.entity.DiscountCurveEntity;
 import com.xl.alm.job.dur.entity.DiscountFactorEntity;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
@@ -9,12 +10,9 @@ import com.xl.alm.job.dur.mapper.DiscountFactorMapper;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowSummaryMapper;
 import com.xl.alm.job.dur.mapper.LiabilityDurationSummaryMapper;
 import com.xl.alm.job.dur.service.LiabilityDurationSummaryService;
-import com.xl.alm.job.dur.util.BigDecimalUtil;
 import com.xl.alm.job.dur.util.ValueSetUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
 import org.apache.commons.math3.linear.ArrayFieldVector;
-import org.apache.commons.math3.linear.FieldMatrix;
 import org.apache.commons.math3.linear.FieldVector;
 import org.apache.commons.math3.util.BigReal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 负债久期计算服务实现类
@@ -34,17 +35,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSummaryService {
-
-    /**
-     * 计算精度 - 小数位数
-     */
-    private static final int SCALE = 8;
-
-    /**
-     * 计算过程中的精度 - 小数位数
-     */
-    private static final int CALCULATION_SCALE = 16;
-
     /**
      * 基点差值 0.01 (1%)
      */
@@ -211,14 +201,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
             Map<Integer, BigDecimal> cashFlowValueMap = ValueSetUtil.parseValueMap(cashFlowSummary.getCashValSet());
             Map<Integer, BigDecimal> presentCashValueMap = ValueSetUtil.parseValueMap(cashFlowSummary.getPresentCashValSet());
             Map<Integer, String> dateMap = ValueSetUtil.parseDateMap(cashFlowSummary.getCashValSet());
-
-            if (cashFlowSummary.getCashFlowType().equals("01")
-            && cashFlowSummary.getBpType().equals("03")
-            && cashFlowSummary.getDurationType().equals("01")
-            && cashFlowSummary.getDesignType().equals("传统险")
-            && cashFlowSummary.getIsShortTerm().equals("N")) {
-                log.info("aaaaaaa");
-            }
 
             // 获取折现因子和折现率
             String factorType = determineFactorType(cashFlowSummary.getDesignType(), cashFlowSummary.getIsShortTerm());
@@ -429,7 +411,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
         BigDecimal sum = calculateVectorSum(resultVector);
 
         // 计算最终的久期值
-        BigDecimal durationValue = sum.divide(presentCashValue, SCALE, RoundingMode.HALF_UP);
+        BigDecimal durationValue = sum.divide(presentCashValue, CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
         log.debug("计算得到的久期值: {}", durationValue);
 
         return durationValue;
@@ -606,7 +588,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
             // 计算久期值: (B-A)/(C*0.01)
             BigDecimal durationValue = diffValue.divide(cValue.multiply(new BigReal(BP_DIFF)))
                 .bigDecimalValue()
-                .setScale(SCALE, RoundingMode.HALF_UP);
+                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
 
             durationValueMap.put(i, durationValue);
         }

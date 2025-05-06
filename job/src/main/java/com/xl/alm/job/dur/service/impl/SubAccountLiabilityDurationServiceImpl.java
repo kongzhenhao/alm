@@ -1,5 +1,6 @@
 package com.xl.alm.job.dur.service.impl;
 
+import com.xl.alm.job.dur.constant.CalculationConstant;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
 import com.xl.alm.job.dur.entity.LiabilityDurationSummaryEntity;
 import com.xl.alm.job.dur.entity.SubAccountLiabilityDurationEntity;
@@ -42,16 +43,6 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
 
     @Autowired
     private SubAccountLiabilityPresentValueMapper subAccountLiabilityPresentValueMapper;
-
-    /**
-     * 计算精度 - 小数位数
-     */
-    private static final int SCALE = 8;
-
-    /**
-     * 计算过程中的精度 - 小数位数
-     */
-    private static final int CALCULATION_SCALE = 16;
 
     /**
      * 基点差值 0.01 (1%)
@@ -208,8 +199,8 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
                                 .add(nonShortTermPresentValue.multiply(nonShortTermDurationValue));
 
                         // 计算汇总久期值
-                        durationSummaryValue = numerator.divide(denominator, CALCULATION_SCALE, RoundingMode.HALF_UP)
-                                .setScale(SCALE, RoundingMode.HALF_UP);
+                        durationSummaryValue = numerator.divide(denominator, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
+                                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
                     }
 
                     durationSummaryValueMap.put(i, durationSummaryValue);
@@ -253,7 +244,7 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
             // 步骤1: 按账期读取TB0008表duration_type为有效久期的数据
             // 查询分账户负债现金流现值汇总表数据（TB0008）
             List<SubAccountLiabilityPresentValueEntity> presentValueEntities = subAccountLiabilityPresentValueMapper
-                    .selectSubAccountLiabilityPresentValueEntityListByCondition(accountPeriod, null, null, "02", null);
+                    .selectSubAccountLiabilityPresentValueEntityListByCondition(accountPeriod, null, null, null, null);
 
             if (presentValueEntities == null || presentValueEntities.isEmpty()) {
                 log.warn("未找到账期{}的分账户负债现金流现值汇总数据", accountPeriod);
@@ -310,13 +301,13 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
 
                     // 如果0bp的现值不为0，计算有效久期
                     if (presentValueC.compareTo(BigDecimal.ZERO) != 0) {
-                        // 计算分子：+50bp的现值 - -50bp的现值
-                        BigDecimal numerator = presentValueA.subtract(presentValueB);
+                        // 计算分子：-50bp的现值 - +50bp的现值
+                        BigDecimal numerator = presentValueB.subtract(presentValueA);
 
                         // 计算有效久期值：分子 / 0.01 / 0bp的现值
-                        durationSummaryValue = numerator.divide(BP_DIFF, CALCULATION_SCALE, RoundingMode.HALF_UP)
-                                .divide(presentValueC, CALCULATION_SCALE, RoundingMode.HALF_UP)
-                                .setScale(SCALE, RoundingMode.HALF_UP);
+                        durationSummaryValue = numerator.divide(BP_DIFF, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
+                                .divide(presentValueC, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
+                                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
                     }
 
                     durationSummaryValueMap.put(i, durationSummaryValue);

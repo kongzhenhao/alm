@@ -1,5 +1,6 @@
 package com.xl.alm.job.dur.service.impl;
 
+import com.xl.alm.job.dur.constant.CalculationConstant;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
 import com.xl.alm.job.dur.entity.SubAccountLiabilityPresentValueEntity;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowSummaryMapper;
@@ -29,17 +30,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLiabilityPresentValueService {
-
-    /**
-     * 计算精度 - 小数位数
-     */
-    private static final int SCALE = 8;
-
-    /**
-     * 计算过程中的精度 - 小数位数
-     */
-    private static final int CALCULATION_SCALE = 16;
-
     /**
      * 高精度计算上下文
      */
@@ -188,7 +178,7 @@ public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLia
             BigReal value = vector.getEntry(i);
 
             // 将处理后的值转回BigDecimal并保存
-            processedValueMap.put(index, value.bigDecimalValue().setScale(SCALE, RoundingMode.HALF_UP));
+            processedValueMap.put(index, value.bigDecimalValue().setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP));
         }
 
         return processedValueMap;

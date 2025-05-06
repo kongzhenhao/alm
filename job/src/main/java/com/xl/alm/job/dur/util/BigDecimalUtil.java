@@ -1,5 +1,7 @@
 package com.xl.alm.job.dur.util;
 
+import com.xl.alm.job.dur.constant.CalculationConstant;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -9,9 +11,6 @@ import java.math.RoundingMode;
  * @author AI Assistant
  */
 public class BigDecimalUtil {
-
-    private static final int DEFAULT_SCALE = 8; // 默认精度：小数位留8位，四舍五入
-
     /**
      * 加法
      *
@@ -68,7 +67,7 @@ public class BigDecimalUtil {
      * @return 商
      */
     public static BigDecimal divide(BigDecimal a, BigDecimal b) {
-        return divide(a, b, DEFAULT_SCALE);
+        return divide(a, b, CalculationConstant.CALCULATION_RESULT_SCALE);
     }
 
     /**
@@ -96,7 +95,7 @@ public class BigDecimalUtil {
      * @return 设置精度后的值
      */
     public static BigDecimal setScale(BigDecimal value) {
-        return setScale(value, DEFAULT_SCALE);
+        return setScale(value, CalculationConstant.CALCULATION_RESULT_SCALE);
     }
 
     /**
