@@ -8,11 +8,7 @@ import com.xl.alm.job.dur.mapper.SubAccountLiabilityPresentValueMapper;
 import com.xl.alm.job.dur.service.SubAccountLiabilityPresentValueService;
 import com.xl.alm.job.dur.util.ValueSetUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
-import org.apache.commons.math3.linear.ArrayFieldVector;
-import org.apache.commons.math3.linear.FieldMatrix;
-import org.apache.commons.math3.linear.FieldVector;
-import org.apache.commons.math3.util.BigReal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +26,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLiabilityPresentValueService {
-    /**
-     * 高精度计算上下文
-     */
-    private static final MathContext HIGH_PRECISION_CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
-
     @Autowired
     private LiabilityCashFlowSummaryMapper liabilityCashFlowSummaryMapper;
 
@@ -103,8 +94,7 @@ public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLia
 
             if (valueMapByKey.containsKey(key)) {
                 // 如果已存在相同key的记录，累加值
-                Map<Integer, BigDecimal> existingValueMap = valueMapByKey.get(key);
-                valueMapByKey.put(key, ValueSetUtil.mergeValueMaps(existingValueMap, valueMap));
+                valueMapByKey.compute(key, (k, existingValueMap) -> ValueSetUtil.mergeValueMaps(existingValueMap, valueMap));
             } else {
                 // 否则，添加新记录
                 valueMapByKey.put(key, valueMap);
@@ -145,7 +135,7 @@ public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLia
     }
 
     /**
-     * 使用BigDecimal矩阵操作处理现金流现值
+     * 处理现金流现值
      *
      * @param valueMap 现金流现值Map
      * @return 处理后的现金流现值Map
@@ -161,24 +151,10 @@ public class SubAccountLiabilityPresentValueServiceImpl implements SubAccountLia
             return processedValueMap;
         }
 
-        // 创建BigReal数组
-        BigReal[] valueArray = new BigReal[validIndices.size()];
-        for (int i = 0; i < validIndices.size(); i++) {
-            int index = validIndices.get(i);
+        // 直接复制值到新的Map
+        for (int index : validIndices) {
             BigDecimal value = valueMap.getOrDefault(index, BigDecimal.ZERO);
-            valueArray[i] = new BigReal(value);
-        }
-
-        // 创建向量
-        FieldVector<BigReal> vector = new ArrayFieldVector<>(valueArray);
-
-        // 对每个有效索引处理现金流现值
-        for (int i = 0; i < validIndices.size(); i++) {
-            int index = validIndices.get(i);
-            BigReal value = vector.getEntry(i);
-
-            // 将处理后的值转回BigDecimal并保存
-            processedValueMap.put(index, value.bigDecimalValue().setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP));
+            processedValueMap.put(index, value);
         }
 
         return processedValueMap;

@@ -43,7 +43,7 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
     private SubAccountLiabilityDurationTask subAccountLiabilityDurationTask;
 
     @Override
-    public ProcessResult process(TaskContext taskContext) throws Exception {
+    public ProcessResult process(TaskContext taskContext) {
         log.info("负债计算处理器开始执行，任务参数：{}", taskContext.getJobParams());
         
         try {
@@ -101,14 +101,14 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
         }
     }
 
-    @PostConstruct
-    public void init() {
-        TaskContext tc = new TaskContext();
-        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
-        try {
-            process(tc);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @PostConstruct
+//    public void init() {
+//        TaskContext tc = new TaskContext();
+//        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
+//        try {
+//            process(tc);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

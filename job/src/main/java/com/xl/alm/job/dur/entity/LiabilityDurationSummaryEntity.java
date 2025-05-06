@@ -2,12 +2,14 @@ package com.xl.alm.job.dur.entity;
 
 import com.xl.alm.job.common.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 负债久期汇总表实体类
  *
  * @author AI Assistant
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class LiabilityDurationSummaryEntity extends BaseEntity {
     private Long id;

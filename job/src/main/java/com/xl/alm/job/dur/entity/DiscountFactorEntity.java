@@ -2,12 +2,14 @@ package com.xl.alm.job.dur.entity;
 
 import com.xl.alm.job.common.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 折现因子表实体类
  *
  * @author AI Assistant
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class DiscountFactorEntity extends BaseEntity {
     private Long id;

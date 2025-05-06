@@ -276,9 +276,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
             String cashFlowType) {
         Map<Integer, BigDecimal> durationValueMap = new HashMap<>();
 
-        // 使用高精度计算上下文
-        MathContext mc = HIGH_PRECISION_CONTEXT;
-
         // 是否为流入类型
         boolean isInflow = "01".equals(cashFlowType);
 
@@ -303,7 +300,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
             // 使用矩阵计算久期值
             BigDecimal durationValue = calculateDurationWithMatrix(
                 cashFlowValueMap, factorValueMap, curveValueMap,
-                i, startIndex, size, isInflow, mc, presentCashValue);
+                i, startIndex, size, isInflow, presentCashValue);
 
             durationValueMap.put(i, durationValue);
         }
@@ -321,7 +318,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
      * @param startIndex 起始索引
      * @param size 计算大小
      * @param isInflow 是否为流入
-     * @param mc 精度上下文
      * @param presentCashValue 现金流现值
      * @return 久期值
      */
@@ -330,7 +326,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
             Map<Integer, BigDecimal> factorValueMap,
             Map<Integer, BigDecimal> curveValueMap,
             int baseIndex, int startIndex, int size, boolean isInflow,
-            MathContext mc, BigDecimal presentCashValue) {
+            BigDecimal presentCashValue) {
 
         log.debug("开始计算久期值, baseIndex={}, startIndex={}, size={}, isInflow={}",
                 baseIndex, startIndex, size, isInflow);
@@ -371,11 +367,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
 
             BigDecimal timeWeight;
             // 计算时间权重
-            if (isInflow) {
-                timeWeight = new BigDecimal(j).divide(new BigDecimal("12"), mc);
-            } else {
-                timeWeight = new BigDecimal(j).divide(new BigDecimal("12"), mc);
-            }
+            timeWeight = new BigDecimal(j).divide(new BigDecimal("12"), CalculationConstant.PROCESS_SCALE, RoundingMode.HALF_UP);
             timeWeightArray[i] = new BigReal(timeWeight);
 
             // 计算因子索引
@@ -411,7 +403,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
         BigDecimal sum = calculateVectorSum(resultVector);
 
         // 计算最终的久期值
-        BigDecimal durationValue = sum.divide(presentCashValue, CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
+        BigDecimal durationValue = sum.divide(presentCashValue, CalculationConstant.RESULT_SCALE, RoundingMode.HALF_UP);
         log.debug("计算得到的久期值: {}", durationValue);
 
         return durationValue;
@@ -587,8 +579,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
 
             // 计算久期值: (B-A)/(C*0.01)
             BigDecimal durationValue = diffValue.divide(cValue.multiply(new BigReal(BP_DIFF)))
-                .bigDecimalValue()
-                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
+                .bigDecimalValue();
 
             durationValueMap.put(i, durationValue);
         }

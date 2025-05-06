@@ -1,5 +1,6 @@
 package com.xl.alm.job.dur.service.impl;
 
+import com.xl.alm.job.dur.constant.CalculationConstant;
 import com.xl.alm.job.dur.entity.DiscountFactorEntity;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowEntity;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
@@ -7,7 +8,6 @@ import com.xl.alm.job.dur.mapper.DiscountFactorMapper;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowMapper;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowSummaryMapper;
 import com.xl.alm.job.dur.service.LiabilityCashFlowSummaryService;
-import com.xl.alm.job.dur.util.BigDecimalUtil;
 import com.xl.alm.job.dur.util.ValueSetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.linear.ArrayFieldVector;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -221,8 +222,7 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
                 BigReal[] factorVector = extractFactorBigRealArray(factorValueMap, i, i + 1, maxIndex, -1);
                 BigDecimal presentValue = calculateDotProduct(cashFlowVector, factorVector);
 
-                presentValue = BigDecimalUtil.setScale(presentValue);
-                presentValueMap.put(i, presentValue);
+                presentValueMap.put(i, presentValue.setScale(CalculationConstant.RESULT_SCALE, RoundingMode.HALF_UP));
             }
 
         } else { // 流出
@@ -231,8 +231,7 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
                 BigReal[] factorVector = extractFactorBigRealArray(factorValueMap, i, i, maxIndex, 0);
                 BigDecimal presentValue = calculateDotProduct(cashFlowVector, factorVector);
 
-                presentValue = BigDecimalUtil.setScale(presentValue);
-                presentValueMap.put(i, presentValue);
+                presentValueMap.put(i, presentValue.setScale(CalculationConstant.RESULT_SCALE, RoundingMode.HALF_UP));
             }
         }
 

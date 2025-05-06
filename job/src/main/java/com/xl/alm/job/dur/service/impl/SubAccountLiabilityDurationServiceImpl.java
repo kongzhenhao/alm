@@ -199,8 +199,7 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
                                 .add(nonShortTermPresentValue.multiply(nonShortTermDurationValue));
 
                         // 计算汇总久期值
-                        durationSummaryValue = numerator.divide(denominator, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
-                                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
+                        durationSummaryValue = numerator.divide(denominator, CalculationConstant.RESULT_SCALE, RoundingMode.HALF_UP);
                     }
 
                     durationSummaryValueMap.put(i, durationSummaryValue);
@@ -305,9 +304,8 @@ public class SubAccountLiabilityDurationServiceImpl implements SubAccountLiabili
                         BigDecimal numerator = presentValueB.subtract(presentValueA);
 
                         // 计算有效久期值：分子 / 0.01 / 0bp的现值
-                        durationSummaryValue = numerator.divide(BP_DIFF, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
-                                .divide(presentValueC, CalculationConstant.CALCULATION_PROCESS_SCALE, RoundingMode.HALF_UP)
-                                .setScale(CalculationConstant.CALCULATION_RESULT_SCALE, RoundingMode.HALF_UP);
+                        durationSummaryValue = numerator.divide(BP_DIFF, CalculationConstant.PROCESS_SCALE, RoundingMode.HALF_UP)
+                                .divide(presentValueC, CalculationConstant.RESULT_SCALE, RoundingMode.HALF_UP);
                     }
 
                     durationSummaryValueMap.put(i, durationSummaryValue);
