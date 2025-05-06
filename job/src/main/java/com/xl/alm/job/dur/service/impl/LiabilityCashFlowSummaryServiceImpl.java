@@ -65,7 +65,7 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
 
             // 步骤3：计算现金流现值
             List<LiabilityCashFlowSummaryEntity> summaryEntities = calculatePresentValues(
-                    accountPeriod, cashFlowValueMap, cashFlowDateMap, factorMap);
+                    cashFlowValueMap, cashFlowDateMap, factorMap);
             log.info("计算现金流现值完成，共计算{}条记录", summaryEntities.size());
 
             // 步骤4：数据入表
@@ -126,8 +126,7 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
 
             if (cashFlowValueMap.containsKey(key)) {
                 // 如果已存在相同key的记录，累加值
-                Map<Integer, BigDecimal> existingValueMap = cashFlowValueMap.get(key);
-                cashFlowValueMap.put(key, ValueSetUtil.mergeValueMaps(existingValueMap, valueMap));
+                cashFlowValueMap.compute(key, (k, existingValueMap) -> ValueSetUtil.mergeValueMaps(existingValueMap, valueMap));
             } else {
                 // 否则，添加新记录
                 cashFlowValueMap.put(key, valueMap);
@@ -139,14 +138,12 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
     /**
      * 计算现金流现值
      *
-     * @param accountPeriod 账期
      * @param cashFlowValueMap 现金流值Map
      * @param cashFlowDateMap 现金流日期Map
      * @param factorMap 因子Map
      * @return 负债现金流汇总实体列表
      */
     private List<LiabilityCashFlowSummaryEntity> calculatePresentValues(
-            String accountPeriod,
             Map<String, Map<Integer, BigDecimal>> cashFlowValueMap,
             Map<String, Map<Integer, String>> cashFlowDateMap,
             Map<String, Map<Integer, BigDecimal>> factorMap) {

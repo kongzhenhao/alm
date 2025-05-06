@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +38,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
      * 基点差值 0.01 (1%)
      */
     private static final BigDecimal BP_DIFF = new BigDecimal("0.01");
-
-    /**
-     * 高精度计算上下文
-     */
-    private static final MathContext HIGH_PRECISION_CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
 
     @Autowired
     private DiscountFactorMapper discountFactorMapper;

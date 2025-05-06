@@ -1,6 +1,5 @@
 package com.xl.alm.job.dur.service.impl;
 
-import com.xl.alm.job.dur.constant.CalculationConstant;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity;
 import com.xl.alm.job.dur.entity.SubAccountLiabilityPresentValueEntity;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowSummaryMapper;
@@ -8,14 +7,11 @@ import com.xl.alm.job.dur.mapper.SubAccountLiabilityPresentValueMapper;
 import com.xl.alm.job.dur.service.SubAccountLiabilityPresentValueService;
 import com.xl.alm.job.dur.util.ValueSetUtil;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.*;
 
 /**

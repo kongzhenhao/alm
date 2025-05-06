@@ -4,12 +4,9 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.xl.alm.job.dur.task.LiabilityCashFlowSummaryTask;
 import com.xl.alm.job.dur.task.LiabilityDurationSummaryTask;
-import com.xl.alm.job.dur.task.SubAccountLiabilityPresentValueTask;
 import com.xl.alm.job.dur.task.SubAccountLiabilityDurationTask;
+import com.xl.alm.job.dur.task.SubAccountLiabilityPresentValueTask;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
