@@ -9,6 +9,7 @@ import com.xl.alm.app.dto.SubAccountLiabilityDurationDTO;
 import com.xl.alm.app.query.SubAccountLiabilityDurationQuery;
 import com.xl.alm.app.service.SubAccountLiabilityDurationService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -121,8 +122,8 @@ public class SubAccountLiabilityDurationController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, SubAccountLiabilityDurationQuery query) {
         List<SubAccountLiabilityDurationDTO> list = subAccountLiabilityDurationService.selectSubAccountLiabilityDurationDtoList(query);
-        ExcelUtil<SubAccountLiabilityDurationDTO> util = new ExcelUtil<>(SubAccountLiabilityDurationDTO.class);
-        util.exportExcel(list, "分账户负债久期汇总数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理durationValSet字段
+        ValueSetExcelExporter.exportExcel(list, "分账户负债久期汇总数据", response, "durationValSet");
     }
 
     /**

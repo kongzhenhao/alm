@@ -9,6 +9,8 @@ import com.xl.alm.app.dto.LiabilityCashFlowDTO;
 import com.xl.alm.app.query.LiabilityCashFlowQuery;
 import com.xl.alm.app.service.LiabilityCashFlowService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
+import com.xl.alm.app.util.ValueSetExcelImportListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -117,7 +119,7 @@ public class LiabilityCashFlowController extends BaseController {
     public Result remove(@PathVariable Long id) {
         return toAjax(liabilityCashFlowService.deleteLiabilityCashFlowDtoById(id));
     }
-    
+
     /**
      * 批量删除负债现金流
      */
@@ -135,14 +137,28 @@ public class LiabilityCashFlowController extends BaseController {
     @Log(title = "负债现金流", businessType = BusinessType.IMPORT)
     @PostMapping("/importData")
     public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
-        ExcelUtil<LiabilityCashFlowDTO> util = new ExcelUtil<>(LiabilityCashFlowDTO.class);
-        List<LiabilityCashFlowDTO> dtoList = util.importExcel(file.getInputStream());
-        String operName = getUsername();
         try {
+            // 使用自定义的ValueSetExcelImportListener处理Excel导入
+            // 将表头列名从0开始至1272的列转成JSON串赋值到cashValSet字段中
+            ValueSetExcelImportListener<LiabilityCashFlowDTO> listener = new ValueSetExcelImportListener<>(LiabilityCashFlowDTO.class, "cashValSet");
+
+            // 读取Excel文件
+            com.alibaba.excel.EasyExcel.read(file.getInputStream())
+                    .registerReadListener(listener)
+                    .sheet()
+                    .headRowNumber(2) // 设置表头行数为2，确保不跳过表头行
+                    .doRead();
+
+            // 获取处理后的数据列表
+            List<LiabilityCashFlowDTO> dtoList = listener.getResultList();
+
+            // 导入数据
+            String operName = getUsername();
             String message = liabilityCashFlowService.importLiabilityCashFlowDto(dtoList, updateSupport, operName);
             return Result.success(message);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            logger.error("导入负债现金流失败", e);
+            return Result.error("导入失败：" + e.getMessage());
         }
     }
 
@@ -153,9 +169,10 @@ public class LiabilityCashFlowController extends BaseController {
     @Log(title = "负债现金流", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, LiabilityCashFlowQuery query) {
-        ExcelUtil<LiabilityCashFlowDTO> util = new ExcelUtil<>(LiabilityCashFlowDTO.class);
         List<LiabilityCashFlowDTO> list = liabilityCashFlowService.selectLiabilityCashFlowDtoList(query);
-        util.exportExcel(list, "负债现金流数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理cashValSet字段
+        // 表头全部用中文，编码值通过字典转为中文
+        ValueSetExcelExporter.exportExcel(list, "负债现金流数据", response, "cashValSet");
     }
 
     /**
@@ -164,7 +181,8 @@ public class LiabilityCashFlowController extends BaseController {
     @PreAuthorize("@ss.hasPermi('dur:liability:cash:flow:export')")
     @PostMapping("/exportTemplate")
     public void exportTemplate(HttpServletResponse response) {
-        ExcelUtil<LiabilityCashFlowDTO> util = new ExcelUtil<>(LiabilityCashFlowDTO.class);
-        util.exportTemplateExcel(response, "负债现金流");
+        // 使用自定义的ValueSetExcelExporter导出模板，处理cashValSet字段
+        // 序号从0开始，共有1273项，序号为0的列日期显示为上一月最后一天的日期，随序号递增加一个自然月显示日期
+        ValueSetExcelExporter.exportTemplateExcel(LiabilityCashFlowDTO.class, "负债现金流模板", response, "cashValSet");
     }
 }

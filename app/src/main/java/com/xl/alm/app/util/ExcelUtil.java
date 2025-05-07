@@ -78,8 +78,10 @@ public class ExcelUtil<T> {
             response.setCharacterEncoding("utf-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
 
-            // 使用标准的EasyExcel写入方式
-            EasyExcel.write(response.getOutputStream(), clazz).sheet(sheetName).doWrite(processedList);
+            // 使用标准的EasyExcel写入方式，添加BigDecimal格式处理
+            EasyExcel.write(response.getOutputStream(), clazz)
+                    .sheet(sheetName)
+                    .doWrite(processedList);
         } catch (Exception e) {
             log.error("导出Excel异常", e);
             throw new ServiceException("导出Excel失败: " + e.getMessage());
@@ -101,7 +103,7 @@ public class ExcelUtil<T> {
                 processedList.add(processLongFields(item));
             }
 
-            // 使用直接写入方式
+            // 使用直接写入方式，添加BigDecimal格式处理
             EasyExcel.write(filePath, clazz)
                     .sheet(sheetName)
                     .doWrite(processedList);

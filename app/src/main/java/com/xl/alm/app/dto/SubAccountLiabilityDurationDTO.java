@@ -17,8 +17,6 @@ import javax.validation.constraints.Size;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubAccountLiabilityDurationDTO extends BaseDTO {
-    private static final long serialVersionUID = 1L;
-
     /** 主键 */
     private Long id;
 

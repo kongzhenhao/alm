@@ -76,7 +76,7 @@
     </select>
 
     <!-- 批量插入负债现金流数据 -->
-    <insert id="batchInsertLiabilityCashFlowEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+    <insert id="batchInsertLiabilityCashFlowEntity" parameterType="java.util.List">
         insert into t_dur_liability_cash_flow (
             account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term, 
             actuarial_code, business_code, product_name, insurance_main_type, insurance_sub_type,

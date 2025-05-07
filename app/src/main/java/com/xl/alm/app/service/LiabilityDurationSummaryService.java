@@ -33,7 +33,6 @@ public interface LiabilityDurationSummaryService {
      *
      * @param accountPeriod 账期
      * @param cashFlowType 现金流类型
-     * @param bpType 基点类型
      * @param durationType 久期类型
      * @param designType 设计类型
      * @param isShortTerm 是否为中短期险种
@@ -42,7 +41,6 @@ public interface LiabilityDurationSummaryService {
     LiabilityDurationSummaryDTO selectLiabilityDurationSummaryDtoByCondition(
             String accountPeriod,
             String cashFlowType,
-            String bpType,
             String durationType,
             String designType,
             String isShortTerm);

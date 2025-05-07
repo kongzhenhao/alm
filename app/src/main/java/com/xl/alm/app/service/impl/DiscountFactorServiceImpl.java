@@ -180,19 +180,19 @@ public class DiscountFactorServiceImpl implements DiscountFactorService {
                         dto.getFactorType(),
                         dto.getBpType(),
                         dto.getDurationType());
-                
+
                 if (StringUtils.isNull(existDto)) {
                     dto.setCreateBy(username);
                     dto.setUpdateBy(username);
                     this.insertDiscountFactorDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 导入成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 导入成功");
                 } else if (updateSupport) {
                     dto.setId(existDto.getId());
                     dto.setUpdateBy(username);
                     this.updateDiscountFactorDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 更新成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 更新成功");
                 } else {
                     failureNum++;
                     failureMsg.append("<br/>").append(failureNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 已存在");
@@ -209,9 +209,7 @@ public class DiscountFactorServiceImpl implements DiscountFactorService {
             failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
             throw new RuntimeException(failureMsg.toString());
         } else {
-            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+            return "成功导入" + successNum + "条数据";
         }
-
-        return successMsg.toString();
     }
 }

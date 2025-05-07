@@ -9,6 +9,7 @@ import com.xl.alm.app.dto.LiabilityCashFlowSummaryDTO;
 import com.xl.alm.app.query.LiabilityCashFlowSummaryQuery;
 import com.xl.alm.app.service.LiabilityCashFlowSummaryService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -140,9 +141,10 @@ public class LiabilityCashFlowSummaryController extends BaseController {
     @Log(title = "负债现金流汇总", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, LiabilityCashFlowSummaryQuery query) {
-        ExcelUtil<LiabilityCashFlowSummaryDTO> util = new ExcelUtil<>(LiabilityCashFlowSummaryDTO.class);
         List<LiabilityCashFlowSummaryDTO> list = liabilityCashFlowSummaryService.selectLiabilityCashFlowSummaryDtoList(query);
-        util.exportExcel(list, "负债现金流汇总数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理cashValSet和presentCashValSet字段
+        // 传入多个值集字段名称，表头全部用中文，编码值通过字典转为中文
+        ValueSetExcelExporter.exportExcel(list, "负债现金流汇总数据", response, "cashValSet", "presentCashValSet");
     }
 
     /**

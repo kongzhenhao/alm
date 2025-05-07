@@ -141,7 +141,7 @@ public class DiscountCurveServiceImpl implements DiscountCurveService {
     public int deleteDiscountCurveDtoById(Long id) {
         return discountCurveMapper.deleteDiscountCurveEntityById(id);
     }
-    
+
     /**
      * 批量删除折现曲线数据
      *
@@ -180,44 +180,48 @@ public class DiscountCurveServiceImpl implements DiscountCurveService {
                         dto.getCurveType(),
                         dto.getBpType(),
                         dto.getDurationType());
-                
+
                 if (StringUtils.isNull(existDto)) {
                     dto.setCreateBy(username);
                     dto.setUpdateBy(username);
                     this.insertDiscountCurveDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
-                            .append(" 曲线类型 ").append(dto.getCurveType())
-                            .append(" 基点类型 ").append(dto.getBpType())
-                            .append(" 久期类型 ").append(dto.getDurationType())
-                            .append(" 导入成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
+//                            .append(" 曲线类型 ").append(dto.getCurveType())
+//                            .append(" 基点类型 ").append(dto.getBpType())
+//                            .append(" 久期类型 ").append(dto.getDurationType())
+//                            .append(" 导入成功");
                 } else if (updateSupport) {
                     dto.setId(existDto.getId());
                     dto.setUpdateBy(username);
                     this.updateDiscountCurveDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
-                            .append(" 曲线类型 ").append(dto.getCurveType())
-                            .append(" 基点类型 ").append(dto.getBpType())
-                            .append(" 久期类型 ").append(dto.getDurationType())
-                            .append(" 更新成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod())
+//                            .append(" 曲线类型 ").append(dto.getCurveType())
+//                            .append(" 基点类型 ").append(dto.getBpType())
+//                            .append(" 久期类型 ").append(dto.getDurationType())
+//                            .append(" 更新成功");
                 } else {
                     failureNum++;
-                    failureMsg.append("<br/>").append(failureNum).append("、账期 ").append(dto.getAccountPeriod())
-                            .append(" 曲线类型 ").append(dto.getCurveType())
-                            .append(" 基点类型 ").append(dto.getBpType())
-                            .append(" 久期类型 ").append(dto.getDurationType())
-                            .append(" 已存在");
+                    if (failureNum <= 10) {
+                        failureMsg.append("<br/>").append(failureNum).append("、账期 ").append(dto.getAccountPeriod())
+                                .append(" 曲线类型 ").append(dto.getCurveType())
+                                .append(" 基点类型 ").append(dto.getBpType())
+                                .append(" 久期类型 ").append(dto.getDurationType())
+                                .append(" 已存在");
+                    }
                 }
             } catch (Exception e) {
                 failureNum++;
-                String msg = "<br/>" + failureNum + "、账期 " + dto.getAccountPeriod() +
-                        " 曲线类型 " + dto.getCurveType() +
-                        " 基点类型 " + dto.getBpType() +
-                        " 久期类型 " + dto.getDurationType() +
-                        " 导入失败：";
-                failureMsg.append(msg).append(e.getMessage());
-                log.error(msg, e);
+                if (failureNum <= 10) {
+                    String msg = "<br/>" + failureNum + "、账期 " + dto.getAccountPeriod() +
+                            " 曲线类型 " + dto.getCurveType() +
+                            " 基点类型 " + dto.getBpType() +
+                            " 久期类型 " + dto.getDurationType() +
+                            " 导入失败：";
+                    failureMsg.append(msg).append(e.getMessage());
+                    log.error(msg, e);
+                }
             }
         }
 
@@ -225,8 +229,7 @@ public class DiscountCurveServiceImpl implements DiscountCurveService {
             failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
             throw new RuntimeException(failureMsg.toString());
         } else {
-            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+            return "成功导入" + successNum + "条数据";
         }
-        return successMsg.toString();
     }
 }

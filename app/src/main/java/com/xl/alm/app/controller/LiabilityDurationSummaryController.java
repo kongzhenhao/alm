@@ -9,6 +9,7 @@ import com.xl.alm.app.dto.LiabilityDurationSummaryDTO;
 import com.xl.alm.app.query.LiabilityDurationSummaryQuery;
 import com.xl.alm.app.service.LiabilityDurationSummaryService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -57,12 +58,11 @@ public class LiabilityDurationSummaryController extends BaseController {
     public Result getInfoByCondition(
             @RequestParam("accountPeriod") String accountPeriod,
             @RequestParam("cashFlowType") String cashFlowType,
-            @RequestParam("bpType") String bpType,
             @RequestParam("durationType") String durationType,
             @RequestParam("designType") String designType,
             @RequestParam("isShortTerm") String isShortTerm) {
         return Result.success(liabilityDurationSummaryService.selectLiabilityDurationSummaryDtoByCondition(
-                accountPeriod, cashFlowType, bpType, durationType, designType, isShortTerm));
+                accountPeriod, cashFlowType, durationType, designType, isShortTerm));
     }
 
     /**
@@ -140,9 +140,9 @@ public class LiabilityDurationSummaryController extends BaseController {
     @Log(title = "负债久期汇总", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, LiabilityDurationSummaryQuery query) {
-        ExcelUtil<LiabilityDurationSummaryDTO> util = new ExcelUtil<>(LiabilityDurationSummaryDTO.class);
         List<LiabilityDurationSummaryDTO> list = liabilityDurationSummaryService.selectLiabilityDurationSummaryDtoList(query);
-        util.exportExcel(list, "负债久期汇总数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理durationValSet字段
+        ValueSetExcelExporter.exportExcel(list, "负债久期汇总数据", response, "durationValSet");
     }
 
     /**

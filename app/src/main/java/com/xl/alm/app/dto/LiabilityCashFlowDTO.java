@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @Data
 public class LiabilityCashFlowDTO extends BaseDTO {
     private Long id;
-    
+
     /**
      * 账期，格式YYYYMM
      */
@@ -38,7 +38,7 @@ public class LiabilityCashFlowDTO extends BaseDTO {
      */
     @NotBlank(message = "基点类型不能为空")
     @Size(min = 2, max = 2, message = "基点类型长度必须为2")
-    @Excel(name = "基点类型", readConverterExp = "01=+50bp,02=-50bp", combo = {"01", "02"})
+    @Excel(name = "基点类型", readConverterExp = "01=+50bp,02=-50bp", combo = {"01", "02"}, dictType = "dur_bp_type")
     private String bpType;
 
     /**
@@ -62,7 +62,7 @@ public class LiabilityCashFlowDTO extends BaseDTO {
      */
     @NotBlank(message = "是否为中短期险种不能为空")
     @Size(min = 1, max = 1, message = "是否为中短期险种长度必须为1")
-    @Excel(name = "是否为中短期险种", readConverterExp = "Y=是,N=否", combo = {"Y", "N"})
+    @Excel(name = "是否为中短期险种", readConverterExp = "Y=是,N=否", combo = {"Y", "N"}, dictType = "dur_is_short_term")
     private String isShortTerm;
 
     /**
@@ -109,6 +109,6 @@ public class LiabilityCashFlowDTO extends BaseDTO {
      * 现金流值集,分为1272项,格式{"1":{"date":"2025-01-01","val":0.25},"2":{"date":"2025-01-02","val":0.35},...,"1272":{"date":"2025-12-01","val":0.15}}
      */
     @NotBlank(message = "现金流值集不能为空")
-    @Excel(name = "现金流值集")
+    @Excel(name = "现金流值集", width = 50)
     private String cashValSet;
 }

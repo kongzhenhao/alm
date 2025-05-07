@@ -9,6 +9,7 @@ import com.xl.alm.app.dto.SubAccountLiabilityPresentValueDTO;
 import com.xl.alm.app.query.SubAccountLiabilityPresentValueQuery;
 import com.xl.alm.app.service.SubAccountLiabilityPresentValueService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +49,8 @@ public class SubAccountLiabilityPresentValueController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, SubAccountLiabilityPresentValueQuery query) {
         List<SubAccountLiabilityPresentValueDTO> list = subAccountLiabilityPresentValueService.selectSubAccountLiabilityPresentValueDtoList(query);
-        ExcelUtil<SubAccountLiabilityPresentValueDTO> util = new ExcelUtil<>(SubAccountLiabilityPresentValueDTO.class);
-        util.exportExcel(list, "分账户负债现金流现值汇总数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理presentCashValSet字段
+        ValueSetExcelExporter.exportExcel(list, "分账户负债现金流现值汇总数据", response, "presentCashValSet");
     }
 
     /**

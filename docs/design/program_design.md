@@ -586,7 +586,7 @@ b. 有效久期数据入库
 (1) 按账期读取TB0008表duration_type为有效久期的数据,通过以下步骤计算出久期汇总值值集
 
 a. 找到基点类型为"+50bp","-50bp","0bp"的记录,分别标记为A,B,C,然后按以下公式进行计算久期汇总值
-- 公式: duration_summary_value[i] = (A.present_cash_val_set[i].value - B.present_cash_val_set[i].value)/0.01/C.present_cash_val_set[i].value
+- 公式: duration_summary_value[i] = (B.present_cash_val_set[i].value - A.present_cash_val_set[i].value)/0.01/C.present_cash_val_set[i].value
 - 久期汇总值值集,格式为{"0":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[0]},"1":{"date":A.present_cash_val_set[1].date,"value":duration_summary_value[1]},...,"1272":{"date":A.present_cash_val_set[1272].date,"value":duration_summary_value[1272]}}
 - 精度：计算结果数值的小数位留8位，计算过程保留小数位16位，四舍五入
 - 即使计算后的duration_summary_value[i]值小于等于0也要保存

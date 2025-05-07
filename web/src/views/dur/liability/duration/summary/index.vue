@@ -97,16 +97,6 @@
           v-hasPermi="['dur:liability:duration:summary:export']"
         >导出</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-upload2"
-          size="mini"
-          @click="handleImport"
-          v-hasPermi="['dur:liability:duration:summary:import']"
-        >导入</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 

@@ -93,5 +93,6 @@ public class LiabilityCashFlowSummaryDTO extends BaseDTO {
     /**
      * 是否删除，0：否，1：是
      */
+
     private int isDel = 0;
 }

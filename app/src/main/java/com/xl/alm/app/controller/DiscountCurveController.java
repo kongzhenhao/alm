@@ -9,6 +9,9 @@ import com.xl.alm.app.dto.DiscountCurveDTO;
 import com.xl.alm.app.query.DiscountCurveQuery;
 import com.xl.alm.app.service.DiscountCurveService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
+import com.xl.alm.app.util.ValueSetExcelImportListener;
+import com.alibaba.excel.EasyExcel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -102,7 +105,7 @@ public class DiscountCurveController extends BaseController {
     public Result remove(@PathVariable Long id) {
         return toAjax(discountCurveService.deleteDiscountCurveDtoById(id));
     }
-    
+
     /**
      * 批量删除折现曲线
      */
@@ -130,14 +133,28 @@ public class DiscountCurveController extends BaseController {
     @Log(title = "折现曲线", businessType = BusinessType.IMPORT)
     @PostMapping("/importData")
     public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
-        ExcelUtil<DiscountCurveDTO> util = new ExcelUtil<>(DiscountCurveDTO.class);
-        List<DiscountCurveDTO> dtoList = util.importExcel(file.getInputStream());
-        String operName = getUsername();
         try {
+            // 使用自定义的ValueSetExcelImportListener处理Excel导入
+            // 将表头列名从0开始至1272的列转成JSON串赋值到curveValSet字段中
+            ValueSetExcelImportListener<DiscountCurveDTO> listener = new ValueSetExcelImportListener<>(DiscountCurveDTO.class, "curveValSet");
+
+            // 读取Excel文件
+            EasyExcel.read(file.getInputStream())
+                    .registerReadListener(listener)
+                    .sheet()
+                    .headRowNumber(2) // 设置表头行数为2，确保不跳过表头行
+                    .doRead();
+
+            // 获取处理后的数据列表
+            List<DiscountCurveDTO> dtoList = listener.getResultList();
+
+            // 导入数据
+            String operName = getUsername();
             String message = discountCurveService.importDiscountCurveDto(dtoList, updateSupport, operName);
             return Result.success(message);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            logger.error("导入折现曲线失败", e);
+            return Result.error("导入失败：" + e.getMessage());
         }
     }
 
@@ -148,9 +165,10 @@ public class DiscountCurveController extends BaseController {
     @Log(title = "折现曲线", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, DiscountCurveQuery query) {
-        ExcelUtil<DiscountCurveDTO> util = new ExcelUtil<>(DiscountCurveDTO.class);
         List<DiscountCurveDTO> list = discountCurveService.selectDiscountCurveDtoList(query);
-        util.exportExcel(list, "折现曲线数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理curveValSet字段
+        // 表头全部用中文，编码值通过字典转为中文
+        ValueSetExcelExporter.exportExcel(list, "折现曲线数据", response, "curveValSet");
     }
 
     /**
@@ -159,7 +177,8 @@ public class DiscountCurveController extends BaseController {
     @PreAuthorize("@ss.hasPermi('dur:discount:curve:export')")
     @PostMapping("/exportTemplate")
     public void exportTemplate(HttpServletResponse response) {
-        ExcelUtil<DiscountCurveDTO> util = new ExcelUtil<>(DiscountCurveDTO.class);
-        util.exportTemplateExcel(response, "折现曲线");
+        // 使用自定义的ValueSetExcelExporter导出模板，处理curveValSet字段
+        // 序号从0开始，共有1273项，序号为0的列日期显示为上一月最后一天的日期，随序号递增加一个自然月显示日期
+        ValueSetExcelExporter.exportTemplateExcel(DiscountCurveDTO.class, "折现曲线模板", response, "curveValSet");
     }
 }

@@ -64,7 +64,7 @@ export function updateLiabilityCashFlow(data) {
 // 删除负债现金流
 export function delLiabilityCashFlow(id) {
   return request({
-    url: '/dur/liability/cash/flow/' + id,
+    url: '/dur/liability/cash/flow/batch/' + id,
     method: 'delete',
   });
 }

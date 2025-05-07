@@ -9,6 +9,9 @@ import com.xl.alm.app.dto.DiscountFactorDTO;
 import com.xl.alm.app.query.DiscountFactorQuery;
 import com.xl.alm.app.service.DiscountFactorService;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.util.ValueSetExcelExporter;
+import com.xl.alm.app.util.ValueSetExcelImportListener;
+import com.alibaba.excel.EasyExcel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -114,14 +117,28 @@ public class DiscountFactorController extends BaseController {
     @Log(title = "折现因子", businessType = BusinessType.IMPORT)
     @PostMapping("/importData")
     public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
-        ExcelUtil<DiscountFactorDTO> util = new ExcelUtil<>(DiscountFactorDTO.class);
-        List<DiscountFactorDTO> dtoList = util.importExcel(file.getInputStream());
-        String operName = getUsername();
         try {
+            // 使用自定义的ValueSetExcelImportListener处理Excel导入
+            // 将表头列名从0开始至1272的列转成JSON串赋值到factorValSet字段中
+            ValueSetExcelImportListener<DiscountFactorDTO> listener = new ValueSetExcelImportListener<>(DiscountFactorDTO.class, "factorValSet");
+
+            // 读取Excel文件
+            EasyExcel.read(file.getInputStream())
+                    .registerReadListener(listener)
+                    .sheet()
+                    .headRowNumber(2) // 设置表头行数为2，确保不跳过表头行
+                    .doRead();
+
+            // 获取处理后的数据列表
+            List<DiscountFactorDTO> dtoList = listener.getResultList();
+
+            // 导入数据
+            String operName = getUsername();
             String message = discountFactorService.importDiscountFactorDto(dtoList, updateSupport, operName);
             return Result.success(message);
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            logger.error("导入折现因子失败", e);
+            return Result.error("导入失败：" + e.getMessage());
         }
     }
 
@@ -132,9 +149,10 @@ public class DiscountFactorController extends BaseController {
     @Log(title = "折现因子", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, DiscountFactorQuery query) {
-        ExcelUtil<DiscountFactorDTO> util = new ExcelUtil<>(DiscountFactorDTO.class);
         List<DiscountFactorDTO> list = discountFactorService.selectDiscountFactorDtoList(query);
-        util.exportExcel(list, "折现因子数据", response);
+        // 使用自定义的ValueSetExcelExporter导出，处理factorValSet字段
+        // 表头全部用中文，编码值通过字典转为中文
+        ValueSetExcelExporter.exportExcel(list, "折现因子数据", response, "factorValSet");
     }
 
     /**
@@ -143,7 +161,8 @@ public class DiscountFactorController extends BaseController {
     @PreAuthorize("@ss.hasPermi('dur:discount:factor:import')")
     @PostMapping("/exportTemplate")
     public void exportTemplate(HttpServletResponse response) {
-        ExcelUtil<DiscountFactorDTO> util = new ExcelUtil<>(DiscountFactorDTO.class);
-        util.exportTemplateExcel(response, "折现因子");
+        // 使用自定义的ValueSetExcelExporter导出模板，处理factorValSet字段
+        // 序号从0开始，共有1273项，序号为0的列日期显示为上一月最后一天的日期，随序号递增加一个自然月显示日期
+        ValueSetExcelExporter.exportTemplateExcel(DiscountFactorDTO.class, "折现因子模板", response, "factorValSet");
     }
 }

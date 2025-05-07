@@ -189,22 +189,27 @@ public class LiabilityCashFlowServiceImpl implements LiabilityCashFlowService {
                     list.add(dto);
                     batchInsertLiabilityCashFlowDto(list);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 导入成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 导入成功");
                 } else if (updateSupport) {
                     dto.setId(existDto.getId());
                     dto.setUpdateBy(username);
                     updateLiabilityCashFlowDto(dto);
                     successNum++;
-                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 更新成功");
+//                    successMsg.append("<br/>").append(successNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 更新成功");
                 } else {
                     failureNum++;
-                    failureMsg.append("<br/>").append(failureNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 已存在");
+                    if (failureNum <= 10) {
+                        failureMsg.append("<br/>").append(failureNum).append("、账期 ").append(dto.getAccountPeriod()).append(" 已存在");
+                    }
                 }
             } catch (Exception e) {
                 failureNum++;
-                String msg = "<br/>" + failureNum + "、账期 " + dto.getAccountPeriod() + " 导入失败：";
-                failureMsg.append(msg).append(e.getMessage());
-                log.error(msg, e);
+                if (failureNum <= 10) {
+                    String msg = "<br/>" + failureNum + "、账期 " + dto.getAccountPeriod() + " 导入失败：";
+                    failureMsg.append(msg).append(e.getMessage());
+                    log.error(msg, e);
+                }
+
             }
         }
 

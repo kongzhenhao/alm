@@ -36,7 +36,6 @@ public interface LiabilityDurationSummaryMapper {
      *
      * @param accountPeriod 账期
      * @param cashFlowType 现金流类型
-     * @param bpType 基点类型
      * @param durationType 久期类型
      * @param designType 设计类型
      * @param isShortTerm 是否为中短期险种
@@ -45,7 +44,6 @@ public interface LiabilityDurationSummaryMapper {
     LiabilityDurationSummaryEntity selectLiabilityDurationSummaryEntityByCondition(
             @Param("accountPeriod") String accountPeriod,
             @Param("cashFlowType") String cashFlowType,
-            @Param("bpType") String bpType,
             @Param("durationType") String durationType,
             @Param("designType") String designType,
             @Param("isShortTerm") String isShortTerm);

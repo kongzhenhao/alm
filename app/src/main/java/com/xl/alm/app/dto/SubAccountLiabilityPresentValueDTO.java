@@ -15,8 +15,6 @@ import javax.validation.constraints.Size;
  */
 @Data
 public class SubAccountLiabilityPresentValueDTO extends BaseDTO {
-    private static final long serialVersionUID = 1L;
-
     /** 主键 */
     private Long id;
 

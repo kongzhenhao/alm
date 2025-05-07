@@ -62,7 +62,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
      *
      * @param accountPeriod 账期
      * @param cashFlowType 现金流类型
-     * @param bpType 基点类型
      * @param durationType 久期类型
      * @param designType 设计类型
      * @param isShortTerm 是否为中短期险种
@@ -72,12 +71,11 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
     public LiabilityDurationSummaryDTO selectLiabilityDurationSummaryDtoByCondition(
             String accountPeriod,
             String cashFlowType,
-            String bpType,
             String durationType,
             String designType,
             String isShortTerm) {
         LiabilityDurationSummaryEntity entity = liabilityDurationSummaryMapper.selectLiabilityDurationSummaryEntityByCondition(
-                accountPeriod, cashFlowType, bpType, durationType, designType, isShortTerm);
+                accountPeriod, cashFlowType, durationType, designType, isShortTerm);
         if (entity == null) {
             return null;
         }
@@ -181,7 +179,7 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
 
                 // 验证是否存在相同记录
                 LiabilityDurationSummaryDTO existDto = selectLiabilityDurationSummaryDtoByCondition(
-                        dto.getAccountPeriod(), dto.getCashFlowType(), dto.getBpType(),
+                        dto.getAccountPeriod(), dto.getCashFlowType(),
                         dto.getDurationType(), dto.getDesignType(), dto.getIsShortTerm());
 
                 if (StringUtils.isNull(existDto)) {

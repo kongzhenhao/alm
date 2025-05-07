@@ -617,19 +617,12 @@ export default {
     },
     // 下载文件
     downloadFile(response, fileName) {
-      const blob = new Blob([response.data]);
-      if ('download' in document.createElement('a')) {
-        const elink = document.createElement('a');
-        elink.download = fileName;
-        elink.style.display = 'none';
-        elink.href = URL.createObjectURL(blob);
-        document.body.appendChild(elink);
-        elink.click();
-        URL.revokeObjectURL(elink.href);
-        document.body.removeChild(elink);
-      } else {
-        navigator.msSaveBlob(blob, fileName);
-      }
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
     },
     /** 查看现金流值集按钮操作 */
     handleViewCashValSet(row) {

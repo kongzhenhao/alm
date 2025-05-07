@@ -463,6 +463,15 @@ export default {
     submitFileForm() {
       this.$refs.upload.submit();
     },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
     /** 查看因子值集按钮操作 */
     handleViewFactorValSet(row) {
       try {
