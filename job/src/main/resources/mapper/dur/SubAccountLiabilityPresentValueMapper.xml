@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.SubAccountLiabilityPresentValueMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.SubAccountLiabilityPresentValueEntity" id="SubAccountLiabilityPresentValueEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="presentCashValSet" column="present_cash_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <!-- 批量插入分账户负债现金流现值汇总数据 -->
+    <insert id="batchInsertSubAccountLiabilityPresentValueEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_sub_account_liability_present_value (
+            account_period, cash_flow_type, bp_type, duration_type, design_type,
+            present_cash_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod},
+            #{item.cashFlowType},
+            #{item.bpType},
+            #{item.durationType},
+            #{item.designType},
+            #{item.presentCashValSet},
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 删除指定账期的分账户负债现金流现值汇总数据 -->
+    <update id="deleteSubAccountLiabilityPresentValueEntityByPeriod" parameterType="String">
+        delete from t_dur_sub_account_liability_present_value
+        where account_period = #{accountPeriod}
+    </update>
+
+    <!-- 根据条件查询分账户负债现金流现值汇总 -->
+    <select id="selectSubAccountLiabilityPresentValueEntityByCondition" resultMap="SubAccountLiabilityPresentValueEntityResult">
+        select id, account_period, cash_flow_type, bp_type, duration_type, design_type,
+               present_cash_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_sub_account_liability_present_value
+        <where>
+            account_period = #{accountPeriod}
+            and cash_flow_type = #{cashFlowType}
+            and bp_type = #{bpType}
+            and duration_type = #{durationType}
+            and design_type = #{designType}
+            and is_del = 0
+        </where>
+    </select>
+
+    <!-- 根据条件查询分账户负债现金流现值汇总列表 -->
+    <select id="selectSubAccountLiabilityPresentValueEntityListByCondition" resultMap="SubAccountLiabilityPresentValueEntityResult">
+        select id, account_period, cash_flow_type, bp_type, duration_type, design_type,
+               present_cash_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_sub_account_liability_present_value
+        <where>
+            is_del = 0
+            <if test="accountPeriod != null and accountPeriod != ''">
+                and account_period = #{accountPeriod}
+            </if>
+            <if test="cashFlowType != null and cashFlowType != ''">
+                and cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="bpType != null and bpType != ''">
+                and bp_type = #{bpType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                and duration_type = #{durationType}
+            </if>
+            <if test="designType != null and designType != ''">
+                and design_type = #{designType}
+            </if>
+        </where>
+    </select>
+</mapper>

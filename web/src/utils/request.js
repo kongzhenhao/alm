@@ -86,7 +86,7 @@ service.interceptors.request.use(
     }
     //  flowable 根据模块参数替换 接口地址
     if (
-      config.url.includes('/flowable/') &&
+      config.url && config.url.includes('/flowable/') &&
       getUrlParams(window.location.href).tenantId
     ) {
       if (!config.headers.hasChangedUrl) {

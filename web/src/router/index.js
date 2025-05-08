@@ -1,9 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-// Import route modules
-import durRoutes from './modules/dur';
-
 Vue.use(Router);
 
 /* Layout */
@@ -109,8 +106,6 @@ export const constantRoutes = [
 
 // 动态路由，基于用户权限动态去加载
 export const dynamicRoutes = [
-  // 久期管理路由
-  durRoutes,
   {
     path: '/system/user-auth',
     component: Layout,

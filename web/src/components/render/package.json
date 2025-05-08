@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/JakHuang/form-generator/issues"
   },
-  "homepage": "https://github.com/JakHuang/form-generator#readme"
+  "homepage": "https://github.com/JakHuang/form-generator#readme",
+  "dependencies": {
+    "form-gen-render": "file:"
+  }
 }

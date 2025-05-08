@@ -1,0 +1,136 @@
+# 数据源配置
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    autoconfigure:
+      # 排除 Druid 自动配置
+      exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 100
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 是否开启空闲连接的检测
+      testWhileIdle: true
+      # 是否开启连接的检测功能，在获取连接时检测连接是否有效
+      testOnBorrow: false
+      # 是否开启连接的检测功能，在归还连接时检测连接是否有效
+      testOnReturn: false
+      # 是否缓存PreparedStatement对象
+      poolPreparedStatements: true
+      # 缓存PreparedStatement对象的最大数量
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 用于检测连接是否有效的SQL语句
+      validationQuery: SELECT 1
+      webStatFilter:
+        enabled: false
+      statViewServlet:
+        enabled: false
+      # 配置监控统计用的filter，监控统计
+      filter:
+        stat:
+          enabled: false
+    dynamic:
+      primary: mysql
+      strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      datasource:
+        mysql:
+          url: jdbc:mysql://localhost:3306/alm?keepAlive=true&autoReconnect=true&autoReconnectForPools=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+          username: alm
+          password: 123456
+          driver-class-name: com.mysql.cj.jdbc.Driver
+    starrocks:
+      streamload:
+        host: kube-starrocks-fe-service.starrocks.svc.cluster.local
+        database: alm
+        port: 8030
+        username: alm
+        password: 123456
+
+  #配置redis数据库连接
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    timeout: 5000
+    database: 0
+    jedis:
+      pool:
+        max-active: 8 #最大连接数
+        max-idle: 4
+        min-idle: 4
+        max-wait: 10000
+
+oss:
+  endpoint: oss-cn-beijing.aliyuncs.com
+  bucketName:
+    public:  int-pub
+    private: int-pri
+  accessKeyId: ENC(0Nf3rZFCxzDb6S6t60v1hVXfpJf+hUhTwsYlUx5AfcbMYumqIUAG3g==)
+  accessKeySecret: ENC(U7Kj06nXAP+ef1fF5Pm1JD5Hc3KjcwiF8QFwjCjR/Uyh+Kql2S9pAw==)
+  prefix: itmanager
+  ishttps: N
+
+# 日志配置
+logging:
+  level:
+    com.jd: info
+    org.springframework: warn
+  config: classpath:logback-int.xml
+
+powerjob:
+  worker:
+    app-name: admin_data
+    app-password: ENC(r+ziP5+N8CJr5g5bJXx0ww==)
+    enabled: true
+    max-appended-wf-context-length: 4096
+    max-result-length: 4096
+    port: 27777
+    protocol: akka
+    server-address: fin-int.idadt.com/api/job
+    store-strategy: disk
+powerJobUrl: https://fin-int.idadt.com/api/job/
+
+ledger:
+  constant:
+    summarize-field: segment9
+
+financeId:
+  load:
+    # 达到此比例情况，加载备用号池
+    percent: 30
+  #系统号
+  system:
+    num: 10001
+  #数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/alm?keepAlive=true&autoReconnect=true&autoReconnectForPools=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    type: mysql
+    driver: com.mysql.cj.jdbc.Driver
+    user: alm
+    password: 123456
+  
+  
+job-scheduling:
+  config:
+    cluster-name: job-cluster
+    enable: true
+    role: worker
+    port: 5702
+    member-list: # 非 k8s 环境生效
+      - 127.0.0.1:5701
+powerjob:
+  worker:
+    enabled: false

@@ -1,0 +1,26 @@
+## 开发环境
+- 操作系统：Windows 11
+- JDK版本：JDK8
+- 前端框架：Vue 2.6.12 + RuoYi 3.8.2
+- Java框架：Spring Boot 2.7.18
+
+# Workspace
+- 项目根目录：D:/git/alm
+- app模块路径：D:/git/alm/app
+- web模块路径：D:/git/alm/web
+- job模块路径：D:/git/alm/job
+- docs模块路径：D:/git/alm/docs
+
+# 通用规范
+- *Controller的@RequestMapping注解路径要用`模块名`+小写类名前缀*部分作为路径，多个单词间用斜杠(/)分隔
+    - 正确示例：类名LiabilityCashFlowController，@RequestMapping路径为/dur/liability/cash/flow，这里dur为模块名
+    - 错误示例：/dur/liability-cash-flow
+    - 错误示例：/dur/liabilityCashFlow,/liability/cash/flow
+- 前端的vue及js文件路径按`模块名/小写单词1/小写单词2/.../CamelCase格式文件名`格式创建目录和文件，这里每个单词从*Controller前缀提取
+    - 正确示例：由类名LiabilityCashFlowController生成`web/src/views/dur/liability/cash/flow/index.vue`目录和文件名，这里dur是模块，index是vue文件名
+    - 错误示例：web/src/views/dur/LiabilityCashFlow.vue
+    - 错误示例：web/src/views/liability-cash-flow.vue
+- Controller方法返回类型必须使用com.jd.lightning.common.core.domain.Result
+
+# 输出语言
+- 输出语言为中文

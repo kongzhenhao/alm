@@ -67,7 +67,7 @@ export function addDateRange(params, dateRange, propName) {
   return search;
 }
 
-// 回显数据字典 
+// 回显数据字典
 export function selectDictLabel(datas, value) {
   if (value === undefined) {
     return "";
@@ -203,6 +203,8 @@ export function handleTree(data, id, parentId, children) {
 */
 export function tansParams(params) {
   let result = ''
+  // 确保params是一个对象，如果是undefined或null则使用空对象
+  params = params || {};
   for (const propName of Object.keys(params)) {
     const value = params[propName];
     var part = encodeURIComponent(propName) + "=";

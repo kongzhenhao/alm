@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.DiscountFactorMapper">
+
+    <resultMap type="com.xl.alm.app.entity.DiscountFactorEntity" id="DiscountFactorEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="factorType" column="factor_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="factorValSet" column="factor_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectDiscountFactorEntityVo">
+        select id, account_period, factor_type, bp_type, duration_type,
+               factor_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_discount_factor
+    </sql>
+
+    <!-- 查询折现因子列表 -->
+    <select id="selectDiscountFactorEntityList" parameterType="com.xl.alm.app.query.DiscountFactorQuery" resultMap="DiscountFactorEntityResult">
+        <include refid="selectDiscountFactorEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountPeriod != null and accountPeriod != ''">and account_period = #{accountPeriod}</if>
+            <if test="factorType != null and factorType != ''">and factor_type = #{factorType}</if>
+            <if test="bpType != null and bpType != ''">and bp_type = #{bpType}</if>
+            <if test="durationType != null and durationType != ''">and duration_type = #{durationType}</if>
+            and is_del = 0
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 用id查询折现因子列表 -->
+    <select id="selectDiscountFactorEntityById" parameterType="Long" resultMap="DiscountFactorEntityResult">
+        <include refid="selectDiscountFactorEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期、因子类型、基点类型和久期类型查询折现因子 -->
+    <select id="selectDiscountFactorEntityByCondition" resultMap="DiscountFactorEntityResult">
+        <include refid="selectDiscountFactorEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            and factor_type = #{factorType}
+            and bp_type = #{bpType}
+            and duration_type = #{durationType}
+            and is_del = 0
+        </where>
+    </select>
+
+    <!-- 新增折现因子 -->
+    <insert id="insertDiscountFactorEntity" parameterType="com.xl.alm.app.entity.DiscountFactorEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_discount_factor (
+            account_period, factor_type, bp_type, duration_type,
+            factor_val_set, create_by, update_by
+        ) values (
+            #{accountPeriod}, #{factorType}, #{bpType}, #{durationType},
+            #{factorValSet}, #{createBy}, #{updateBy}
+        )
+    </insert>
+
+    <!-- 批量插入折现因子数据 -->
+    <insert id="batchInsertDiscountFactorEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_discount_factor (
+            account_period, factor_type, bp_type, duration_type,
+            factor_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod},
+            #{item.factorType},
+            #{item.bpType},
+            #{item.durationType},
+            #{item.factorValSet},
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改折现因子 -->
+    <update id="updateDiscountFactorEntity" parameterType="com.xl.alm.app.entity.DiscountFactorEntity">
+        update t_dur_discount_factor
+        <set>
+            <if test="accountPeriod != null and accountPeriod != ''">account_period = #{accountPeriod},</if>
+            <if test="factorType != null and factorType != ''">factor_type = #{factorType},</if>
+            <if test="bpType != null and bpType != ''">bp_type = #{bpType},</if>
+            <if test="durationType != null and durationType != ''">duration_type = #{durationType},</if>
+            <if test="factorValSet != null and factorValSet != ''">factor_val_set = #{factorValSet},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = now()
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <!-- 删除折现因子 -->
+    <update id="deleteDiscountFactorEntityById" parameterType="Long">
+        update t_dur_discount_factor set is_del = 1, update_time = now()
+        where id = #{id} and is_del = 0
+    </update>
+
+    <!-- 批量删除折现因子 -->
+    <update id="deleteDiscountFactorEntityByIds" parameterType="Long[]">
+        update t_dur_discount_factor set is_del = 1, update_time = now()
+        where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and is_del = 0
+    </update>
+
+    <!-- 删除指定账期的折现因子数据 -->
+    <update id="deleteDiscountFactorEntityByPeriod" parameterType="String">
+        update t_dur_discount_factor set is_del = 1, update_time = now()
+        where account_period = #{accountPeriod} and is_del = 0
+    </update>
+</mapper>
