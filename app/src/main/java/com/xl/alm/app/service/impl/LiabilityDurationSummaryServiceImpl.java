@@ -131,17 +131,6 @@ public class LiabilityDurationSummaryServiceImpl implements LiabilityDurationSum
     }
 
     /**
-     * 删除负债久期汇总信息
-     *
-     * @param id 负债久期汇总主键
-     * @return 结果
-     */
-    @Override
-    public int deleteLiabilityDurationSummaryDtoById(Long id) {
-        return liabilityDurationSummaryMapper.deleteLiabilityDurationSummaryEntityById(id);
-    }
-
-    /**
      * 根据账期删除负债久期汇总
      *
      * @param accountPeriod 账期

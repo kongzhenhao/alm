@@ -169,7 +169,6 @@ public class DiscountCurveServiceImpl implements DiscountCurveService {
         }
         int successNum = 0;
         int failureNum = 0;
-        StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
 
         for (DiscountCurveDTO dto : dtoList) {

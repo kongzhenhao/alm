@@ -297,13 +297,8 @@ public class ValueSetExcelExporter {
      */
     public static <T> void exportTemplateExcel(Class<T> clazz, String sheetName, HttpServletResponse response, String valueSetField) {
         try {
-            // 创建一个空实例作为模板
-            T instance = clazz.newInstance();
-
-            // 检查值集字段是否存在
-            Field valueSetFieldObj = null;
             try {
-                valueSetFieldObj = clazz.getDeclaredField(valueSetField);
+                Field valueSetFieldObj = clazz.getDeclaredField(valueSetField);
                 valueSetFieldObj.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 throw new ServiceException("值集字段 " + valueSetField + " 不存在");

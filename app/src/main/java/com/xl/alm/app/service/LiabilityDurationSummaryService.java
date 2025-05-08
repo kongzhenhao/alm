@@ -78,14 +78,6 @@ public interface LiabilityDurationSummaryService {
     int deleteLiabilityDurationSummaryDtoByIds(Long[] ids);
 
     /**
-     * 删除负债久期汇总信息
-     *
-     * @param id 负债久期汇总主键
-     * @return 结果
-     */
-    int deleteLiabilityDurationSummaryDtoById(Long id);
-
-    /**
      * 根据账期删除负债久期汇总
      *
      * @param accountPeriod 账期

@@ -4,14 +4,16 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.CellExtra;
 import com.alibaba.excel.read.metadata.holder.ReadRowHolder;
-import com.alibaba.excel.read.metadata.holder.ReadSheetHolder;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 值集Excel导入监听器
@@ -49,13 +51,12 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
 
     /**
      * 结果列表
-     */
-    private final List<T> resultList = new ArrayList<>();
+     * -- GETTER --
+     *  获取结果列表
 
-    /**
-     * 当前处理的行号
      */
-    private int currentRowIndex = 0;
+    @Getter
+    private final List<T> resultList = new ArrayList<>();
 
     /**
      * 普通字段映射，key为列索引，value为字段名
@@ -83,22 +84,27 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
         log.info("初始化值集开始列索引，目标类型: {}", className);
 
         // 根据不同的DTO类型设置不同的值集开始列索引
-        if ("LiabilityCashFlowDTO".equals(className)) {
-            // 负债现金流的值集开始列索引
-            valueSetStartIndex = 12;
-            log.info("负债现金流的值集开始列索引设置为: {}", valueSetStartIndex);
-        } else if ("DiscountFactorDTO".equals(className)) {
-            // 折现因子的值集开始列索引
-            valueSetStartIndex = 5;
-            log.info("折现因子的值集开始列索引设置为: {}", valueSetStartIndex);
-        } else if ("DiscountCurveDTO".equals(className)) {
-            // 折现曲线的值集开始列索引
-            valueSetStartIndex = 5;
-            log.info("折现曲线的值集开始列索引设置为: {}", valueSetStartIndex);
-        } else {
-            // 其他类型的默认值集开始列索引
-            valueSetStartIndex = 12;
-            log.warn("未找到目标类型[{}]的值集开始列索引配置，使用默认值: {}", className, valueSetStartIndex);
+        switch (className) {
+            case "LiabilityCashFlowDTO":
+                // 负债现金流的值集开始列索引
+                valueSetStartIndex = 12;
+                log.info("负债现金流的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
+            case "DiscountFactorDTO":
+                // 折现因子的值集开始列索引
+                valueSetStartIndex = 5;
+                log.info("折现因子的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
+            case "DiscountCurveDTO":
+                // 折现曲线的值集开始列索引
+                valueSetStartIndex = 5;
+                log.info("折现曲线的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
+            default:
+                // 其他类型的默认值集开始列索引
+                valueSetStartIndex = 12;
+                log.warn("未找到目标类型[{}]的值集开始列索引配置，使用默认值: {}", className, valueSetStartIndex);
+                break;
         }
     }
 
@@ -115,56 +121,52 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
         normalFieldMap.put(1, "accountPeriod");
 
         // 根据不同的DTO类型设置不同的字段映射
-        if ("LiabilityCashFlowDTO".equals(className)) {
-            // 负债现金流的字段映射
-            normalFieldMap.put(2, "cashFlowType");
-            normalFieldMap.put(3, "bpType");
-            normalFieldMap.put(4, "durationType");
-            normalFieldMap.put(5, "designType");
-            normalFieldMap.put(6, "isShortTerm");
-            normalFieldMap.put(7, "actuarialCode");
-            normalFieldMap.put(8, "businessCode");
-            normalFieldMap.put(9, "productName");
-            normalFieldMap.put(10, "insuranceMainType");
-            normalFieldMap.put(11, "insuranceSubType");
-            log.info("初始化负债现金流字段映射完成");
-        } else if ("DiscountFactorDTO".equals(className)) {
-            // 折现因子的字段映射
-            normalFieldMap.put(2, "factorType");
-            normalFieldMap.put(3, "bpType");
-            normalFieldMap.put(4, "durationType");
-            log.info("初始化折现因子字段映射完成");
-        } else if ("DiscountCurveDTO".equals(className)) {
-            // 折现曲线的字段映射
-            normalFieldMap.put(2, "curveType");
-            normalFieldMap.put(3, "bpType");
-            normalFieldMap.put(4, "durationType");
-            log.info("初始化折现曲线字段映射完成");
-        } else {
-            // 其他类型的默认字段映射
-            log.warn("未找到目标类型[{}]的字段映射配置，使用默认映射", className);
-            normalFieldMap.put(2, "cashFlowType");
-            normalFieldMap.put(3, "bpType");
-            normalFieldMap.put(4, "durationType");
-            normalFieldMap.put(5, "designType");
-            normalFieldMap.put(6, "isShortTerm");
-            normalFieldMap.put(7, "actuarialCode");
-            normalFieldMap.put(8, "businessCode");
-            normalFieldMap.put(9, "productName");
-            normalFieldMap.put(10, "insuranceMainType");
-            normalFieldMap.put(11, "insuranceSubType");
-            normalFieldMap.put(12, "factorType");
-            normalFieldMap.put(13, "curveType");
+        switch (className) {
+            case "LiabilityCashFlowDTO":
+                // 负债现金流的字段映射
+                normalFieldMap.put(2, "cashFlowType");
+                normalFieldMap.put(3, "bpType");
+                normalFieldMap.put(4, "durationType");
+                normalFieldMap.put(5, "designType");
+                normalFieldMap.put(6, "isShortTerm");
+                normalFieldMap.put(7, "actuarialCode");
+                normalFieldMap.put(8, "businessCode");
+                normalFieldMap.put(9, "productName");
+                normalFieldMap.put(10, "insuranceMainType");
+                normalFieldMap.put(11, "insuranceSubType");
+                log.info("初始化负债现金流字段映射完成");
+                break;
+            case "DiscountFactorDTO":
+                // 折现因子的字段映射
+                normalFieldMap.put(2, "factorType");
+                normalFieldMap.put(3, "bpType");
+                normalFieldMap.put(4, "durationType");
+                log.info("初始化折现因子字段映射完成");
+                break;
+            case "DiscountCurveDTO":
+                // 折现曲线的字段映射
+                normalFieldMap.put(2, "curveType");
+                normalFieldMap.put(3, "bpType");
+                normalFieldMap.put(4, "durationType");
+                log.info("初始化折现曲线字段映射完成");
+                break;
+            default:
+                // 其他类型的默认字段映射
+                log.warn("未找到目标类型[{}]的字段映射配置，使用默认映射", className);
+                normalFieldMap.put(2, "cashFlowType");
+                normalFieldMap.put(3, "bpType");
+                normalFieldMap.put(4, "durationType");
+                normalFieldMap.put(5, "designType");
+                normalFieldMap.put(6, "isShortTerm");
+                normalFieldMap.put(7, "actuarialCode");
+                normalFieldMap.put(8, "businessCode");
+                normalFieldMap.put(9, "productName");
+                normalFieldMap.put(10, "insuranceMainType");
+                normalFieldMap.put(11, "insuranceSubType");
+                normalFieldMap.put(12, "factorType");
+                normalFieldMap.put(13, "curveType");
+                break;
         }
-    }
-
-    /**
-     * 获取结果列表
-     *
-     * @return 结果列表
-     */
-    public List<T> getResultList() {
-        return resultList;
     }
 
     @Override
@@ -208,7 +210,10 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
     @Override
     public void invoke(Map<Integer, Object> data, AnalysisContext context) {
         ReadRowHolder readRowHolder = context.readRowHolder();
-        currentRowIndex = readRowHolder.getRowIndex();
+        /**
+         * 当前处理的行号
+         */
+        int currentRowIndex = readRowHolder.getRowIndex();
 
         // 跳过表头行
         if (currentRowIndex < HEAD_ROW_COUNT) {
@@ -216,16 +221,15 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
         }
 
         // 处理数据行
-        processDataRow(data, context);
+        processDataRow(data);
     }
 
     /**
      * 处理数据行
      *
      * @param data    数据行
-     * @param context 上下文
      */
-    private void processDataRow(Map<Integer, Object> data, AnalysisContext context) {
+    private void processDataRow(Map<Integer, Object> data) {
         try {
             // 创建目标对象实例
             T targetObject = targetClass.newInstance();

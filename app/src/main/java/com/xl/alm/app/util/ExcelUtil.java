@@ -1,16 +1,13 @@
 package com.xl.alm.app.util;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.excel.write.metadata.WriteSheet;
 import com.jd.lightning.common.exception.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
@@ -89,31 +86,6 @@ public class ExcelUtil<T> {
     }
 
     /**
-     * 导出Excel到指定路径
-     *
-     * @param list      数据列表
-     * @param sheetName 工作表名称
-     * @param filePath  文件路径
-     */
-    public void exportExcel(List<T> list, String sheetName, String filePath) {
-        try {
-            // 处理数据，确保每个单元格的内容不超过32767字符
-            List<T> processedList = new ArrayList<>();
-            for (T item : list) {
-                processedList.add(processLongFields(item));
-            }
-
-            // 使用直接写入方式，添加BigDecimal格式处理
-            EasyExcel.write(filePath, clazz)
-                    .sheet(sheetName)
-                    .doWrite(processedList);
-        } catch (Exception e) {
-            log.error("导出Excel异常", e);
-            throw new ServiceException("导出Excel失败: " + e.getMessage());
-        }
-    }
-
-    /**
      * 导出模板
      *
      * @param response 响应对象
@@ -158,7 +130,7 @@ public class ExcelUtil<T> {
                 Object value = field.get(item);
 
                 // 如果是字符串类型且不为空
-                if (value instanceof String && value != null) {
+                if (value instanceof String) {
                     String strValue = (String) value;
 
                     // 如果超过32767字符（Excel单元格限制）
