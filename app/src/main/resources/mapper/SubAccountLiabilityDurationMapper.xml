@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.SubAccountLiabilityDurationMapper">
+
+    <resultMap type="com.xl.alm.app.entity.SubAccountLiabilityDurationEntity" id="SubAccountLiabilityDurationEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="durationValSet" column="duration_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectSubAccountLiabilityDurationEntityVo">
+        select id, account_period, cash_flow_type, duration_type, design_type,
+               duration_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_sub_account_liability_duration
+    </sql>
+
+    <!-- 查询分账户负债久期汇总列表 -->
+    <select id="selectSubAccountLiabilityDurationEntityList" parameterType="com.xl.alm.app.query.SubAccountLiabilityDurationQuery" resultMap="SubAccountLiabilityDurationEntityResult">
+        <include refid="selectSubAccountLiabilityDurationEntityVo"/>
+        <where>
+            is_del = 0
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="accountPeriod != null and accountPeriod != ''">
+                AND account_period = #{accountPeriod}
+            </if>
+            <if test="cashFlowType != null and cashFlowType != ''">
+                AND cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                AND duration_type = #{durationType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+        </where>
+        order by account_period desc, cash_flow_type, duration_type, design_type
+    </select>
+
+    <!-- 查询分账户负债久期汇总详细 -->
+    <select id="selectSubAccountLiabilityDurationEntityById" parameterType="Long" resultMap="SubAccountLiabilityDurationEntityResult">
+        <include refid="selectSubAccountLiabilityDurationEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据条件查询分账户负债久期汇总 -->
+    <select id="selectSubAccountLiabilityDurationEntityByCondition" resultMap="SubAccountLiabilityDurationEntityResult">
+        <include refid="selectSubAccountLiabilityDurationEntityVo"/>
+        <where>
+            is_del = 0
+            <if test="accountPeriod != null and accountPeriod != ''">
+                AND account_period = #{accountPeriod}
+            </if>
+            <if test="cashFlowType != null and cashFlowType != ''">
+                AND cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                AND duration_type = #{durationType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <!-- 新增分账户负债久期汇总 -->
+    <insert id="insertSubAccountLiabilityDurationEntity" parameterType="com.xl.alm.app.entity.SubAccountLiabilityDurationEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_sub_account_liability_duration (
+            account_period, cash_flow_type, duration_type, design_type,
+            duration_val_set, create_by, update_by
+        ) values (
+            #{accountPeriod}, #{cashFlowType}, #{durationType}, #{designType},
+            #{durationValSet}, #{createBy}, #{updateBy}
+        )
+    </insert>
+
+    <!-- 批量新增分账户负债久期汇总 -->
+    <insert id="batchInsertSubAccountLiabilityDurationEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_sub_account_liability_duration (
+            account_period, cash_flow_type, duration_type, design_type,
+            duration_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountPeriod}, #{item.cashFlowType}, #{item.durationType}, #{item.designType},
+            #{item.durationValSet}, #{item.createBy}, #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改分账户负债久期汇总 -->
+    <update id="updateSubAccountLiabilityDurationEntity" parameterType="com.xl.alm.app.entity.SubAccountLiabilityDurationEntity">
+        update t_dur_sub_account_liability_duration
+        <set>
+            <if test="accountPeriod != null and accountPeriod != ''">account_period = #{accountPeriod},</if>
+            <if test="cashFlowType != null and cashFlowType != ''">cash_flow_type = #{cashFlowType},</if>
+            <if test="durationType != null and durationType != ''">duration_type = #{durationType},</if>
+            <if test="designType != null and designType != ''">design_type = #{designType},</if>
+            <if test="durationValSet != null and durationValSet != ''">duration_val_set = #{durationValSet},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <!-- 删除分账户负债久期汇总 -->
+    <update id="deleteSubAccountLiabilityDurationEntityById" parameterType="Long">
+        update t_dur_sub_account_liability_duration set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除分账户负债久期汇总 -->
+    <update id="deleteSubAccountLiabilityDurationEntityByIds" parameterType="Long">
+        update t_dur_sub_account_liability_duration set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 删除指定账期的分账户负债久期汇总 -->
+    <update id="deleteSubAccountLiabilityDurationEntityByPeriod" parameterType="String">
+        update t_dur_sub_account_liability_duration set is_del = 1 where account_period = #{accountPeriod}
+    </update>
+
+</mapper>

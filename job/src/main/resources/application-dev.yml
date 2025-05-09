@@ -86,7 +86,7 @@ logging:
   level:
     com.jd: info
     org.springframework: warn
-  config: classpath:logback-int.xml
+  config: classpath:logback-dev.xml
 
 powerjob:
   worker:
@@ -100,10 +100,6 @@ powerjob:
     server-address: fin-int.idadt.com/api/job
     store-strategy: disk
 powerJobUrl: https://fin-int.idadt.com/api/job/
-
-ledger:
-  constant:
-    summarize-field: segment9
 
 financeId:
   load:

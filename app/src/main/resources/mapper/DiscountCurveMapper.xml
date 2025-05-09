@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.DiscountCurveMapper">
+
+    <resultMap type="com.xl.alm.app.entity.DiscountCurveEntity" id="DiscountCurveEntityResult">
+        <id property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="curveType" column="curve_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="curveValSet" column="curve_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectDiscountCurveEntityVo">
+        select id, account_period, curve_type, bp_type, duration_type, 
+               curve_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_discount_curve
+    </sql>
+
+    <!-- 查询折现曲线列表 -->
+    <select id="selectDiscountCurveEntityList" parameterType="com.xl.alm.app.query.DiscountCurveQuery" resultMap="DiscountCurveEntityResult">
+        <include refid="selectDiscountCurveEntityVo"/>
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="accountPeriod != null and accountPeriod != ''">
+                AND account_period = #{accountPeriod}
+            </if>
+            <if test="curveType != null and curveType != ''">
+                AND curve_type = #{curveType}
+            </if>
+            <if test="bpType != null and bpType != ''">
+                AND bp_type = #{bpType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                AND duration_type = #{durationType}
+            </if>
+            <if test="isDel != null">
+                AND is_del = #{isDel}
+            </if>
+        </where>
+        order by account_period desc, curve_type, bp_type, duration_type
+    </select>
+
+    <!-- 用id查询折现曲线 -->
+    <select id="selectDiscountCurveEntityById" parameterType="Long" resultMap="DiscountCurveEntityResult">
+        <include refid="selectDiscountCurveEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期、曲线类型、基点类型和久期类型查询折现曲线 -->
+    <select id="selectDiscountCurveEntityByCondition" resultMap="DiscountCurveEntityResult">
+        <include refid="selectDiscountCurveEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            AND curve_type = #{curveType}
+            AND bp_type = #{bpType}
+            AND duration_type = #{durationType}
+            AND is_del = 0
+        </where>
+    </select>
+
+    <!-- 批量插入折现曲线数据 -->
+    <insert id="batchInsertDiscountCurveEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_discount_curve (
+            account_period, curve_type, bp_type, duration_type, 
+            curve_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod},
+            #{item.curveType},
+            #{item.bpType},
+            #{item.durationType},
+            #{item.curveValSet},
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新折现曲线数据 -->
+    <update id="updateDiscountCurveEntity" parameterType="com.xl.alm.app.entity.DiscountCurveEntity">
+        update t_dur_discount_curve
+        <set>
+            <if test="accountPeriod != null and accountPeriod != ''">account_period = #{accountPeriod},</if>
+            <if test="curveType != null and curveType != ''">curve_type = #{curveType},</if>
+            <if test="bpType != null and bpType != ''">bp_type = #{bpType},</if>
+            <if test="durationType != null and durationType != ''">duration_type = #{durationType},</if>
+            <if test="curveValSet != null and curveValSet != ''">curve_val_set = #{curveValSet},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = now()
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <!-- 删除指定账期的折现曲线数据 -->
+    <update id="deleteDiscountCurveEntityByPeriod" parameterType="String">
+        update t_dur_discount_curve set is_del = 1, update_time = now() 
+        where account_period = #{accountPeriod} and is_del = 0
+    </update>
+
+    <!-- 删除指定id的折现曲线数据 -->
+    <update id="deleteDiscountCurveEntityById" parameterType="Long">
+        update t_dur_discount_curve set is_del = 1, update_time = now() 
+        where id = #{id} and is_del = 0
+    </update>
+    
+    <!-- 批量删除折现曲线数据 -->
+    <update id="deleteDiscountCurveEntityByIds" parameterType="Long">
+        update t_dur_discount_curve set is_del = 1, update_time = now() 
+        where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and is_del = 0
+    </update>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.LiabilityDurationSummaryMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.LiabilityDurationSummaryEntity" id="LiabilityDurationSummaryEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="isShortTerm" column="is_short_term"/>
+        <result property="durationValSet" column="duration_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectLiabilityDurationSummaryEntityVo">
+        select id, account_period, cash_flow_type, duration_type, design_type, is_short_term,
+               duration_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_liability_duration_summary
+    </sql>
+
+    <!-- 批量插入负债久期汇总数据 -->
+    <insert id="batchInsertLiabilityDurationSummaryEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_liability_duration_summary (
+            account_period, cash_flow_type, duration_type, design_type, is_short_term,
+            duration_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod},
+            #{item.cashFlowType},
+            #{item.durationType},
+            #{item.designType},
+            #{item.isShortTerm},
+            #{item.durationValSet},
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 删除指定账期的负债久期汇总数据 -->
+    <update id="deleteLiabilityDurationSummaryEntityByPeriod" parameterType="String">
+        delete from t_dur_liability_duration_summary
+        where account_period = #{accountPeriod}
+    </update>
+
+    <!-- 根据条件查询负债久期汇总 -->
+    <select id="selectLiabilityDurationSummaryEntityByCondition" resultMap="LiabilityDurationSummaryEntityResult">
+        <include refid="selectLiabilityDurationSummaryEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            and cash_flow_type = #{cashFlowType}
+            and duration_type = #{durationType}
+            and design_type = #{designType}
+            and is_short_term = #{isShortTerm}
+            and is_del = 0
+        </where>
+    </select>
+
+    <!-- 根据条件查询负债久期汇总列表 -->
+    <select id="selectLiabilityDurationSummaryEntityListByCondition" resultMap="LiabilityDurationSummaryEntityResult">
+        <include refid="selectLiabilityDurationSummaryEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            <if test="cashFlowType != null and cashFlowType != ''">
+                and cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                and duration_type = #{durationType}
+            </if>
+            <if test="designType != null and designType != ''">
+                and design_type = #{designType}
+            </if>
+            <if test="isShortTerm != null and isShortTerm != ''">
+                and is_short_term = #{isShortTerm}
+            </if>
+            and is_del = 0
+        </where>
+    </select>
+</mapper>

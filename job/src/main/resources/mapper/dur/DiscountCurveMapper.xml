@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.DiscountCurveMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.DiscountCurveEntity" id="DiscountCurveEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="curveType" column="curve_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="curveValSet" column="curve_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectDiscountCurveEntityVo">
+        select id, account_period, curve_type, bp_type, duration_type, curve_val_set, 
+               create_time, create_by, update_time, update_by, is_del
+        from t_dur_discount_curve
+    </sql>
+
+    <!-- 查询折现曲线列表 -->
+    <select id="selectDiscountCurveEntityListByPeriod" parameterType="String" resultMap="DiscountCurveEntityResult">
+        <include refid="selectDiscountCurveEntityVo"/>
+        where account_period = #{accountPeriod} and is_del = 0
+    </select>
+
+    <!-- 根据账期、曲线类型、基点类型和久期类型查询折现曲线 -->
+    <select id="selectDiscountCurveEntityByCondition" resultMap="DiscountCurveEntityResult">
+        <include refid="selectDiscountCurveEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            and curve_type = #{curveType}
+            and bp_type = #{bpType}
+            and duration_type = #{durationType}
+            and is_del = 0
+        </where>
+    </select>
+</mapper>

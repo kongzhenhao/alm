@@ -17,6 +17,7 @@
     "tinymce-vue"
   ],
   "dependencies": {
+    "form-gen-tinymce": "file:",
     "throttle-debounce": "^2.1.0"
   },
   "author": "jakHuang",

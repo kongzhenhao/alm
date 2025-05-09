@@ -64,7 +64,7 @@
     <insert id="batchInsertSampleEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
         insert into t_dur_discount_factor (
             account_period, factor_type, duration_type, design_type, is_short_term, 
-            factor_val_set, create_time, create_by, update_time, update_by, is_del
+            factor_val_set, create_by, update_by
         ) values
         <foreach collection="list" item="item" separator=",">
             (
@@ -74,11 +74,8 @@
             #{item.designType},
             #{item.isShortTerm},
             #{item.factorValSet},
-            #{item.createTime},
             #{item.createBy},
-            #{item.updateTime},
-            #{item.updateBy},
-            #{item.isDel}
+            #{item.updateBy}
             )
         </foreach>
     </insert>

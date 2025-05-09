@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.LiabilityCashFlowSummaryMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.LiabilityCashFlowSummaryEntity" id="LiabilityCashFlowSummaryEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="bpType" column="bp_type"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="isShortTerm" column="is_short_term"/>
+        <result property="cashValSet" column="cash_val_set"/>
+        <result property="presentCashValSet" column="present_cash_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectLiabilityCashFlowSummaryEntityVo">
+        select id, account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term,
+               cash_val_set, present_cash_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_liability_cash_flow_summary
+    </sql>
+
+    <!-- 根据条件查询负债现金流汇总列表 -->
+    <select id="selectLiabilityCashFlowSummaryEntityListByCondition" resultMap="LiabilityCashFlowSummaryEntityResult">
+        <include refid="selectLiabilityCashFlowSummaryEntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            <if test="cashFlowType != null and cashFlowType != ''">
+                and cash_flow_type = #{cashFlowType}
+            </if>
+            <if test="bpType != null and bpType != ''">
+                and bp_type = #{bpType}
+            </if>
+            <if test="durationType != null and durationType != ''">
+                and duration_type = #{durationType}
+            </if>
+            <if test="designType != null and designType != ''">
+                and design_type = #{designType}
+            </if>
+            <if test="isShortTerm != null and isShortTerm != ''">
+                and is_short_term = #{isShortTerm}
+            </if>
+            and is_del = 0
+        </where>
+    </select>
+
+    <!-- 批量插入负债现金流汇总数据 -->
+    <insert id="batchInsertLiabilityCashFlowSummaryEntity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_liability_cash_flow_summary (
+            account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term,
+            cash_val_set, present_cash_val_set, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod},
+            #{item.cashFlowType},
+            #{item.bpType},
+            #{item.durationType},
+            #{item.designType},
+            #{item.isShortTerm},
+            #{item.cashValSet},
+            #{item.presentCashValSet},
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 删除指定账期的负债现金流汇总数据 -->
+    <update id="deleteLiabilityCashFlowSummaryEntityByPeriod" parameterType="String">
+        delete from t_dur_liability_cash_flow_summary
+        where account_period = #{accountPeriod}
+    </update>
+
+    <!-- 根据账期查询负债现金流汇总列表 -->
+    <select id="selectLiabilityCashFlowSummaryEntityListByPeriod" parameterType="String" resultMap="LiabilityCashFlowSummaryEntityResult">
+        <include refid="selectLiabilityCashFlowSummaryEntityVo"/>
+        where account_period = #{accountPeriod} and is_del = 0
+    </select>
+</mapper>
