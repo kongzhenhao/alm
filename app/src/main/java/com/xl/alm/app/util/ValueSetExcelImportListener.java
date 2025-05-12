@@ -150,6 +150,12 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
                 normalFieldMap.put(4, "durationType");
                 log.info("初始化折现曲线字段映射完成");
                 break;
+            case "KeyDurationParameterDTO":
+                // 关键久期参数的字段映射
+                normalFieldMap.put(1, "accountPeriod");
+                normalFieldMap.put(2, "keyDuration");
+                log.info("初始化关键久期参数字段映射完成");
+                break;
             default:
                 // 其他类型的默认字段映射
                 log.warn("未找到目标类型[{}]的字段映射配置，使用默认映射", className);

@@ -35,6 +35,10 @@ VALUES (1, '+50bp', '01', 'dur_bp_type', NULL, 'primary', 'Y', '0', 'admin', SYS
 INSERT INTO sys_dict_data(dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, update_by, update_time, remark)
 VALUES (2, '-50bp', '02', 'dur_bp_type', NULL, 'info', 'N', '0', 'admin', SYSDATE(), '', NULL, NULL);
 
+-- 添加 0bp 基点类型
+INSERT INTO sys_dict_data(dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, update_by, update_time, remark)
+VALUES (3, '0bp', '03', 'dur_bp_type', NULL, 'success', 'N', '0', 'admin', SYSDATE(), '', NULL, NULL);
+
 -- 久期类型
 INSERT INTO sys_dict_data(dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, update_by, update_time, remark)
 VALUES (1, '修正久期', '01', 'dur_duration_type', NULL, 'primary', 'Y', '0', 'admin', SYSDATE(), '', NULL, NULL);

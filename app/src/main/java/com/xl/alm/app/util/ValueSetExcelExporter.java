@@ -75,13 +75,18 @@ public class ValueSetExcelExporter {
                 }
             }
 
-            // 获取所有字段（排除值集字段和isDel字段）
+            // 获取所有字段（排除值集字段、isDel字段、serialVersionUID和id字段，以及静态字段）
             List<Field> normalFields = new ArrayList<>();
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
                 String fieldName = field.getName();
-                // 排除值集字段和isDel字段
-                if (!valueSetFieldMap.containsKey(fieldName) && !"isDel".equals(fieldName)) {
+                int modifiers = field.getModifiers();
+
+                // 排除值集字段、isDel字段、serialVersionUID和静态字段，但保留id字段
+                if (!valueSetFieldMap.containsKey(fieldName) &&
+                    !"isDel".equals(fieldName) &&
+                    !"serialVersionUID".equals(fieldName) &&
+                    !java.lang.reflect.Modifier.isStatic(modifiers)) {
                     normalFields.add(field);
                 }
             }
@@ -304,13 +309,18 @@ public class ValueSetExcelExporter {
                 throw new ServiceException("值集字段 " + valueSetField + " 不存在");
             }
 
-            // 获取所有字段（排除值集字段和isDel字段）
+            // 获取所有字段（排除值集字段、isDel字段、serialVersionUID和id字段，以及静态字段）
             List<Field> normalFields = new ArrayList<>();
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
                 String fieldName = field.getName();
-                // 排除值集字段和isDel字段
-                if (!fieldName.equals(valueSetField) && !"isDel".equals(fieldName)) {
+                int modifiers = field.getModifiers();
+
+                // 排除值集字段、isDel字段、serialVersionUID和静态字段，但保留id字段
+                if (!fieldName.equals(valueSetField) &&
+                    !"isDel".equals(fieldName) &&
+                    !"serialVersionUID".equals(fieldName) &&
+                    !java.lang.reflect.Modifier.isStatic(modifiers)) {
                     normalFields.add(field);
                 }
             }

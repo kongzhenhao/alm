@@ -57,7 +57,7 @@
 ```mermaid
 erDiagram
     %% 1. 源数据表
-    负债现金流现值汇总表 ||--o{ 分中短负债基点价值DV10表 : "4.计算DV10"
+    负债现金流汇总表 ||--o{ 分中短负债基点价值DV10表 : "4.计算DV10"
 
     %% 2. 关键久期参数计算流程
     关键久期参数表 ||--o{ 关键久期折现曲线表 : "2.计算折现曲线"
@@ -75,7 +75,7 @@ erDiagram
 | 表编号 | 表中文名 | 表英文名 | 备注 |
 | ---- | ------ | ---- | ------ |
 | TB0001 | 折现曲线表 | t_dur_discount_curve | 存储折现曲线数据（来源于duration_program_design.md中的TB0002） |
-| TB0002 | 负债现金流现值汇总表 | t_dur_liability_cash_flow_summary | 存储负债现金流现值汇总数据（来源于duration_program_design.md中的TB0005） |
+| TB0002 | 负债现金流汇总表 | t_dur_liability_cash_flow_summary | 存储负债现金流现值汇总数据（来源于duration_program_design.md中的TB0005） |
 | TB0003 | 关键久期参数表 | t_dur_key_duration_parameter | 存储关键久期计算所需的参数 |
 | TB0004 | 关键久期折现曲线表 | t_dur_key_duration_discount_curve | 存储关键久期计算所需的折现曲线 |
 | TB0005 | 关键久期折现因子表 | t_dur_key_duration_discount_factors | 存储关键久期计算所需的折现因子 |
@@ -87,7 +87,7 @@ erDiagram
 ##### （1）TB0001 折现曲线表
 *注：此表来源于duration_program_design.md中的TB0002，此处不再详细定义*
 
-##### （2）TB0002 负债现金流现值汇总表
+##### （2）TB0002 负债现金流汇总表
 *注：此表来源于duration_program_design.md中的TB0005，此处不再详细定义*
 
 ##### （3）TB0003 关键久期参数表
@@ -274,7 +274,7 @@ flowchart TD
     K[UC0004: 计算分中短负债基点价值DV10]
     L[UC0005: 计算分账户负债基点价值DV10]
 
-    %% 负债现金流现值汇总表的使用
+    %% 负债现金流汇总表的使用
     E --> K
 
     %% 关键久期相关表的使用
