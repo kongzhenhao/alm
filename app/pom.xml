@@ -261,7 +261,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.xl.alm.app.AppStarter</mainClass>
-                    <excludeGroupIds>com.jd.lightning,com.jd.finance</excludeGroupIds>
                 </configuration>
                 <executions>
                     <execution>
