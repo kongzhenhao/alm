@@ -52,9 +52,9 @@ spring:
     open-in-view: false
   #配置redis数据库连接
   redis:
-    host: localhost
+    host: 10.2.13.149
     port: 6379
-    password: 123456
+    password: User123$
     timeout: 5000
     database: 2
 
