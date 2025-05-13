@@ -31,6 +31,8 @@ mybatis-plus:
     local-cache-scope: STATEMENT
 
 spring:
+  profiles:
+    active: int
   lifecycle:
     timeout-per-shutdown-phase: 40s
   #  mvc 路径解析配置

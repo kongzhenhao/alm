@@ -1,6 +1,7 @@
 package com.xl.alm.job.common.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class BaseEntity implements Serializable {
     /**
      * 搜索值
      */
+    @TableField(exist = false)
     private String searchValue;
 
     /**
@@ -42,11 +44,13 @@ public class BaseEntity implements Serializable {
     /**
      * 备注
      */
+    @TableField(exist = false)
     private String remark;
 
     /**
      * 请求参数
      */
+    @TableField(exist = false)
     private Map<String, Object> params;
 
     public String getSearchValue() {

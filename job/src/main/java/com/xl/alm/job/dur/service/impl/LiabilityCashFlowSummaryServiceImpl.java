@@ -121,8 +121,8 @@ public class LiabilityCashFlowSummaryServiceImpl implements LiabilityCashFlowSum
                          entity.getBpType() + "|" + entity.getDurationType() + "|" +
                          entity.getDesignType() + "|" + entity.getIsShortTerm();
 
-            Map<Integer, BigDecimal> valueMap = ValueSetUtil.parseValueMap(entity.getCashValSet());
-            Map<Integer, String> dateMap = ValueSetUtil.parseDateMap(entity.getCashValSet());
+            Map<Integer, BigDecimal> valueMap = ValueSetUtil.parseValueMap(entity.getCashFlowValSet());
+            Map<Integer, String> dateMap = ValueSetUtil.parseDateMap(entity.getCashFlowValSet());
 
             if (cashFlowValueMap.containsKey(key)) {
                 // 如果已存在相同key的记录，累加值

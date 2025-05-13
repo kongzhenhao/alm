@@ -100,14 +100,14 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
         }
     }
 
-    @PostConstruct
-    public void init() {
-        TaskContext tc = new TaskContext();
-        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
-        try {
-            process(tc);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @PostConstruct
+//    public void init() {
+//        TaskContext tc = new TaskContext();
+//        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
+//        try {
+//            process(tc);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
