@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.UniversalAvgSettlementRateMapper">
+
+    <resultMap type="com.xl.alm.app.entity.UniversalAvgSettlementRateEntity" id="UniversalAvgSettlementRateResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="guaranteedCostRate" column="guaranteed_cost_rate"/>
+        <result property="avgRateT0" column="avg_rate_t0"/>
+        <result property="avgRateT1" column="avg_rate_t1"/>
+        <result property="avgRateT2" column="avg_rate_t2"/>
+        <result property="avgRateT3" column="avg_rate_t3"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectUniversalAvgSettlementRateVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, short_term_flag, 
+               guaranteed_cost_rate, avg_rate_t0, avg_rate_t1, avg_rate_t2, avg_rate_t3, 
+               remark, create_by, create_time, update_by, update_time, is_del
+        from t_base_universal_avg_settlement_rate
+    </sql>
+
+    <select id="selectUniversalAvgSettlementRateList" parameterType="com.xl.alm.app.query.UniversalAvgSettlementRateQuery" resultMap="UniversalAvgSettlementRateResult">
+        <include refid="selectUniversalAvgSettlementRateVo"/>
+        <where>
+            is_del = 0
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code like concat('%', #{actuarialCode}, '%')
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code like concat('%', #{businessCode}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUniversalAvgSettlementRateById" parameterType="Long" resultMap="UniversalAvgSettlementRateResult">
+        <include refid="selectUniversalAvgSettlementRateVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectUniversalAvgSettlementRateByCode" resultMap="UniversalAvgSettlementRateResult">
+        <include refid="selectUniversalAvgSettlementRateVo"/>
+        where actuarial_code = #{actuarialCode} and accounting_period = #{accountingPeriod} and is_del = 0
+    </select>
+
+    <insert id="insertUniversalAvgSettlementRate" parameterType="com.xl.alm.app.entity.UniversalAvgSettlementRateEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_base_universal_avg_settlement_rate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period,</if>
+            <if test="actuarialCode != null">actuarial_code,</if>
+            <if test="businessCode != null">business_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="shortTermFlag != null">short_term_flag,</if>
+            <if test="guaranteedCostRate != null">guaranteed_cost_rate,</if>
+            <if test="avgRateT0 != null">avg_rate_t0,</if>
+            <if test="avgRateT1 != null">avg_rate_t1,</if>
+            <if test="avgRateT2 != null">avg_rate_t2,</if>
+            <if test="avgRateT3 != null">avg_rate_t3,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            is_del
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">#{accountingPeriod},</if>
+            <if test="actuarialCode != null">#{actuarialCode},</if>
+            <if test="businessCode != null">#{businessCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="shortTermFlag != null">#{shortTermFlag},</if>
+            <if test="guaranteedCostRate != null">#{guaranteedCostRate},</if>
+            <if test="avgRateT0 != null">#{avgRateT0},</if>
+            <if test="avgRateT1 != null">#{avgRateT1},</if>
+            <if test="avgRateT2 != null">#{avgRateT2},</if>
+            <if test="avgRateT3 != null">#{avgRateT3},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            0
+        </trim>
+    </insert>
+
+    <update id="updateUniversalAvgSettlementRate" parameterType="com.xl.alm.app.entity.UniversalAvgSettlementRateEntity">
+        update t_base_universal_avg_settlement_rate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="actuarialCode != null">actuarial_code = #{actuarialCode},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="shortTermFlag != null">short_term_flag = #{shortTermFlag},</if>
+            <if test="guaranteedCostRate != null">guaranteed_cost_rate = #{guaranteedCostRate},</if>
+            <if test="avgRateT0 != null">avg_rate_t0 = #{avgRateT0},</if>
+            <if test="avgRateT1 != null">avg_rate_t1 = #{avgRateT1},</if>
+            <if test="avgRateT2 != null">avg_rate_t2 = #{avgRateT2},</if>
+            <if test="avgRateT3 != null">avg_rate_t3 = #{avgRateT3},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteUniversalAvgSettlementRateById" parameterType="Long">
+        update t_base_universal_avg_settlement_rate set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteUniversalAvgSettlementRateByIds" parameterType="Long">
+        update t_base_universal_avg_settlement_rate set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsertUniversalAvgSettlementRate" parameterType="java.util.List">
+        insert into t_base_universal_avg_settlement_rate (
+            accounting_period, actuarial_code, business_code, product_name, short_term_flag, 
+            guaranteed_cost_rate, avg_rate_t0, avg_rate_t1, avg_rate_t2, avg_rate_t3, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName}, #{item.shortTermFlag},
+            #{item.guaranteedCostRate}, #{item.avgRateT0}, #{item.avgRateT1}, #{item.avgRateT2}, #{item.avgRateT3},
+            #{item.remark}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, 0
+            )
+        </foreach>
+    </insert>
+</mapper>

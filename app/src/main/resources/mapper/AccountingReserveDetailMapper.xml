@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.AccountingReserveDetailMapper">
+
+    <resultMap type="com.xl.alm.app.entity.AccountingReserveDetailEntity" id="AccountingReserveDetailResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="validPolicyCount" column="valid_policy_count"/>
+        <result property="accumulatedPremium" column="accumulated_premium"/>
+        <result property="accountValue" column="account_value"/>
+        <result property="dividendProvision" column="dividend_provision"/>
+        <result property="bestEstimate" column="best_estimate"/>
+        <result property="riskMargin" column="risk_margin"/>
+        <result property="residualMargin" column="residual_margin"/>
+        <result property="unmodeledReserve" column="unmodeled_reserve"/>
+        <result property="waiverReserve" column="waiver_reserve"/>
+        <result property="persistenceBonusReserve" column="persistence_bonus_reserve"/>
+        <result property="longTermUnearned" column="long_term_unearned"/>
+        <result property="shortTermUnearned" column="short_term_unearned"/>
+        <result property="unearnedPremiumReserve" column="unearned_premium_reserve"/>
+        <result property="outstandingClaimReserve" column="outstanding_claim_reserve"/>
+        <result property="totalAccountingReserve" column="total_accounting_reserve"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectAccountingReserveDetailVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
+               valid_policy_count, accumulated_premium, account_value, dividend_provision, best_estimate, risk_margin, residual_margin,
+               unmodeled_reserve, waiver_reserve, persistence_bonus_reserve, long_term_unearned, short_term_unearned,
+               unearned_premium_reserve, outstanding_claim_reserve, total_accounting_reserve,
+               remark, create_by, create_time, update_by, update_time, is_del
+        from t_base_accounting_reserve_detail
+    </sql>
+
+    <select id="selectAccountingReserveDetailList" parameterType="com.xl.alm.app.query.AccountingReserveDetailQuery" resultMap="AccountingReserveDetailResult">
+        <include refid="selectAccountingReserveDetailVo"/>
+        <where>
+            is_del = 0
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code like concat('%', #{actuarialCode}, '%')
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code like concat('%', #{businessCode}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="termType != null and termType != ''">
+                AND term_type = #{termType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAccountingReserveDetailById" parameterType="Long" resultMap="AccountingReserveDetailResult">
+        <include refid="selectAccountingReserveDetailVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectAccountingReserveDetailByCode" resultMap="AccountingReserveDetailResult">
+        <include refid="selectAccountingReserveDetailVo"/>
+        where actuarial_code = #{actuarialCode} and accounting_period = #{accountingPeriod} and is_del = 0
+    </select>
+
+    <insert id="insertAccountingReserveDetail" parameterType="com.xl.alm.app.entity.AccountingReserveDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_base_accounting_reserve_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period,</if>
+            <if test="actuarialCode != null">actuarial_code,</if>
+            <if test="businessCode != null">business_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="termType != null">term_type,</if>
+            <if test="designType != null">design_type,</if>
+            <if test="shortTermFlag != null">short_term_flag,</if>
+            <if test="validPolicyCount != null">valid_policy_count,</if>
+            <if test="accumulatedPremium != null">accumulated_premium,</if>
+            <if test="accountValue != null">account_value,</if>
+            <if test="dividendProvision != null">dividend_provision,</if>
+            <if test="bestEstimate != null">best_estimate,</if>
+            <if test="riskMargin != null">risk_margin,</if>
+            <if test="residualMargin != null">residual_margin,</if>
+            <if test="unmodeledReserve != null">unmodeled_reserve,</if>
+            <if test="waiverReserve != null">waiver_reserve,</if>
+            <if test="persistenceBonusReserve != null">persistence_bonus_reserve,</if>
+            <if test="longTermUnearned != null">long_term_unearned,</if>
+            <if test="shortTermUnearned != null">short_term_unearned,</if>
+            <if test="unearnedPremiumReserve != null">unearned_premium_reserve,</if>
+            <if test="outstandingClaimReserve != null">outstanding_claim_reserve,</if>
+            <if test="totalAccountingReserve != null">total_accounting_reserve,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            is_del
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">#{accountingPeriod},</if>
+            <if test="actuarialCode != null">#{actuarialCode},</if>
+            <if test="businessCode != null">#{businessCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="termType != null">#{termType},</if>
+            <if test="designType != null">#{designType},</if>
+            <if test="shortTermFlag != null">#{shortTermFlag},</if>
+            <if test="validPolicyCount != null">#{validPolicyCount},</if>
+            <if test="accumulatedPremium != null">#{accumulatedPremium},</if>
+            <if test="accountValue != null">#{accountValue},</if>
+            <if test="dividendProvision != null">#{dividendProvision},</if>
+            <if test="bestEstimate != null">#{bestEstimate},</if>
+            <if test="riskMargin != null">#{riskMargin},</if>
+            <if test="residualMargin != null">#{residualMargin},</if>
+            <if test="unmodeledReserve != null">#{unmodeledReserve},</if>
+            <if test="waiverReserve != null">#{waiverReserve},</if>
+            <if test="persistenceBonusReserve != null">#{persistenceBonusReserve},</if>
+            <if test="longTermUnearned != null">#{longTermUnearned},</if>
+            <if test="shortTermUnearned != null">#{shortTermUnearned},</if>
+            <if test="unearnedPremiumReserve != null">#{unearnedPremiumReserve},</if>
+            <if test="outstandingClaimReserve != null">#{outstandingClaimReserve},</if>
+            <if test="totalAccountingReserve != null">#{totalAccountingReserve},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            0
+        </trim>
+    </insert>
+
+    <update id="updateAccountingReserveDetail" parameterType="com.xl.alm.app.entity.AccountingReserveDetailEntity">
+        update t_base_accounting_reserve_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="actuarialCode != null">actuarial_code = #{actuarialCode},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="termType != null">term_type = #{termType},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="shortTermFlag != null">short_term_flag = #{shortTermFlag},</if>
+            <if test="validPolicyCount != null">valid_policy_count = #{validPolicyCount},</if>
+            <if test="accumulatedPremium != null">accumulated_premium = #{accumulatedPremium},</if>
+            <if test="accountValue != null">account_value = #{accountValue},</if>
+            <if test="dividendProvision != null">dividend_provision = #{dividendProvision},</if>
+            <if test="bestEstimate != null">best_estimate = #{bestEstimate},</if>
+            <if test="riskMargin != null">risk_margin = #{riskMargin},</if>
+            <if test="residualMargin != null">residual_margin = #{residualMargin},</if>
+            <if test="unmodeledReserve != null">unmodeled_reserve = #{unmodeledReserve},</if>
+            <if test="waiverReserve != null">waiver_reserve = #{waiverReserve},</if>
+            <if test="persistenceBonusReserve != null">persistence_bonus_reserve = #{persistenceBonusReserve},</if>
+            <if test="longTermUnearned != null">long_term_unearned = #{longTermUnearned},</if>
+            <if test="shortTermUnearned != null">short_term_unearned = #{shortTermUnearned},</if>
+            <if test="unearnedPremiumReserve != null">unearned_premium_reserve = #{unearnedPremiumReserve},</if>
+            <if test="outstandingClaimReserve != null">outstanding_claim_reserve = #{outstandingClaimReserve},</if>
+            <if test="totalAccountingReserve != null">total_accounting_reserve = #{totalAccountingReserve},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteAccountingReserveDetailById" parameterType="Long">
+        update t_base_accounting_reserve_detail set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteAccountingReserveDetailByIds" parameterType="Long">
+        update t_base_accounting_reserve_detail set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsertAccountingReserveDetail" parameterType="java.util.List">
+        insert into t_base_accounting_reserve_detail (
+            accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
+            valid_policy_count, accumulated_premium, account_value, dividend_provision, best_estimate, risk_margin, residual_margin,
+            unmodeled_reserve, waiver_reserve, persistence_bonus_reserve, long_term_unearned, short_term_unearned,
+            unearned_premium_reserve, outstanding_claim_reserve, total_accounting_reserve,
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName},
+            #{item.termType}, #{item.designType}, #{item.shortTermFlag},
+            #{item.validPolicyCount}, #{item.accumulatedPremium}, #{item.accountValue},
+            #{item.dividendProvision}, #{item.bestEstimate}, #{item.riskMargin}, #{item.residualMargin},
+            #{item.unmodeledReserve}, #{item.waiverReserve}, #{item.persistenceBonusReserve}, #{item.longTermUnearned}, #{item.shortTermUnearned},
+            #{item.unearnedPremiumReserve}, #{item.outstandingClaimReserve}, #{item.totalAccountingReserve},
+            #{item.remark}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, 0
+            )
+        </foreach>
+    </insert>
+</mapper>

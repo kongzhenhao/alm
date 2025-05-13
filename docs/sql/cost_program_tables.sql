@@ -309,27 +309,3 @@ CREATE TABLE t_cost_account_effective_rate (
     UNIQUE KEY idx_account_effective_rate_unique (accounting_period, design_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分账户有效成本率表';
 
--- 12. 负债现金流表(TB0012)
-CREATE TABLE t_dur_liability_cash_flow (
-    id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    create_by VARCHAR(64) COMMENT '创建人员',
-    create_time DATETIME COMMENT '创建时间',
-    update_by VARCHAR(64) COMMENT '更新人员',
-    update_time DATETIME COMMENT '更新时间',
-    remark VARCHAR(500) COMMENT '备注信息',
-    is_del TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
-    accounting_period VARCHAR(6) NOT NULL COMMENT '账期',
-    cash_flow_type VARCHAR(20) NOT NULL COMMENT '现金流类型',
-    basis_point_type VARCHAR(10) COMMENT '基点类型',
-    actuarial_code VARCHAR(20) NOT NULL COMMENT '精算代码',
-    business_code VARCHAR(20) NOT NULL COMMENT '业务代码',
-    product_name VARCHAR(100) NOT NULL COMMENT '产品名称',
-    cash_flow_set TEXT NOT NULL COMMENT '现金流值集',
-    duration_type VARCHAR(20) NOT NULL COMMENT '久期类型',
-    main_insurance_type VARCHAR(50) NOT NULL COMMENT '险种主类',
-    detailed_insurance_type VARCHAR(50) NOT NULL COMMENT '险种细类',
-    design_type VARCHAR(50) NOT NULL COMMENT '设计类型',
-    short_term_flag CHAR(1) NOT NULL DEFAULT 'N' COMMENT '是否中短：Y-是，N-否',
-    PRIMARY KEY (id),
-    UNIQUE KEY idx_liability_cash_flow_unique (accounting_period, cash_flow_type, basis_point_type, actuarial_code, duration_type, design_type, short_term_flag)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='负债现金流表';
