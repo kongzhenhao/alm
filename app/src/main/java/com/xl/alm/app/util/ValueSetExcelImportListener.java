@@ -100,6 +100,21 @@ public class ValueSetExcelImportListener<T> extends AnalysisEventListener<Map<In
                 valueSetStartIndex = 5;
                 log.info("折现曲线的值集开始列索引设置为: {}", valueSetStartIndex);
                 break;
+            case "KeyDurationParameterDTO":
+                // 关键久期参数的值集开始列索引
+                valueSetStartIndex = 3;
+                log.info("关键久期参数的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
+            case "KeyDurationDiscountCurveDTO":
+                // 关键久期折现曲线的值集开始列索引
+                valueSetStartIndex = 6;
+                log.info("关键久期折现曲线的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
+            case "KeyDurationDiscountFactorsDTO":
+                // 关键久期折现因子的值集开始列索引
+                valueSetStartIndex = 6;
+                log.info("关键久期折现因子的值集开始列索引设置为: {}", valueSetStartIndex);
+                break;
             default:
                 // 其他类型的默认值集开始列索引
                 valueSetStartIndex = 12;

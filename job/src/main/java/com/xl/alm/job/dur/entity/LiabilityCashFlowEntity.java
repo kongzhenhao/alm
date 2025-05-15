@@ -87,7 +87,7 @@ public class LiabilityCashFlowEntity extends BaseEntity {
     /**
      * 现金流值集,分为1273项,格式{"0":{"date":"2025-01-01","value":0.25},"1":{"date":"2025-01-02","value":0.35},...,"1272":{"date":"2025-12-01","value":0.15}}
      */
-    @TableField("cash_flow_val_set")
+    @TableField("cash_val_set")
     private String cashFlowValSet;
 
     /**

@@ -17,7 +17,7 @@
         <result property="productName" column="product_name"/>
         <result property="insuranceMainType" column="insurance_main_type"/>
         <result property="insuranceSubType" column="insurance_sub_type"/>
-        <result property="cashValSet" column="cash_val_set"/>
+        <result property="cashFlowValSet" column="cash_val_set"/>
         <result property="createTime" column="create_time"/>
         <result property="createBy" column="create_by"/>
         <result property="updateTime" column="update_time"/>
@@ -26,7 +26,7 @@
     </resultMap>
 
     <sql id="selectLiabilityCashFlowEntityVo">
-        select id, account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term, 
+        select id, account_period, cash_flow_type, bp_type, duration_type, design_type, is_short_term,
                actuarial_code, business_code, product_name, insurance_main_type, insurance_sub_type,
                cash_val_set, create_time, create_by, update_time, update_by, is_del
         from t_dur_liability_cash_flow
