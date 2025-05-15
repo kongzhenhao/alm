@@ -75,3 +75,16 @@ financeId:
     user: alm
     password: 123456
 
+jeecg :
+  jmreport:
+    #多租户模式，默认值为空(created:按照创建人隔离、tenant:按照租户隔离) (v1.6.2+ 新增)
+    saasMode: tenant
+    # 平台上线安全配置(v1.6.2+ 新增)
+    firewall:
+      # 数据源安全 (开启后，不允许使用平台数据源、SQL解析不允许select * 查询、禁止测试数据源连接是否正确)
+      # 数据源安全下，预留角色有权限使用 select * 和测试数据源链接
+      dataSourceSafe: true
+      # 低代码开发模式（dev:开发模式，prod:发布模式关闭报表设计，预留角色admin、lowdeveloper可设计, prodsf:发布安全模式 彻底关闭报表设计）
+      lowCodeMode: prod
+      # sql注入检查级别（strict:严格, basic:简单校验, none:不校验）
+      sqlInjectionLevel: strict

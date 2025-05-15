@@ -66,22 +66,22 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
             log.info("负债现金流汇总及现值计算成功");
             
             // 2. 执行负债久期计算任务
-//            log.info("开始执行负债久期计算任务");
-//            boolean durationResult = liabilityDurationSummaryTask.execute(accountPeriod);
-//            if (!durationResult) {
-//                log.error("负债久期计算失败");
-//                return new ProcessResult(false, "负债久期计算失败");
-//            }
-//            log.info("负债久期计算成功");
+            log.info("开始执行负债久期计算任务");
+            boolean durationResult = liabilityDurationSummaryTask.execute(accountPeriod);
+            if (!durationResult) {
+                log.error("负债久期计算失败");
+                return new ProcessResult(false, "负债久期计算失败");
+            }
+            log.info("负债久期计算成功");
             
-//            // 3. 执行分账户负债现金流现值汇总任务
-//            log.info("开始执行分账户负债现金流现值汇总任务");
-//            boolean subAccountPresentValueResult = subAccountLiabilityPresentValueTask.execute(accountPeriod);
-//            if (!subAccountPresentValueResult) {
-//                log.error("分账户负债现金流现值汇总失败");
-//                return new ProcessResult(false, "分账户负债现金流现值汇总失败");
-//            }
-//            log.info("分账户负债现金流现值汇总成功");
+            // 3. 执行分账户负债现金流现值汇总任务
+            log.info("开始执行分账户负债现金流现值汇总任务");
+            boolean subAccountPresentValueResult = subAccountLiabilityPresentValueTask.execute(accountPeriod);
+            if (!subAccountPresentValueResult) {
+                log.error("分账户负债现金流现值汇总失败");
+                return new ProcessResult(false, "分账户负债现金流现值汇总失败");
+            }
+            log.info("分账户负债现金流现值汇总成功");
             
             // 4. 执行分账户负债久期汇总任务
 //            log.info("开始执行分账户负债久期汇总任务");
