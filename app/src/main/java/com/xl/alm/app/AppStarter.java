@@ -16,7 +16,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 @EnableEncryptableProperties
 @MapperScan("com.xl.alm.app.mapper")
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}, scanBasePackages = {"com.xl.*","com.jd.*"})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}, scanBasePackages = {"com.xl.*","com.jd.*","org.jeecg"})
 public class AppStarter {
     public static void main(String[] args) {
         SpringApplication.run(AppStarter.class, args);
