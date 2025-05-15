@@ -56,7 +56,7 @@ export function exportProductAttribute(query) {
 export function importTemplate() {
   return request({
     url: '/base/product/attribute/importTemplate',
-    method: 'post',
+    method: 'get',
     responseType: 'blob'
   });
 }

@@ -4,6 +4,7 @@ import com.jd.lightning.common.utils.DateUtils;
 import com.jd.lightning.common.utils.StringUtils;
 import com.jd.lightning.common.exception.ServiceException;
 import com.xl.alm.app.entity.StatutoryReserveDetailEntity;
+import com.xl.alm.app.dto.StatutoryReserveDetailDTO;
 import com.xl.alm.app.mapper.StatutoryReserveDetailMapper;
 import com.xl.alm.app.query.StatutoryReserveDetailQuery;
 import com.xl.alm.app.service.IStatutoryReserveDetailService;
@@ -116,8 +117,30 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
     @Transactional(rollbackFor = Exception.class)
     public String importStatutoryReserveDetail(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<StatutoryReserveDetailEntity> util = new ExcelUtil<>(StatutoryReserveDetailEntity.class);
-            List<StatutoryReserveDetailEntity> detailList = util.importExcel(file.getInputStream());
+            ExcelUtil<StatutoryReserveDetailDTO> util = new ExcelUtil<>(StatutoryReserveDetailDTO.class);
+            List<StatutoryReserveDetailDTO> dtoList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<StatutoryReserveDetailEntity> detailList = new ArrayList<>();
+            for (StatutoryReserveDetailDTO dto : dtoList) {
+                StatutoryReserveDetailEntity entity = new StatutoryReserveDetailEntity();
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setTermType(dto.getTermType());
+                entity.setDesignType(dto.getDesignType());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setValidPolicyCount(dto.getValidPolicyCount());
+                entity.setAccumulatedPremium(dto.getAccumulatedPremium());
+                entity.setAccountValue(dto.getAccountValue());
+                entity.setStatutoryReserve(dto.getStatutoryReserve());
+                entity.setUnearnedPremiumReserve(dto.getUnearnedPremiumReserve());
+                entity.setOutstandingClaimReserve(dto.getOutstandingClaimReserve());
+                entity.setTotalStatutoryReserve(dto.getTotalStatutoryReserve());
+                entity.setRemark(dto.getRemark());
+                detailList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -126,7 +149,7 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
             for (StatutoryReserveDetailEntity detail : detailList) {
                 try {
                     // 验证必填字段
-                    if (StringUtils.isBlank(detail.getAccountingPeriod()) || 
+                    if (StringUtils.isBlank(detail.getAccountingPeriod()) ||
                         StringUtils.isBlank(detail.getActuarialCode())) {
                         failureNum++;
                         failureMsg.append("<br/>第 ").append(failureNum).append(" 条数据账期或精算代码为空");
@@ -145,18 +168,103 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
                     }
                     if (detail.getAccumulatedPremium() == null) {
                         detail.setAccumulatedPremium(BigDecimal.ZERO);
+                    } else {
+                        // 验证存量累计规模保费是否超过数据库列的范围
+                        // 判断是否超过DECIMAL(18,10)的范围，整数部分最多8位
+                        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                        if (detail.getAccumulatedPremium().compareTo(maxValue) > 0) {
+                            // 如果超过范围，则将其设置为最大值
+                            detail.setAccumulatedPremium(maxValue);
+                        }
                     }
                     if (detail.getAccountValue() == null) {
                         detail.setAccountValue(BigDecimal.ZERO);
+                    } else {
+                        // 验证账户价值是否超过数据库列的范围
+                        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                        if (detail.getAccountValue().compareTo(maxValue) > 0) {
+                            detail.setAccountValue(maxValue);
+                        }
                     }
                     if (detail.getStatutoryReserve() == null) {
                         detail.setStatutoryReserve(BigDecimal.ZERO);
+                    } else {
+                        // 验证法定/非单位准备金是否超过数据库列的范围
+                        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                        if (detail.getStatutoryReserve().compareTo(maxValue) > 0) {
+                            detail.setStatutoryReserve(maxValue);
+                        }
                     }
                     if (detail.getUnearnedPremiumReserve() == null) {
                         detail.setUnearnedPremiumReserve(BigDecimal.ZERO);
+                    } else {
+                        // 验证未到期责任准备金是否超过数据库列的范围
+                        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                        if (detail.getUnearnedPremiumReserve().compareTo(maxValue) > 0) {
+                            detail.setUnearnedPremiumReserve(maxValue);
+                        }
                     }
                     if (detail.getOutstandingClaimReserve() == null) {
                         detail.setOutstandingClaimReserve(BigDecimal.ZERO);
+                    } else {
+                        // 验证未决赔款准备金是否超过数据库列的范围
+                        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                        if (detail.getOutstandingClaimReserve().compareTo(maxValue) > 0) {
+                            detail.setOutstandingClaimReserve(maxValue);
+                        }
+                    }
+
+                    // 验证新添加的字段是否超过数据库列的范围
+                    BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+
+                    // 保证利率准备金
+                    if (detail.getGuaranteedRateReserve() != null && detail.getGuaranteedRateReserve().compareTo(maxValue) > 0) {
+                        detail.setGuaranteedRateReserve(maxValue);
+                    }
+
+                    // 失效单现价
+                    if (detail.getLapsedPolicyValue() != null && detail.getLapsedPolicyValue().compareTo(maxValue) > 0) {
+                        detail.setLapsedPolicyValue(maxValue);
+                    }
+
+                    // 豁免责任准备金
+                    if (detail.getWaiverReserve() != null && detail.getWaiverReserve().compareTo(maxValue) > 0) {
+                        detail.setWaiverReserve(maxValue);
+                    }
+
+                    // 未建模准备金
+                    if (detail.getUnmodeledReserve() != null && detail.getUnmodeledReserve().compareTo(maxValue) > 0) {
+                        detail.setUnmodeledReserve(maxValue);
+                    }
+
+                    // 持续奖准备金
+                    if (detail.getPersistenceBonusReserve() != null && detail.getPersistenceBonusReserve().compareTo(maxValue) > 0) {
+                        detail.setPersistenceBonusReserve(maxValue);
+                    }
+
+                    // 长期未到期准备金
+                    if (detail.getLongTermUnearned() != null && detail.getLongTermUnearned().compareTo(maxValue) > 0) {
+                        detail.setLongTermUnearned(maxValue);
+                    }
+
+                    // 短险未到期准备金
+                    if (detail.getShortTermUnearned() != null && detail.getShortTermUnearned().compareTo(maxValue) > 0) {
+                        detail.setShortTermUnearned(maxValue);
+                    }
+
+                    // 已报未决赔款
+                    if (detail.getReportedUnpaid() != null && detail.getReportedUnpaid().compareTo(maxValue) > 0) {
+                        detail.setReportedUnpaid(maxValue);
+                    }
+
+                    // 未报未决赔款
+                    if (detail.getIncurredUnreported() != null && detail.getIncurredUnreported().compareTo(maxValue) > 0) {
+                        detail.setIncurredUnreported(maxValue);
+                    }
+
+                    // 理赔费用准备金
+                    if (detail.getClaimExpenseReserve() != null && detail.getClaimExpenseReserve().compareTo(maxValue) > 0) {
+                        detail.setClaimExpenseReserve(maxValue);
                     }
 
                     // 计算法定准备金合计
@@ -211,8 +319,8 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
      */
     @Override
     public void importTemplateStatutoryReserveDetail(HttpServletResponse response) {
-        List<StatutoryReserveDetailEntity> templateList = new ArrayList<>();
-        StatutoryReserveDetailEntity template = new StatutoryReserveDetailEntity();
+        List<StatutoryReserveDetailDTO> templateList = new ArrayList<>();
+        StatutoryReserveDetailDTO template = new StatutoryReserveDetailDTO();
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
         template.setBusinessCode("BIZ001");
@@ -224,13 +332,23 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
         template.setAccumulatedPremium(new BigDecimal("10000.00"));
         template.setAccountValue(new BigDecimal("9500.00"));
         template.setStatutoryReserve(new BigDecimal("9000.00"));
+        template.setGuaranteedRateReserve(new BigDecimal("1000.00"));
+        template.setLapsedPolicyValue(new BigDecimal("500.00"));
+        template.setWaiverReserve(new BigDecimal("300.00"));
+        template.setUnmodeledReserve(new BigDecimal("200.00"));
+        template.setPersistenceBonusReserve(new BigDecimal("100.00"));
+        template.setLongTermUnearned(new BigDecimal("400.00"));
+        template.setShortTermUnearned(new BigDecimal("100.00"));
         template.setUnearnedPremiumReserve(new BigDecimal("500.00"));
+        template.setReportedUnpaid(new BigDecimal("150.00"));
+        template.setIncurredUnreported(new BigDecimal("50.00"));
+        template.setClaimExpenseReserve(new BigDecimal("20.00"));
         template.setOutstandingClaimReserve(new BigDecimal("200.00"));
-        template.setTotalStatutoryReserve(new BigDecimal("9700.00"));
+        template.setTotalStatutoryReserve(new BigDecimal("12520.00"));
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<StatutoryReserveDetailEntity> util = new ExcelUtil<>(StatutoryReserveDetailEntity.class);
+        ExcelUtil<StatutoryReserveDetailDTO> util = new ExcelUtil<>(StatutoryReserveDetailDTO.class);
         util.exportExcel(templateList, "法定准备金明细数据模板", response);
     }
 
@@ -244,12 +362,49 @@ public class StatutoryReserveDetailServiceImpl implements IStatutoryReserveDetai
         if (detail.getStatutoryReserve() != null) {
             total = total.add(detail.getStatutoryReserve());
         }
+        if (detail.getGuaranteedRateReserve() != null) {
+            total = total.add(detail.getGuaranteedRateReserve());
+        }
+        if (detail.getLapsedPolicyValue() != null) {
+            total = total.add(detail.getLapsedPolicyValue());
+        }
+        if (detail.getWaiverReserve() != null) {
+            total = total.add(detail.getWaiverReserve());
+        }
+        if (detail.getUnmodeledReserve() != null) {
+            total = total.add(detail.getUnmodeledReserve());
+        }
+        if (detail.getPersistenceBonusReserve() != null) {
+            total = total.add(detail.getPersistenceBonusReserve());
+        }
+        if (detail.getLongTermUnearned() != null) {
+            total = total.add(detail.getLongTermUnearned());
+        }
+        if (detail.getShortTermUnearned() != null) {
+            total = total.add(detail.getShortTermUnearned());
+        }
         if (detail.getUnearnedPremiumReserve() != null) {
             total = total.add(detail.getUnearnedPremiumReserve());
+        }
+        if (detail.getReportedUnpaid() != null) {
+            total = total.add(detail.getReportedUnpaid());
+        }
+        if (detail.getIncurredUnreported() != null) {
+            total = total.add(detail.getIncurredUnreported());
+        }
+        if (detail.getClaimExpenseReserve() != null) {
+            total = total.add(detail.getClaimExpenseReserve());
         }
         if (detail.getOutstandingClaimReserve() != null) {
             total = total.add(detail.getOutstandingClaimReserve());
         }
+
+        // 验证法定准备金合计是否超过数据库列的范围
+        BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+        if (total.compareTo(maxValue) > 0) {
+            total = maxValue;
+        }
+
         detail.setTotalStatutoryReserve(total);
     }
 }

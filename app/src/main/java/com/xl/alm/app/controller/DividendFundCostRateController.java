@@ -7,6 +7,7 @@ import com.jd.lightning.common.core.page.TableDataInfo;
 import com.jd.lightning.common.enums.BusinessType;
 import com.jd.lightning.common.utils.SecurityUtils;
 import com.xl.alm.app.entity.DividendFundCostRateEntity;
+import com.xl.alm.app.dto.DividendFundCostRateDTO;
 import com.xl.alm.app.query.DividendFundCostRateQuery;
 import com.xl.alm.app.service.IDividendFundCostRateService;
 import com.xl.alm.app.util.ExcelUtil;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,8 +50,35 @@ public class DividendFundCostRateController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, DividendFundCostRateQuery query) {
         List<DividendFundCostRateEntity> list = dividendFundCostRateService.selectDividendFundCostRateList(query);
-        ExcelUtil<DividendFundCostRateEntity> util = new ExcelUtil<>(DividendFundCostRateEntity.class);
-        util.exportExcel(list, "分红方案数据", response);
+
+        // 将Entity转换为DTO
+        List<DividendFundCostRateDTO> dtoList = new ArrayList<>();
+        for (DividendFundCostRateEntity entity : list) {
+            DividendFundCostRateDTO dto = new DividendFundCostRateDTO();
+            dto.setId(entity.getId());
+            dto.setAccountingPeriod(entity.getAccountingPeriod());
+            dto.setActuarialCode(entity.getActuarialCode());
+            dto.setBusinessCode(entity.getBusinessCode());
+            dto.setProductName(entity.getProductName());
+            dto.setShortTermFlag(entity.getShortTermFlag());
+            dto.setGuaranteedCostRate(entity.getGuaranteedCostRate());
+            dto.setInvestmentReturnRate(entity.getInvestmentReturnRate());
+            dto.setDividendRatio(entity.getDividendRatio());
+            dto.setFundCostRateT0(entity.getFundCostRateT0());
+            dto.setFundCostRateT1(entity.getFundCostRateT1());
+            dto.setFundCostRateT2(entity.getFundCostRateT2());
+            dto.setFundCostRateT3(entity.getFundCostRateT3());
+            dto.setRemark(entity.getRemark());
+            dto.setCreateBy(entity.getCreateBy());
+            dto.setCreateTime(entity.getCreateTime());
+            dto.setUpdateBy(entity.getUpdateBy());
+            dto.setUpdateTime(entity.getUpdateTime());
+            dto.setIsDel(entity.getIsDel());
+            dtoList.add(dto);
+        }
+
+        ExcelUtil<DividendFundCostRateDTO> util = new ExcelUtil<>(DividendFundCostRateDTO.class);
+        util.exportExcel(dtoList, "分红方案数据", response);
     }
 
     /**
@@ -108,8 +137,7 @@ public class DividendFundCostRateController extends BaseController {
     /**
      * 下载分红方案导入模板
      */
-    @PreAuthorize("@ss.hasPermi('base:dividend:fund:import')")
-    @PostMapping("/importTemplate")
+    @GetMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
         dividendFundCostRateService.importTemplateDividendFundCostRate(response);
     }

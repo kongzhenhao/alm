@@ -56,7 +56,7 @@ export function exportSettlement(query) {
 export function importSettlementTemplate() {
   return request({
     url: '/base/universal/settlement/importTemplate',
-    method: 'post',
+    method: 'get',
     responseType: 'blob'
   });
 }

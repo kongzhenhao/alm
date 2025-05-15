@@ -56,7 +56,7 @@ export function exportForecast(query) {
 export function importForecastTemplate() {
   return request({
     url: '/base/statutory/forecast/importTemplate',
-    method: 'post',
+    method: 'get',
     responseType: 'blob'
   });
 }

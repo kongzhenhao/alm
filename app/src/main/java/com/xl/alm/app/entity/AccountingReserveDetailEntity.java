@@ -79,11 +79,44 @@ public class AccountingReserveDetailEntity extends BaseEntity {
     /** 未到期责任准备金 */
     private BigDecimal unearnedPremiumReserve;
 
+    /** 已报未决 */
+    private BigDecimal reportedUnpaid;
+
+    /** 未报未决 */
+    private BigDecimal incurredUnreported;
+
+    /** 理赔费用准备金 */
+    private BigDecimal claimExpenseReserve;
+
     /** 未决赔款准备金 */
     private BigDecimal outstandingClaimReserve;
 
     /** 会计准备金合计 */
     private BigDecimal totalAccountingReserve;
+
+    /** 应收分保未到期责任准备金 */
+    private BigDecimal reinsuranceUnearned;
+
+    /** 应收分保已报未决 */
+    private BigDecimal reinsuranceReported;
+
+    /** 应收分保未报未决 */
+    private BigDecimal reinsuranceUnreported;
+
+    /** 应收分保未决合计 */
+    private BigDecimal reinsuranceClaimTotal;
+
+    /** 应收分保合计 */
+    private BigDecimal reinsuranceTotal;
+
+    /** 失效保单现价 */
+    private BigDecimal lapsedPolicyValue;
+
+    /** 零头月红利 */
+    private BigDecimal fractionalMonthDividend;
+
+    /** 应付未付红利 */
+    private BigDecimal unpaidDividend;
 
     /** 是否删除，0:否，1:是 */
     private Integer isDel;

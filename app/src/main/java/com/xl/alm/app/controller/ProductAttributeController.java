@@ -5,16 +5,19 @@ import com.jd.lightning.common.core.controller.BaseController;
 import com.jd.lightning.common.core.domain.Result;
 import com.jd.lightning.common.core.page.TableDataInfo;
 import com.jd.lightning.common.enums.BusinessType;
-import com.jd.lightning.common.utils.poi.ExcelUtil;
+import com.xl.alm.app.util.ExcelUtil;
 import com.jd.lightning.common.utils.SecurityUtils;
 import com.xl.alm.app.entity.ProductAttributeEntity;
+import com.xl.alm.app.dto.ProductAttributeDTO;
 import com.xl.alm.app.service.IProductAttributeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/base/product/attribute")
+@Slf4j
 public class ProductAttributeController extends BaseController {
     @Autowired
     private IProductAttributeService productAttributeService;
@@ -47,8 +51,36 @@ public class ProductAttributeController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, ProductAttributeEntity productAttribute) {
         List<ProductAttributeEntity> list = productAttributeService.selectProductAttributeList(productAttribute);
-        ExcelUtil<ProductAttributeEntity> util = new ExcelUtil<>(ProductAttributeEntity.class);
-        util.exportExcel(response, list, "产品属性数据");
+
+        // 将Entity转换为DTO
+        List<ProductAttributeDTO> dtoList = new ArrayList<>();
+        for (ProductAttributeEntity entity : list) {
+            ProductAttributeDTO dto = new ProductAttributeDTO();
+            dto.setId(entity.getId());
+            dto.setAccountingPeriod(entity.getAccountingPeriod());
+            dto.setActuarialCode(entity.getActuarialCode());
+            dto.setBusinessCode(entity.getBusinessCode());
+            dto.setProductName(entity.getProductName());
+            dto.setTermType(entity.getTermType());
+            dto.setInsuranceMainType(entity.getInsuranceMainType());
+            dto.setInsuranceSubType(entity.getInsuranceSubType());
+            dto.setDesignType(entity.getDesignType());
+            dto.setShortTermFlag(entity.getShortTermFlag());
+            dto.setRegMidId(entity.getRegMidId());
+            dto.setGuaranteedCostRate(entity.getGuaranteedCostRate());
+            dto.setSubAccount(entity.getSubAccount());
+            dto.setNewBusinessFlag(entity.getNewBusinessFlag());
+            dto.setRemark(entity.getRemark());
+            dto.setIsDel(entity.getIsDel());
+            dto.setCreateBy(entity.getCreateBy());
+            dto.setCreateTime(entity.getCreateTime());
+            dto.setUpdateBy(entity.getUpdateBy());
+            dto.setUpdateTime(entity.getUpdateTime());
+            dtoList.add(dto);
+        }
+
+        ExcelUtil<ProductAttributeDTO> util = new ExcelUtil<>(ProductAttributeDTO.class);
+        util.exportExcel(dtoList, "产品属性数据", response);
     }
 
     /**
@@ -98,17 +130,21 @@ public class ProductAttributeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('base:product:attribute:import')")
     @Log(title = "产品属性", businessType = BusinessType.IMPORT)
     @PostMapping("/importData")
-    public Result importData(MultipartFile file, boolean updateSupport) throws Exception {
-        String operName = SecurityUtils.getUsername();
-        String message = productAttributeService.importProductAttribute(file, updateSupport, operName);
-        return success(message);
+    public Result importData(MultipartFile file, boolean updateSupport) {
+        try {
+            String operName = SecurityUtils.getUsername();
+            String message = productAttributeService.importProductAttribute(file, updateSupport, operName);
+            return success(message);
+        } catch (Exception e) {
+            log.error("导入产品属性数据失败", e);
+            return error(e.getMessage());
+        }
     }
 
     /**
      * 下载产品属性导入模板
      */
-    @PreAuthorize("@ss.hasPermi('base:product:attribute:import')")
-    @PostMapping("/importTemplate")
+    @GetMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
         productAttributeService.importTemplateProductAttribute(response);
     }

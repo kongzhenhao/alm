@@ -4,6 +4,7 @@ import com.jd.lightning.common.utils.DateUtils;
 import com.jd.lightning.common.utils.StringUtils;
 import com.jd.lightning.common.exception.ServiceException;
 import com.xl.alm.app.entity.DividendFundCostRateEntity;
+import com.xl.alm.app.dto.DividendFundCostRateDTO;
 import com.xl.alm.app.mapper.DividendFundCostRateMapper;
 import com.xl.alm.app.query.DividendFundCostRateQuery;
 import com.xl.alm.app.service.IDividendFundCostRateService;
@@ -112,8 +113,28 @@ public class DividendFundCostRateServiceImpl implements IDividendFundCostRateSer
     @Transactional(rollbackFor = Exception.class)
     public String importDividendFundCostRate(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<DividendFundCostRateEntity> util = new ExcelUtil<>(DividendFundCostRateEntity.class);
-            List<DividendFundCostRateEntity> rateList = util.importExcel(file.getInputStream());
+            ExcelUtil<DividendFundCostRateDTO> util = new ExcelUtil<>(DividendFundCostRateDTO.class);
+            List<DividendFundCostRateDTO> dtoList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<DividendFundCostRateEntity> rateList = new ArrayList<>();
+            for (DividendFundCostRateDTO dto : dtoList) {
+                DividendFundCostRateEntity entity = new DividendFundCostRateEntity();
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setGuaranteedCostRate(dto.getGuaranteedCostRate());
+                entity.setInvestmentReturnRate(dto.getInvestmentReturnRate());
+                entity.setDividendRatio(dto.getDividendRatio());
+                entity.setFundCostRateT0(dto.getFundCostRateT0());
+                entity.setFundCostRateT1(dto.getFundCostRateT1());
+                entity.setFundCostRateT2(dto.getFundCostRateT2());
+                entity.setFundCostRateT3(dto.getFundCostRateT3());
+                entity.setRemark(dto.getRemark());
+                rateList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -204,8 +225,8 @@ public class DividendFundCostRateServiceImpl implements IDividendFundCostRateSer
      */
     @Override
     public void importTemplateDividendFundCostRate(HttpServletResponse response) {
-        List<DividendFundCostRateEntity> templateList = new ArrayList<>();
-        DividendFundCostRateEntity template = new DividendFundCostRateEntity();
+        List<DividendFundCostRateDTO> templateList = new ArrayList<>();
+        DividendFundCostRateDTO template = new DividendFundCostRateDTO();
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
         template.setBusinessCode("BIZ001");
@@ -221,7 +242,7 @@ public class DividendFundCostRateServiceImpl implements IDividendFundCostRateSer
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<DividendFundCostRateEntity> util = new ExcelUtil<>(DividendFundCostRateEntity.class);
+        ExcelUtil<DividendFundCostRateDTO> util = new ExcelUtil<>(DividendFundCostRateDTO.class);
         util.exportExcel(templateList, "分红方案数据模板", response);
     }
 }

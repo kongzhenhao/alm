@@ -56,7 +56,7 @@ export function exportFund(query) {
 export function importFundTemplate() {
   return request({
     url: '/base/dividend/fund/importTemplate',
-    method: 'post',
+    method: 'get',
     responseType: 'blob'
   });
 }

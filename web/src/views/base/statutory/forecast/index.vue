@@ -547,8 +547,10 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      // 直接下载模板文件
-      window.open(process.env.VUE_APP_BASE_API + "/base/statutory/forecast/importTemplate", "_blank");
+      // 使用API函数下载模板文件
+      importForecastTemplate().then(response => {
+        this.downloadFile(response, `法定准备金预测模板_${new Date().getTime()}.xlsx`);
+      });
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
@@ -561,6 +563,15 @@ export default {
       this.$refs.upload.clearFiles();
       this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
       this.getList();
+    },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
     },
     // 提交上传文件
     submitFileForm() {

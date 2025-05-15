@@ -4,6 +4,7 @@ import com.jd.lightning.common.exception.ServiceException;
 import com.jd.lightning.common.utils.DateUtils;
 import com.jd.lightning.common.utils.StringUtils;
 import com.xl.alm.app.entity.AccountingReserveDetailEntity;
+import com.xl.alm.app.dto.AccountingReserveDetailDTO;
 import com.xl.alm.app.mapper.AccountingReserveDetailMapper;
 import com.xl.alm.app.query.AccountingReserveDetailQuery;
 import com.xl.alm.app.service.IAccountingReserveDetailService;
@@ -116,8 +117,61 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
     @Transactional(rollbackFor = Exception.class)
     public String importAccountingReserveDetail(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<AccountingReserveDetailEntity> util = new ExcelUtil<>(AccountingReserveDetailEntity.class);
-            List<AccountingReserveDetailEntity> detailList = util.importExcel(file.getInputStream());
+            ExcelUtil<AccountingReserveDetailDTO> util = new ExcelUtil<>(AccountingReserveDetailDTO.class);
+            List<AccountingReserveDetailDTO> dtoList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<AccountingReserveDetailEntity> detailList = new ArrayList<>();
+            for (AccountingReserveDetailDTO dto : dtoList) {
+                AccountingReserveDetailEntity entity = new AccountingReserveDetailEntity();
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setTermType(dto.getTermType());
+                entity.setDesignType(dto.getDesignType());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setValidPolicyCount(dto.getValidPolicyCount());
+                // 验证存量累计规模保费是否超过数据库列的范围
+                if (dto.getAccumulatedPremium() != null) {
+                    // 判断是否超过DECIMAL(18,10)的范围，整数部分最多8位
+                    BigDecimal maxValue = new BigDecimal("99999999.9999999999");
+                    if (dto.getAccumulatedPremium().compareTo(maxValue) > 0) {
+                        // 如果超过范围，则将其设置为最大值
+                        entity.setAccumulatedPremium(maxValue);
+                    } else {
+                        entity.setAccumulatedPremium(dto.getAccumulatedPremium());
+                    }
+                } else {
+                    entity.setAccumulatedPremium(BigDecimal.ZERO);
+                }
+                entity.setAccountValue(dto.getAccountValue());
+                entity.setDividendProvision(dto.getDividendProvision());
+                entity.setBestEstimate(dto.getBestEstimate());
+                entity.setRiskMargin(dto.getRiskMargin());
+                entity.setResidualMargin(dto.getResidualMargin());
+                entity.setUnmodeledReserve(dto.getUnmodeledReserve());
+                entity.setWaiverReserve(dto.getWaiverReserve());
+                entity.setPersistenceBonusReserve(dto.getPersistenceBonusReserve());
+                entity.setLongTermUnearned(dto.getLongTermUnearned());
+                entity.setShortTermUnearned(dto.getShortTermUnearned());
+                entity.setUnearnedPremiumReserve(dto.getUnearnedPremiumReserve());
+                entity.setReportedUnpaid(dto.getReportedUnpaid());
+                entity.setIncurredUnreported(dto.getIncurredUnreported());
+                entity.setClaimExpenseReserve(dto.getClaimExpenseReserve());
+                entity.setOutstandingClaimReserve(dto.getOutstandingClaimReserve());
+                entity.setTotalAccountingReserve(dto.getTotalAccountingReserve());
+                entity.setReinsuranceUnearned(dto.getReinsuranceUnearned());
+                entity.setReinsuranceReported(dto.getReinsuranceReported());
+                entity.setReinsuranceUnreported(dto.getReinsuranceUnreported());
+                entity.setReinsuranceClaimTotal(dto.getReinsuranceClaimTotal());
+                entity.setReinsuranceTotal(dto.getReinsuranceTotal());
+                entity.setLapsedPolicyValue(dto.getLapsedPolicyValue());
+                entity.setFractionalMonthDividend(dto.getFractionalMonthDividend());
+                entity.setUnpaidDividend(dto.getUnpaidDividend());
+                entity.setRemark(dto.getRemark());
+                detailList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -182,6 +236,30 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
                     if (detail.getOutstandingClaimReserve() == null) {
                         detail.setOutstandingClaimReserve(BigDecimal.ZERO);
                     }
+                    if (detail.getReinsuranceUnearned() == null) {
+                        detail.setReinsuranceUnearned(BigDecimal.ZERO);
+                    }
+                    if (detail.getReinsuranceReported() == null) {
+                        detail.setReinsuranceReported(BigDecimal.ZERO);
+                    }
+                    if (detail.getReinsuranceUnreported() == null) {
+                        detail.setReinsuranceUnreported(BigDecimal.ZERO);
+                    }
+                    if (detail.getReinsuranceClaimTotal() == null) {
+                        detail.setReinsuranceClaimTotal(BigDecimal.ZERO);
+                    }
+                    if (detail.getReinsuranceTotal() == null) {
+                        detail.setReinsuranceTotal(BigDecimal.ZERO);
+                    }
+                    if (detail.getLapsedPolicyValue() == null) {
+                        detail.setLapsedPolicyValue(BigDecimal.ZERO);
+                    }
+                    if (detail.getFractionalMonthDividend() == null) {
+                        detail.setFractionalMonthDividend(BigDecimal.ZERO);
+                    }
+                    if (detail.getUnpaidDividend() == null) {
+                        detail.setUnpaidDividend(BigDecimal.ZERO);
+                    }
 
                     // 计算会计准备金合计
                     calculateTotalAccountingReserve(detail);
@@ -235,8 +313,8 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
      */
     @Override
     public void importTemplateAccountingReserveDetail(HttpServletResponse response) {
-        List<AccountingReserveDetailEntity> templateList = new ArrayList<>();
-        AccountingReserveDetailEntity template = new AccountingReserveDetailEntity();
+        List<AccountingReserveDetailDTO> templateList = new ArrayList<>();
+        AccountingReserveDetailDTO template = new AccountingReserveDetailDTO();
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
         template.setBusinessCode("BIZ001");
@@ -257,12 +335,23 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
         template.setLongTermUnearned(new BigDecimal("600.00"));
         template.setShortTermUnearned(new BigDecimal("100.00"));
         template.setUnearnedPremiumReserve(new BigDecimal("500.00"));
+        template.setReportedUnpaid(new BigDecimal("150.00"));
+        template.setIncurredUnreported(new BigDecimal("50.00"));
+        template.setClaimExpenseReserve(new BigDecimal("20.00"));
         template.setOutstandingClaimReserve(new BigDecimal("200.00"));
         template.setTotalAccountingReserve(new BigDecimal("9700.00"));
+        template.setReinsuranceUnearned(new BigDecimal("100.00"));
+        template.setReinsuranceReported(new BigDecimal("50.00"));
+        template.setReinsuranceUnreported(new BigDecimal("30.00"));
+        template.setReinsuranceClaimTotal(new BigDecimal("80.00"));
+        template.setReinsuranceTotal(new BigDecimal("180.00"));
+        template.setLapsedPolicyValue(new BigDecimal("300.00"));
+        template.setFractionalMonthDividend(new BigDecimal("20.00"));
+        template.setUnpaidDividend(new BigDecimal("40.00"));
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<AccountingReserveDetailEntity> util = new ExcelUtil<>(AccountingReserveDetailEntity.class);
+        ExcelUtil<AccountingReserveDetailDTO> util = new ExcelUtil<>(AccountingReserveDetailDTO.class);
         util.exportExcel(templateList, "会计准备金明细数据模板", response);
     }
 
@@ -303,8 +392,23 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
         if (detail.getUnearnedPremiumReserve() != null) {
             total = total.add(detail.getUnearnedPremiumReserve());
         }
+        if (detail.getReportedUnpaid() != null) {
+            total = total.add(detail.getReportedUnpaid());
+        }
+        if (detail.getIncurredUnreported() != null) {
+            total = total.add(detail.getIncurredUnreported());
+        }
+        if (detail.getClaimExpenseReserve() != null) {
+            total = total.add(detail.getClaimExpenseReserve());
+        }
         if (detail.getOutstandingClaimReserve() != null) {
             total = total.add(detail.getOutstandingClaimReserve());
+        }
+        if (detail.getFractionalMonthDividend() != null) {
+            total = total.add(detail.getFractionalMonthDividend());
+        }
+        if (detail.getUnpaidDividend() != null) {
+            total = total.add(detail.getUnpaidDividend());
         }
         detail.setTotalAccountingReserve(total);
     }

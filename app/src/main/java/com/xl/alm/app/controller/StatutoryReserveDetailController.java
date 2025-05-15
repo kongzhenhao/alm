@@ -7,6 +7,7 @@ import com.jd.lightning.common.core.page.TableDataInfo;
 import com.jd.lightning.common.enums.BusinessType;
 import com.jd.lightning.common.utils.SecurityUtils;
 import com.xl.alm.app.entity.StatutoryReserveDetailEntity;
+import com.xl.alm.app.dto.StatutoryReserveDetailDTO;
 import com.xl.alm.app.query.StatutoryReserveDetailQuery;
 import com.xl.alm.app.service.IStatutoryReserveDetailService;
 import com.xl.alm.app.util.ExcelUtil;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,8 +50,47 @@ public class StatutoryReserveDetailController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, StatutoryReserveDetailQuery query) {
         List<StatutoryReserveDetailEntity> list = statutoryReserveDetailService.selectStatutoryReserveDetailList(query);
-        ExcelUtil<StatutoryReserveDetailEntity> util = new ExcelUtil<>(StatutoryReserveDetailEntity.class);
-        util.exportExcel(list, "法定准备金明细数据", response);
+
+        // 将Entity转换为DTO
+        List<StatutoryReserveDetailDTO> dtoList = new ArrayList<>();
+        for (StatutoryReserveDetailEntity entity : list) {
+            StatutoryReserveDetailDTO dto = new StatutoryReserveDetailDTO();
+            dto.setId(entity.getId());
+            dto.setAccountingPeriod(entity.getAccountingPeriod());
+            dto.setActuarialCode(entity.getActuarialCode());
+            dto.setBusinessCode(entity.getBusinessCode());
+            dto.setProductName(entity.getProductName());
+            dto.setTermType(entity.getTermType());
+            dto.setDesignType(entity.getDesignType());
+            dto.setShortTermFlag(entity.getShortTermFlag());
+            dto.setValidPolicyCount(entity.getValidPolicyCount());
+            dto.setAccumulatedPremium(entity.getAccumulatedPremium());
+            dto.setAccountValue(entity.getAccountValue());
+            dto.setStatutoryReserve(entity.getStatutoryReserve());
+            dto.setGuaranteedRateReserve(entity.getGuaranteedRateReserve());
+            dto.setLapsedPolicyValue(entity.getLapsedPolicyValue());
+            dto.setWaiverReserve(entity.getWaiverReserve());
+            dto.setUnmodeledReserve(entity.getUnmodeledReserve());
+            dto.setPersistenceBonusReserve(entity.getPersistenceBonusReserve());
+            dto.setLongTermUnearned(entity.getLongTermUnearned());
+            dto.setShortTermUnearned(entity.getShortTermUnearned());
+            dto.setUnearnedPremiumReserve(entity.getUnearnedPremiumReserve());
+            dto.setReportedUnpaid(entity.getReportedUnpaid());
+            dto.setIncurredUnreported(entity.getIncurredUnreported());
+            dto.setClaimExpenseReserve(entity.getClaimExpenseReserve());
+            dto.setOutstandingClaimReserve(entity.getOutstandingClaimReserve());
+            dto.setTotalStatutoryReserve(entity.getTotalStatutoryReserve());
+            dto.setRemark(entity.getRemark());
+            dto.setCreateBy(entity.getCreateBy());
+            dto.setCreateTime(entity.getCreateTime());
+            dto.setUpdateBy(entity.getUpdateBy());
+            dto.setUpdateTime(entity.getUpdateTime());
+            dto.setIsDel(entity.getIsDel());
+            dtoList.add(dto);
+        }
+
+        ExcelUtil<StatutoryReserveDetailDTO> util = new ExcelUtil<>(StatutoryReserveDetailDTO.class);
+        util.exportExcel(dtoList, "法定准备金明细数据", response);
     }
 
     /**
@@ -108,8 +149,7 @@ public class StatutoryReserveDetailController extends BaseController {
     /**
      * 下载法定准备金明细导入模板
      */
-    @PreAuthorize("@ss.hasPermi('base:statutory:reserve:import')")
-    @PostMapping("/importTemplate")
+    @GetMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response) {
         statutoryReserveDetailService.importTemplateStatutoryReserveDetail(response);
     }

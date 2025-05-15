@@ -4,6 +4,7 @@ import com.jd.lightning.common.exception.ServiceException;
 import com.jd.lightning.common.utils.DateUtils;
 import com.jd.lightning.common.utils.StringUtils;
 import com.xl.alm.app.entity.StatutoryReserveForecastEntity;
+import com.xl.alm.app.dto.StatutoryReserveForecastDTO;
 import com.xl.alm.app.mapper.StatutoryReserveForecastMapper;
 import com.xl.alm.app.query.StatutoryReserveForecastQuery;
 import com.xl.alm.app.service.IStatutoryReserveForecastService;
@@ -138,8 +139,26 @@ public class StatutoryReserveForecastServiceImpl implements IStatutoryReserveFor
     @Transactional(rollbackFor = Exception.class)
     public String importStatutoryReserveForecast(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<StatutoryReserveForecastEntity> util = new ExcelUtil<>(StatutoryReserveForecastEntity.class);
-            List<StatutoryReserveForecastEntity> forecastList = util.importExcel(file.getInputStream());
+            ExcelUtil<StatutoryReserveForecastDTO> util = new ExcelUtil<>(StatutoryReserveForecastDTO.class);
+            List<StatutoryReserveForecastDTO> dtoList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<StatutoryReserveForecastEntity> forecastList = new ArrayList<>();
+            for (StatutoryReserveForecastDTO dto : dtoList) {
+                StatutoryReserveForecastEntity entity = new StatutoryReserveForecastEntity();
+                entity.setBusinessType(dto.getBusinessType());
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setDesignType(dto.getDesignType());
+                entity.setTermType(dto.getTermType());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setStatutoryReserveT1(dto.getStatutoryReserveT1());
+                entity.setStatutoryReserveT2(dto.getStatutoryReserveT2());
+                entity.setStatutoryReserveT3(dto.getStatutoryReserveT3());
+                forecastList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -223,8 +242,8 @@ public class StatutoryReserveForecastServiceImpl implements IStatutoryReserveFor
      */
     @Override
     public void importTemplateStatutoryReserveForecast(HttpServletResponse response) {
-        List<StatutoryReserveForecastEntity> templateList = new ArrayList<>();
-        StatutoryReserveForecastEntity template = new StatutoryReserveForecastEntity();
+        List<StatutoryReserveForecastDTO> templateList = new ArrayList<>();
+        StatutoryReserveForecastDTO template = new StatutoryReserveForecastDTO();
         template.setBusinessType("LIFE");
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
@@ -239,7 +258,7 @@ public class StatutoryReserveForecastServiceImpl implements IStatutoryReserveFor
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<StatutoryReserveForecastEntity> util = new ExcelUtil<>(StatutoryReserveForecastEntity.class);
+        ExcelUtil<StatutoryReserveForecastDTO> util = new ExcelUtil<>(StatutoryReserveForecastDTO.class);
         util.exportExcel(templateList, "法定准备金预测数据模板", response);
     }
 

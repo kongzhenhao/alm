@@ -5,6 +5,7 @@ import com.jd.lightning.common.utils.StringUtils;
 import com.xl.alm.app.util.ExcelUtil;
 import com.jd.lightning.common.exception.ServiceException;
 import com.xl.alm.app.entity.ProductAttributeEntity;
+import com.xl.alm.app.dto.ProductAttributeDTO;
 import com.xl.alm.app.mapper.ProductAttributeMapper;
 import com.xl.alm.app.service.IProductAttributeService;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -110,8 +112,29 @@ public class ProductAttributeServiceImpl implements IProductAttributeService {
     @Transactional(rollbackFor = Exception.class)
     public String importProductAttribute(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<ProductAttributeEntity> util = new ExcelUtil<>(ProductAttributeEntity.class);
-            List<ProductAttributeEntity> productAttributeList = util.importExcel(file.getInputStream());
+            ExcelUtil<ProductAttributeDTO> util = new ExcelUtil<>(ProductAttributeDTO.class);
+            List<ProductAttributeDTO> productAttributeDTOList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<ProductAttributeEntity> productAttributeList = new ArrayList<>();
+            for (ProductAttributeDTO dto : productAttributeDTOList) {
+                ProductAttributeEntity entity = new ProductAttributeEntity();
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setTermType(dto.getTermType());
+                entity.setInsuranceMainType(dto.getInsuranceMainType());
+                entity.setInsuranceSubType(dto.getInsuranceSubType());
+                entity.setDesignType(dto.getDesignType());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setRegMidId(dto.getRegMidId());
+                entity.setGuaranteedCostRate(dto.getGuaranteedCostRate());
+                entity.setSubAccount(dto.getSubAccount());
+                entity.setNewBusinessFlag(dto.getNewBusinessFlag());
+                entity.setRemark(dto.getRemark());
+                productAttributeList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -125,6 +148,23 @@ public class ProductAttributeServiceImpl implements IProductAttributeService {
                         failureNum++;
                         failureMsg.append("<br/>第 ").append(failureNum).append(" 条数据账期或精算代码为空");
                         continue;
+                    }
+
+                    // 验证定价保证成本率格式
+                    if (productAttribute.getGuaranteedCostRate() != null) {
+                        try {
+                            // 确保数值合理
+                            if (productAttribute.getGuaranteedCostRate().compareTo(new BigDecimal("1")) > 0) {
+                                // 如果大于1，可能是百分比格式，需要转换
+                                productAttribute.setGuaranteedCostRate(
+                                    productAttribute.getGuaranteedCostRate().divide(new BigDecimal("100"), 4, BigDecimal.ROUND_HALF_UP)
+                                );
+                            }
+                        } catch (Exception e) {
+                            log.warn("处理定价保证成本率异常", e);
+                            // 如果处理失败，设置为默认值
+                            productAttribute.setGuaranteedCostRate(null);
+                        }
                     }
 
                     // 设置默认值
@@ -190,8 +230,8 @@ public class ProductAttributeServiceImpl implements IProductAttributeService {
      */
     @Override
     public void importTemplateProductAttribute(HttpServletResponse response) {
-        List<ProductAttributeEntity> templateList = new ArrayList<>();
-        ProductAttributeEntity template = new ProductAttributeEntity();
+        List<ProductAttributeDTO> templateList = new ArrayList<>();
+        ProductAttributeDTO template = new ProductAttributeDTO();
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
         template.setBusinessCode("BIZ001");
@@ -208,7 +248,7 @@ public class ProductAttributeServiceImpl implements IProductAttributeService {
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<ProductAttributeEntity> util = new ExcelUtil<>(ProductAttributeEntity.class);
+        ExcelUtil<ProductAttributeDTO> util = new ExcelUtil<>(ProductAttributeDTO.class);
         util.exportExcel(templateList, "产品属性数据模板", response);
     }
 }

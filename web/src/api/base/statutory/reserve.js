@@ -56,7 +56,7 @@ export function exportReserve(query) {
 export function importReserveTemplate() {
   return request({
     url: '/base/statutory/reserve/importTemplate',
-    method: 'post',
+    method: 'get',
     responseType: 'blob'
   });
 }

@@ -135,7 +135,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -271,12 +271,12 @@
 </template>
 
 <script>
-import { 
-  listFund, 
-  getFund, 
-  addFund, 
-  updateFund, 
-  delFund, 
+import {
+  listFund,
+  getFund,
+  addFund,
+  updateFund,
+  delFund,
   exportFund,
   importFundTemplate
 } from "@/api/base/dividend/fund";
@@ -469,8 +469,10 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      // 直接下载模板文件
-      window.open(process.env.VUE_APP_BASE_API + "/base/dividend/fund/importTemplate", "_blank");
+      // 使用API函数下载模板文件
+      importFundTemplate().then(response => {
+        this.downloadFile(response, `分红方案模板_${new Date().getTime()}.xlsx`);
+      });
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
@@ -484,6 +486,15 @@ export default {
       this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
       this.getList();
     },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
     // 提交上传文件
     submitFileForm() {
       this.$refs.upload.submit();
@@ -495,25 +506,25 @@ export default {
 <style lang="scss" scoped>
 .app-container {
   padding: 20px;
-  
+
   .el-table {
     margin-top: 15px;
-    
+
     &__header {
       font-weight: bold;
     }
   }
-  
+
   .pagination-container {
     margin-top: 15px;
   }
-  
+
   .el-dialog {
     &__body {
       padding: 20px 30px;
     }
   }
-  
+
   .upload {
     &__tip {
       color: #606266;

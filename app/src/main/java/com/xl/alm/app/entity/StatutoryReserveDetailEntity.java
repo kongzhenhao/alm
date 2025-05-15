@@ -52,8 +52,38 @@ public class StatutoryReserveDetailEntity extends BaseEntity {
     /** 法定/非单位准备金 */
     private BigDecimal statutoryReserve;
 
+    /** 保证利率准备金 */
+    private BigDecimal guaranteedRateReserve;
+
+    /** 失效单现价 */
+    private BigDecimal lapsedPolicyValue;
+
+    /** 豁免责任准备金 */
+    private BigDecimal waiverReserve;
+
+    /** 未建模准备金 */
+    private BigDecimal unmodeledReserve;
+
+    /** 持续奖准备金 */
+    private BigDecimal persistenceBonusReserve;
+
+    /** 长期未到期准备金 */
+    private BigDecimal longTermUnearned;
+
+    /** 短险未到期准备金 */
+    private BigDecimal shortTermUnearned;
+
     /** 未到期责任准备金 */
     private BigDecimal unearnedPremiumReserve;
+
+    /** 已报未决赔款 */
+    private BigDecimal reportedUnpaid;
+
+    /** 未报未决赔款 */
+    private BigDecimal incurredUnreported;
+
+    /** 理赔费用准备金 */
+    private BigDecimal claimExpenseReserve;
 
     /** 未决赔款准备金 */
     private BigDecimal outstandingClaimReserve;

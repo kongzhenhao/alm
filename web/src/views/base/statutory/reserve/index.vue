@@ -143,7 +143,17 @@
       <el-table-column label="存量累计规模保费" align="center" prop="accumulatedPremium" width="140" />
       <el-table-column label="账户价值" align="center" prop="accountValue" width="120" />
       <el-table-column label="法定/非单位准备金" align="center" prop="statutoryReserve" width="140" />
+      <el-table-column label="保证利率准备金" align="center" prop="guaranteedRateReserve" width="140" />
+      <el-table-column label="失效单现价" align="center" prop="lapsedPolicyValue" width="120" />
+      <el-table-column label="豁免责任准备金" align="center" prop="waiverReserve" width="140" />
+      <el-table-column label="未建模准备金" align="center" prop="unmodeledReserve" width="140" />
+      <el-table-column label="持续奖准备金" align="center" prop="persistenceBonusReserve" width="140" />
+      <el-table-column label="长期未到期准备金" align="center" prop="longTermUnearned" width="140" />
+      <el-table-column label="短险未到期准备金" align="center" prop="shortTermUnearned" width="140" />
       <el-table-column label="未到期责任准备金" align="center" prop="unearnedPremiumReserve" width="140" />
+      <el-table-column label="已报未决赔款" align="center" prop="reportedUnpaid" width="120" />
+      <el-table-column label="未报未决赔款" align="center" prop="incurredUnreported" width="120" />
+      <el-table-column label="理赔费用准备金" align="center" prop="claimExpenseReserve" width="140" />
       <el-table-column label="未决赔款准备金" align="center" prop="outstandingClaimReserve" width="140" />
       <el-table-column label="法定准备金合计" align="center" prop="totalStatutoryReserve" width="140" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -165,7 +175,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -265,8 +275,68 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="保证利率准备金" prop="guaranteedRateReserve">
+              <el-input-number v-model="form.guaranteedRateReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="失效单现价" prop="lapsedPolicyValue">
+              <el-input-number v-model="form.lapsedPolicyValue" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="豁免责任准备金" prop="waiverReserve">
+              <el-input-number v-model="form.waiverReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="未建模准备金" prop="unmodeledReserve">
+              <el-input-number v-model="form.unmodeledReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="持续奖准备金" prop="persistenceBonusReserve">
+              <el-input-number v-model="form.persistenceBonusReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="长期未到期准备金" prop="longTermUnearned">
+              <el-input-number v-model="form.longTermUnearned" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="短险未到期准备金" prop="shortTermUnearned">
+              <el-input-number v-model="form.shortTermUnearned" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item label="未到期责任准备金" prop="unearnedPremiumReserve">
               <el-input-number v-model="form.unearnedPremiumReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="已报未决赔款" prop="reportedUnpaid">
+              <el-input-number v-model="form.reportedUnpaid" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="未报未决赔款" prop="incurredUnreported">
+              <el-input-number v-model="form.incurredUnreported" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="理赔费用准备金" prop="claimExpenseReserve">
+              <el-input-number v-model="form.claimExpenseReserve" :precision="2" :step="1000" :min="0" @change="calculateTotal" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -327,12 +397,12 @@
 </template>
 
 <script>
-import { 
-  listReserve, 
-  getReserve, 
-  addReserve, 
-  updateReserve, 
-  delReserve, 
+import {
+  listReserve,
+  getReserve,
+  addReserve,
+  updateReserve,
+  delReserve,
   exportReserve,
   importReserveTemplate
 } from "@/api/base/statutory/reserve";
@@ -452,7 +522,17 @@ export default {
         accumulatedPremium: 0,
         accountValue: 0,
         statutoryReserve: 0,
+        guaranteedRateReserve: 0,
+        lapsedPolicyValue: 0,
+        waiverReserve: 0,
+        unmodeledReserve: 0,
+        persistenceBonusReserve: 0,
+        longTermUnearned: 0,
+        shortTermUnearned: 0,
         unearnedPremiumReserve: 0,
+        reportedUnpaid: 0,
+        incurredUnreported: 0,
+        claimExpenseReserve: 0,
         outstandingClaimReserve: 0,
         totalStatutoryReserve: 0,
         remark: null
@@ -494,9 +574,25 @@ export default {
     /** 计算法定准备金合计 */
     calculateTotal() {
       const statutoryReserve = this.form.statutoryReserve || 0;
+      const guaranteedRateReserve = this.form.guaranteedRateReserve || 0;
+      const lapsedPolicyValue = this.form.lapsedPolicyValue || 0;
+      const waiverReserve = this.form.waiverReserve || 0;
+      const unmodeledReserve = this.form.unmodeledReserve || 0;
+      const persistenceBonusReserve = this.form.persistenceBonusReserve || 0;
+      const longTermUnearned = this.form.longTermUnearned || 0;
+      const shortTermUnearned = this.form.shortTermUnearned || 0;
       const unearnedPremiumReserve = this.form.unearnedPremiumReserve || 0;
+      const reportedUnpaid = this.form.reportedUnpaid || 0;
+      const incurredUnreported = this.form.incurredUnreported || 0;
+      const claimExpenseReserve = this.form.claimExpenseReserve || 0;
       const outstandingClaimReserve = this.form.outstandingClaimReserve || 0;
-      this.form.totalStatutoryReserve = parseFloat((statutoryReserve + unearnedPremiumReserve + outstandingClaimReserve).toFixed(2));
+
+      const total = statutoryReserve + guaranteedRateReserve + lapsedPolicyValue + waiverReserve +
+                   unmodeledReserve + persistenceBonusReserve + longTermUnearned + shortTermUnearned +
+                   unearnedPremiumReserve + reportedUnpaid + incurredUnreported + claimExpenseReserve +
+                   outstandingClaimReserve;
+
+      this.form.totalStatutoryReserve = parseFloat(total.toFixed(2));
     },
     /** 提交按钮 */
     submitForm() {
@@ -504,7 +600,7 @@ export default {
         if (valid) {
           // 计算法定准备金合计
           this.calculateTotal();
-          
+
           if (this.form.id != null) {
             updateReserve(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
@@ -545,8 +641,10 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      // 直接下载模板文件
-      window.open(process.env.VUE_APP_BASE_API + "/base/statutory/reserve/importTemplate", "_blank");
+      // 使用API函数下载模板文件
+      importReserveTemplate().then(response => {
+        this.downloadFile(response, `法定准备金明细模板_${new Date().getTime()}.xlsx`);
+      });
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
@@ -560,6 +658,15 @@ export default {
       this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
       this.getList();
     },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
     // 提交上传文件
     submitFileForm() {
       this.$refs.upload.submit();
@@ -571,25 +678,25 @@ export default {
 <style lang="scss" scoped>
 .app-container {
   padding: 20px;
-  
+
   .el-table {
     margin-top: 15px;
-    
+
     &__header {
       font-weight: bold;
     }
   }
-  
+
   .pagination-container {
     margin-top: 15px;
   }
-  
+
   .el-dialog {
     &__body {
       padding: 20px 30px;
     }
   }
-  
+
   .upload {
     &__tip {
       color: #606266;

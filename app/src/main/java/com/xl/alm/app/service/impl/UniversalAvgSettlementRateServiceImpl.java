@@ -3,6 +3,7 @@ package com.xl.alm.app.service.impl;
 import com.jd.lightning.common.utils.DateUtils;
 import com.jd.lightning.common.utils.StringUtils;
 import com.xl.alm.app.util.ExcelUtil;
+import com.xl.alm.app.dto.UniversalAvgSettlementRateDTO;
 import com.jd.lightning.common.exception.ServiceException;
 import com.xl.alm.app.entity.UniversalAvgSettlementRateEntity;
 import com.xl.alm.app.mapper.UniversalAvgSettlementRateMapper;
@@ -112,8 +113,26 @@ public class UniversalAvgSettlementRateServiceImpl implements IUniversalAvgSettl
     @Transactional(rollbackFor = Exception.class)
     public String importUniversalAvgSettlementRate(MultipartFile file, boolean updateSupport, String operName) {
         try {
-            ExcelUtil<UniversalAvgSettlementRateEntity> util = new ExcelUtil<>(UniversalAvgSettlementRateEntity.class);
-            List<UniversalAvgSettlementRateEntity> rateList = util.importExcel(file.getInputStream());
+            ExcelUtil<UniversalAvgSettlementRateDTO> util = new ExcelUtil<>(UniversalAvgSettlementRateDTO.class);
+            List<UniversalAvgSettlementRateDTO> dtoList = util.importExcel(file.getInputStream());
+
+            // 将DTO转换为Entity
+            List<UniversalAvgSettlementRateEntity> rateList = new ArrayList<>();
+            for (UniversalAvgSettlementRateDTO dto : dtoList) {
+                UniversalAvgSettlementRateEntity entity = new UniversalAvgSettlementRateEntity();
+                entity.setAccountingPeriod(dto.getAccountingPeriod());
+                entity.setActuarialCode(dto.getActuarialCode());
+                entity.setBusinessCode(dto.getBusinessCode());
+                entity.setProductName(dto.getProductName());
+                entity.setShortTermFlag(dto.getShortTermFlag());
+                entity.setGuaranteedCostRate(dto.getGuaranteedCostRate());
+                entity.setAvgRateT0(dto.getAvgRateT0());
+                entity.setAvgRateT1(dto.getAvgRateT1());
+                entity.setAvgRateT2(dto.getAvgRateT2());
+                entity.setAvgRateT3(dto.getAvgRateT3());
+                entity.setRemark(dto.getRemark());
+                rateList.add(entity);
+            }
             int successNum = 0;
             int failureNum = 0;
             StringBuilder successMsg = new StringBuilder();
@@ -122,7 +141,7 @@ public class UniversalAvgSettlementRateServiceImpl implements IUniversalAvgSettl
             for (UniversalAvgSettlementRateEntity rate : rateList) {
                 try {
                     // 验证必填字段
-                    if (StringUtils.isBlank(rate.getAccountingPeriod()) || 
+                    if (StringUtils.isBlank(rate.getAccountingPeriod()) ||
                         StringUtils.isBlank(rate.getActuarialCode())) {
                         failureNum++;
                         failureMsg.append("<br/>第 ").append(failureNum).append(" 条数据账期或精算代码为空");
@@ -198,8 +217,8 @@ public class UniversalAvgSettlementRateServiceImpl implements IUniversalAvgSettl
      */
     @Override
     public void importTemplateUniversalAvgSettlementRate(HttpServletResponse response) {
-        List<UniversalAvgSettlementRateEntity> templateList = new ArrayList<>();
-        UniversalAvgSettlementRateEntity template = new UniversalAvgSettlementRateEntity();
+        List<UniversalAvgSettlementRateDTO> templateList = new ArrayList<>();
+        UniversalAvgSettlementRateDTO template = new UniversalAvgSettlementRateDTO();
         template.setAccountingPeriod("202401");
         template.setActuarialCode("SAMPLE001");
         template.setBusinessCode("BIZ001");
@@ -213,7 +232,7 @@ public class UniversalAvgSettlementRateServiceImpl implements IUniversalAvgSettl
         template.setRemark("示例数据");
         templateList.add(template);
 
-        ExcelUtil<UniversalAvgSettlementRateEntity> util = new ExcelUtil<>(UniversalAvgSettlementRateEntity.class);
+        ExcelUtil<UniversalAvgSettlementRateDTO> util = new ExcelUtil<>(UniversalAvgSettlementRateDTO.class);
         util.exportExcel(templateList, "万能平均结算利率数据模板", response);
     }
 }
