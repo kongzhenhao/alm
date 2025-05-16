@@ -24,7 +24,10 @@
 
     <sql id="selectDividendFundCostRateVo">
         select id, accounting_period, actuarial_code, business_code, product_name, dividend_ratio,
-               fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3,
+               fund_cost_rate_t0,
+               fund_cost_rate_t1,
+               fund_cost_rate_t2,
+               fund_cost_rate_t3,
                create_time, create_by, update_time, update_by, is_del
         from t_base_dividend_fund_cost_rate
     </sql>

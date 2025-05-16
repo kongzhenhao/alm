@@ -45,9 +45,9 @@ spring:
       strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
       datasource:
         mysql:
-          url: jdbc:mysql://localhost:3306/alm?keepAlive=true&autoReconnect=true&autoReconnectForPools=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
-          username: alm
-          password: 123456
+          url: jdbc:mysql://mysql-sdf6md.rds.jdcloud.com:3306/alm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+          username: alm_test
+          password: "*uZ8^ghI"
           driver-class-name: com.mysql.cj.jdbc.Driver
     starrocks:
       streamload:

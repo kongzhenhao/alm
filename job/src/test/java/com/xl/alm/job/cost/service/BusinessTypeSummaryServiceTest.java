@@ -19,7 +19,7 @@ public class BusinessTypeSummaryServiceTest {
 
     @Test
     public void testCalculateBusinessTypeSummary() {
-        String accountingPeriod = "202501"; // 测试账期
+        String accountingPeriod = "202412"; // 测试账期
         boolean result = businessTypeSummaryService.calculateBusinessTypeSummary(accountingPeriod);
         log.info("分业务类型汇总计算结果：{}", result);
     }

@@ -203,7 +203,7 @@ public class AccountSummaryServiceImpl implements AccountSummaryService {
             AccountSummaryEntity normalAccountEntity = new AccountSummaryEntity();
             normalAccountEntity.setScenarioName(scenarioName);
             normalAccountEntity.setAccountingPeriod(accountingPeriod);
-            normalAccountEntity.setDesignType("普通账户");
+            normalAccountEntity.setDesignType("05"); // 普通账户
             normalAccountEntity.setIsDel(0);
 
             // 计算法定准备金汇总值

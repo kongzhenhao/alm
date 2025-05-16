@@ -39,6 +39,29 @@ import java.util.Map;
 @Service
 public class ProductStatisticsServiceImpl implements ProductStatisticsService {
 
+    // 设计类型常量
+    private static final String DESIGN_TYPE_TRADITIONAL = "01"; // 传统险
+    private static final String DESIGN_TYPE_DIVIDEND = "02";    // 分红险
+    private static final String DESIGN_TYPE_UNIVERSAL = "03";   // 万能险
+
+    // 长短期标识常量
+    private static final String TERM_TYPE_LONG = "L"; // 长期
+
+    // 新业务标识常量
+    private static final String NEW_BUSINESS_FLAG_YES = "Y"; // 是
+
+    // 业务类型常量
+    private static final String BUSINESS_TYPE_VALID = "01"; // 有效业务
+    private static final String BUSINESS_TYPE_NEW = "02";   // 新业务
+
+    // 情景名称常量
+    private static final String SCENARIO_NAME_BASIC = "01";  // 基本情景
+    private static final String SCENARIO_NAME_STRESS = "03"; // 压力情景三
+
+    // 是否中短常量
+    private static final String SHORT_TERM_FLAG_YES = "Y"; // 是
+    private static final String SHORT_TERM_FLAG_NO = "N";  // 否
+
     @Autowired
     private ProductStatisticsMapper productStatisticsMapper;
 
@@ -128,15 +151,18 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
      * @return 万能平均结算利率表数据Map
      */
     private Map<String, UniversalAvgSettlementRateEntity> loadUniversalAvgSettlementRates(String accountingPeriod) {
-        UniversalAvgSettlementRateQuery query = new UniversalAvgSettlementRateQuery();
-        query.setAccountingPeriod(accountingPeriod);
-        List<UniversalAvgSettlementRateEntity> universalAvgSettlementRateList = universalAvgSettlementRateMapper.selectUniversalAvgSettlementRateList(query);
-
         Map<String, UniversalAvgSettlementRateEntity> universalAvgSettlementRateMap = new HashMap<>();
-        for (UniversalAvgSettlementRateEntity universalAvgSettlementRate : universalAvgSettlementRateList) {
-            universalAvgSettlementRateMap.put(universalAvgSettlementRate.getActuarialCode(), universalAvgSettlementRate);
-        }
+        try {
+            UniversalAvgSettlementRateQuery query = new UniversalAvgSettlementRateQuery();
+            query.setAccountingPeriod(accountingPeriod);
+            List<UniversalAvgSettlementRateEntity> universalAvgSettlementRateList = universalAvgSettlementRateMapper.selectUniversalAvgSettlementRateList(query);
 
+            for (UniversalAvgSettlementRateEntity universalAvgSettlementRate : universalAvgSettlementRateList) {
+                universalAvgSettlementRateMap.put(universalAvgSettlementRate.getActuarialCode(), universalAvgSettlementRate);
+            }
+        } catch (Exception e) {
+            log.error("加载万能平均结算利率表数据失败，账期：{}", accountingPeriod, e);
+        }
         return universalAvgSettlementRateMap;
     }
 
@@ -147,15 +173,18 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
      * @return 分红方案表数据Map
      */
     private Map<String, DividendFundCostRateEntity> loadDividendFundCostRates(String accountingPeriod) {
-        DividendFundCostRateQuery query = new DividendFundCostRateQuery();
-        query.setAccountingPeriod(accountingPeriod);
-        List<DividendFundCostRateEntity> dividendFundCostRateList = dividendFundCostRateMapper.selectDividendFundCostRateList(query);
-
         Map<String, DividendFundCostRateEntity> dividendFundCostRateMap = new HashMap<>();
-        for (DividendFundCostRateEntity dividendFundCostRate : dividendFundCostRateList) {
-            dividendFundCostRateMap.put(dividendFundCostRate.getActuarialCode(), dividendFundCostRate);
-        }
+        try {
+            DividendFundCostRateQuery query = new DividendFundCostRateQuery();
+            query.setAccountingPeriod(accountingPeriod);
+            List<DividendFundCostRateEntity> dividendFundCostRateList = dividendFundCostRateMapper.selectDividendFundCostRateList(query);
 
+            for (DividendFundCostRateEntity dividendFundCostRate : dividendFundCostRateList) {
+                dividendFundCostRateMap.put(dividendFundCostRate.getActuarialCode(), dividendFundCostRate);
+            }
+        } catch (Exception e) {
+            log.error("加载分红方案表数据失败，账期：{}", accountingPeriod, e);
+        }
         return dividendFundCostRateMap;
     }
 
@@ -185,19 +214,27 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
      * @return 法定准备金预测表数据Map
      */
     private Map<String, Map<String, StatutoryReserveForecastEntity>> loadStatutoryReserveForecasts(String accountingPeriod) {
-        StatutoryReserveForecastQuery query = new StatutoryReserveForecastQuery();
-        query.setAccountingPeriod(accountingPeriod);
-        List<StatutoryReserveForecastEntity> statutoryReserveForecastList = statutoryReserveForecastMapper.selectStatutoryReserveForecastList(query);
-
         Map<String, Map<String, StatutoryReserveForecastEntity>> statutoryReserveForecastMap = new HashMap<>();
-        for (StatutoryReserveForecastEntity statutoryReserveForecast : statutoryReserveForecastList) {
-            String businessType = statutoryReserveForecast.getBusinessType();
-            String actuarialCode = statutoryReserveForecast.getActuarialCode();
+        try {
+            StatutoryReserveForecastQuery query = new StatutoryReserveForecastQuery();
+            query.setAccountingPeriod(accountingPeriod);
+            List<StatutoryReserveForecastEntity> statutoryReserveForecastList = statutoryReserveForecastMapper.selectStatutoryReserveForecastList(query);
 
-            statutoryReserveForecastMap.computeIfAbsent(businessType, k -> new HashMap<>())
-                    .put(actuarialCode, statutoryReserveForecast);
+            for (StatutoryReserveForecastEntity statutoryReserveForecast : statutoryReserveForecastList) {
+                // 设置情景名称为基本情景
+                statutoryReserveForecast.setScenarioName(SCENARIO_NAME_BASIC);
+                // 设置长短期标识为长期
+                statutoryReserveForecast.setTermType(TERM_TYPE_LONG);
+
+                String businessType = statutoryReserveForecast.getBusinessType();
+                String actuarialCode = statutoryReserveForecast.getActuarialCode();
+
+                statutoryReserveForecastMap.computeIfAbsent(businessType, k -> new HashMap<>())
+                        .put(actuarialCode, statutoryReserveForecast);
+            }
+        } catch (Exception e) {
+            log.error("加载法定准备金预测表数据失败，账期：{}", accountingPeriod, e);
         }
-
         return statutoryReserveForecastMap;
     }
 
@@ -227,24 +264,24 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
             String designType = productAttribute.getDesignType();
 
             // 只处理传统险、分红险、万能险，不包含投连险
-            if ("传统险".equals(designType) || "分红险".equals(designType) || "万能险".equals(designType)) {
+            if (DESIGN_TYPE_TRADITIONAL.equals(designType) || DESIGN_TYPE_DIVIDEND.equals(designType) || DESIGN_TYPE_UNIVERSAL.equals(designType)) {
                 // 步骤2：确定业务类型
-                // 有效业务：设计类型为传统险、分红险、万能险，且长短期标识为长期或L的产品
-                boolean isValidBusiness = "长期".equals(productAttribute.getTermType()) || "L".equals(productAttribute.getTermType());
+                // 有效业务：设计类型为传统险、分红险、万能险，且长短期标识为长期的产品
+                boolean isValidBusiness = TERM_TYPE_LONG.equals(productAttribute.getTermType());
 
-                // 新业务：设计类型为传统险、分红险、万能险，长短期标识为长期或L，且新业务标识为是或Y的产品
-                boolean isNewBusiness = isValidBusiness && ("是".equals(productAttribute.getNewBusinessFlag()) || "Y".equals(productAttribute.getNewBusinessFlag()));
+                // 新业务：设计类型为传统险、分红险、万能险，长短期标识为长期，且新业务标识为是的产品
+                boolean isNewBusiness = isValidBusiness && NEW_BUSINESS_FLAG_YES.equals(productAttribute.getNewBusinessFlag());
 
                 // 处理有效业务
                 if (isValidBusiness) {
-                    processBusinessType(result, "有效业务", "基本情景", accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
-                    processBusinessType(result, "有效业务", "压力情景三", accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
+                    processBusinessType(result, BUSINESS_TYPE_VALID, SCENARIO_NAME_BASIC, accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
+                    processBusinessType(result, BUSINESS_TYPE_VALID, SCENARIO_NAME_STRESS, accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
                 }
 
                 // 处理新业务
                 if (isNewBusiness) {
-                    processBusinessType(result, "新业务", "基本情景", accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
-                    processBusinessType(result, "新业务", "压力情景三", accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
+                    processBusinessType(result, BUSINESS_TYPE_NEW, SCENARIO_NAME_BASIC, accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
+                    processBusinessType(result, BUSINESS_TYPE_NEW, SCENARIO_NAME_STRESS, accountingPeriod, productAttribute, universalAvgSettlementRateMap, dividendFundCostRateMap, statutoryReserveDetailMap, statutoryReserveForecastMap);
                 }
             }
         }
@@ -319,7 +356,7 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
             Map<String, Map<String, StatutoryReserveForecastEntity>> statutoryReserveForecastMap) {
 
         // 法定准备金T0计算规则
-        if ("有效业务".equals(businessType)) {
+        if (BUSINESS_TYPE_VALID.equals(businessType)) {
             StatutoryReserveDetailEntity detail = statutoryReserveDetailMap.get(actuarialCode);
             if (detail != null) {
                 BigDecimal accountValue = detail.getAccountValue() != null ? detail.getAccountValue() : BigDecimal.ZERO;
@@ -338,9 +375,9 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         if (forecastMap != null) {
             StatutoryReserveForecastEntity forecast = forecastMap.get(actuarialCode);
             if (forecast != null) {
-                entity.setStatutoryReserveT1(forecast.getStatutoryReserveT1());
-                entity.setStatutoryReserveT2(forecast.getStatutoryReserveT2());
-                entity.setStatutoryReserveT3(forecast.getStatutoryReserveT3());
+                entity.setStatutoryReserveT1(forecast.getStatutoryReserveT1() != null ? forecast.getStatutoryReserveT1() : BigDecimal.ZERO);
+                entity.setStatutoryReserveT2(forecast.getStatutoryReserveT2() != null ? forecast.getStatutoryReserveT2() : BigDecimal.ZERO);
+                entity.setStatutoryReserveT3(forecast.getStatutoryReserveT3() != null ? forecast.getStatutoryReserveT3() : BigDecimal.ZERO);
             } else {
                 entity.setStatutoryReserveT1(BigDecimal.ZERO);
                 entity.setStatutoryReserveT2(BigDecimal.ZERO);
@@ -377,11 +414,11 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         BigDecimal guaranteedCostRate = productAttribute.getGuaranteedCostRate() != null ? productAttribute.getGuaranteedCostRate() : BigDecimal.ZERO;
 
         // 计算资金成本率T0和资金成本率T1（适用于基本情景和压力情景三）
-        if ("传统险".equals(designType)) {
+        if (DESIGN_TYPE_TRADITIONAL.equals(designType)) {
             // 传统险：取自产品属性表的定价保证成本率字段
             entity.setFundCostRateT0(guaranteedCostRate);
             entity.setFundCostRateT1(guaranteedCostRate);
-        } else if ("分红险".equals(designType)) {
+        } else if (DESIGN_TYPE_DIVIDEND.equals(designType)) {
             // 分红险：取自分红方案表的资金成本率T0和资金成本率T1字段
             DividendFundCostRateEntity dividendFundCostRate = dividendFundCostRateMap.get(actuarialCode);
             if (dividendFundCostRate != null) {
@@ -391,7 +428,7 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
                 entity.setFundCostRateT0(BigDecimal.ZERO);
                 entity.setFundCostRateT1(BigDecimal.ZERO);
             }
-        } else if ("万能险".equals(designType)) {
+        } else if (DESIGN_TYPE_UNIVERSAL.equals(designType)) {
             // 万能险：取自万能平均结算利率表的平均结算利率T0和平均结算利率T1字段
             UniversalAvgSettlementRateEntity universalAvgSettlementRate = universalAvgSettlementRateMap.get(actuarialCode);
             if (universalAvgSettlementRate != null) {
@@ -404,16 +441,16 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         }
 
         // 计算资金成本率T2（适用于基本情景和压力情景三）
-        if ("传统险".equals(designType)) {
+        if (DESIGN_TYPE_TRADITIONAL.equals(designType)) {
             entity.setFundCostRateT2(guaranteedCostRate);
-        } else if ("分红险".equals(designType)) {
+        } else if (DESIGN_TYPE_DIVIDEND.equals(designType)) {
             DividendFundCostRateEntity dividendFundCostRate = dividendFundCostRateMap.get(actuarialCode);
             if (dividendFundCostRate != null) {
                 entity.setFundCostRateT2(dividendFundCostRate.getFundCostRateT2());
             } else {
                 entity.setFundCostRateT2(BigDecimal.ZERO);
             }
-        } else if ("万能险".equals(designType)) {
+        } else if (DESIGN_TYPE_UNIVERSAL.equals(designType)) {
             UniversalAvgSettlementRateEntity universalAvgSettlementRate = universalAvgSettlementRateMap.get(actuarialCode);
             if (universalAvgSettlementRate != null) {
                 entity.setFundCostRateT2(universalAvgSettlementRate.getAvgSettlementRateT2());
@@ -423,18 +460,18 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         }
 
         // 计算资金成本率T3
-        if ("基本情景".equals(scenarioName)) {
+        if (SCENARIO_NAME_BASIC.equals(scenarioName)) {
             // 基本情景
-            if ("传统险".equals(designType)) {
+            if (DESIGN_TYPE_TRADITIONAL.equals(designType)) {
                 entity.setFundCostRateT3(guaranteedCostRate);
-            } else if ("分红险".equals(designType)) {
+            } else if (DESIGN_TYPE_DIVIDEND.equals(designType)) {
                 DividendFundCostRateEntity dividendFundCostRate = dividendFundCostRateMap.get(actuarialCode);
                 if (dividendFundCostRate != null) {
                     entity.setFundCostRateT3(dividendFundCostRate.getFundCostRateT3());
                 } else {
                     entity.setFundCostRateT3(BigDecimal.ZERO);
                 }
-            } else if ("万能险".equals(designType)) {
+            } else if (DESIGN_TYPE_UNIVERSAL.equals(designType)) {
                 UniversalAvgSettlementRateEntity universalAvgSettlementRate = universalAvgSettlementRateMap.get(actuarialCode);
                 if (universalAvgSettlementRate != null) {
                     entity.setFundCostRateT3(universalAvgSettlementRate.getAvgSettlementRateT3());
@@ -444,15 +481,15 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
             }
         } else {
             // 压力情景三
-            if ("传统险".equals(designType)) {
-                if ("N".equals(shortTermFlag)) {
+            if (DESIGN_TYPE_TRADITIONAL.equals(designType)) {
+                if (SHORT_TERM_FLAG_NO.equals(shortTermFlag)) {
                     // 非中短
                     entity.setFundCostRateT3(guaranteedCostRate);
                 } else {
                     // 中短
                     entity.setFundCostRateT3(guaranteedCostRate.add(new BigDecimal("0.02")));
                 }
-            } else if ("分红险".equals(designType)) {
+            } else if (DESIGN_TYPE_DIVIDEND.equals(designType)) {
                 DividendFundCostRateEntity dividendFundCostRate = dividendFundCostRateMap.get(actuarialCode);
                 if (dividendFundCostRate != null) {
                     BigDecimal fundCostRateT3 = dividendFundCostRate.getFundCostRateT3() != null ? dividendFundCostRate.getFundCostRateT3() : BigDecimal.ZERO;
@@ -461,7 +498,7 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
                 } else {
                     entity.setFundCostRateT3(BigDecimal.ZERO);
                 }
-            } else if ("万能险".equals(designType)) {
+            } else if (DESIGN_TYPE_UNIVERSAL.equals(designType)) {
                 UniversalAvgSettlementRateEntity universalAvgSettlementRate = universalAvgSettlementRateMap.get(actuarialCode);
                 if (universalAvgSettlementRate != null) {
                     BigDecimal avgSettlementRateT3 = universalAvgSettlementRate.getAvgSettlementRateT3() != null ? universalAvgSettlementRate.getAvgSettlementRateT3() : BigDecimal.ZERO;
@@ -473,7 +510,7 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         }
 
         // 计算保证成本率T0、保证成本率T1、保证成本率T2、保证成本率T3（适用于基本情景和压力情景三）
-        if ("N".equals(shortTermFlag)) {
+        if (SHORT_TERM_FLAG_NO.equals(shortTermFlag)) {
             // 非中短
             entity.setGuaranteedCostRateT0(guaranteedCostRate);
             entity.setGuaranteedCostRateT1(guaranteedCostRate);

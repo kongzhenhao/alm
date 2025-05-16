@@ -6,7 +6,6 @@
 
     <resultMap type="com.xl.alm.job.cost.entity.StatutoryReserveForecastEntity" id="StatutoryReserveForecastEntityResult">
         <result property="id" column="id"/>
-        <result property="scenarioName" column="scenario_name"/>
         <result property="businessType" column="business_type"/>
         <result property="accountingPeriod" column="accounting_period"/>
         <result property="actuarialCode" column="actuarial_code"/>
@@ -26,8 +25,8 @@
     </resultMap>
 
     <sql id="selectStatutoryReserveForecastVo">
-        select id, scenario_name, business_type, accounting_period, actuarial_code, business_code, product_name, 
-               term_type, design_type, short_term_flag, 
+        select id, business_type, accounting_period, actuarial_code, business_code, product_name,
+               design_type, short_term_flag,
                statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3,
                create_time, create_by, update_time, update_by, is_del
         from t_base_statutory_reserve_forecast
