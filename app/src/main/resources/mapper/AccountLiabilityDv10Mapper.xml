@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.AccountLiabilityDv10Mapper">
+
+    <resultMap type="com.xl.alm.app.entity.AccountLiabilityDv10Entity" id="AccountLiabilityDv10EntityResult">
+        <id property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="valueType" column="value_type"/>
+        <result property="term0" column="term_0"/>
+        <result property="term05" column="term_0_5"/>
+        <result property="term1" column="term_1"/>
+        <result property="term2" column="term_2"/>
+        <result property="term3" column="term_3"/>
+        <result property="term4" column="term_4"/>
+        <result property="term5" column="term_5"/>
+        <result property="term6" column="term_6"/>
+        <result property="term7" column="term_7"/>
+        <result property="term8" column="term_8"/>
+        <result property="term10" column="term_10"/>
+        <result property="term12" column="term_12"/>
+        <result property="term15" column="term_15"/>
+        <result property="term20" column="term_20"/>
+        <result property="term25" column="term_25"/>
+        <result property="term30" column="term_30"/>
+        <result property="term35" column="term_35"/>
+        <result property="term40" column="term_40"/>
+        <result property="term45" column="term_45"/>
+        <result property="term50" column="term_50"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectAccountLiabilityDv10EntityVo">
+        select id, account_period, cash_flow_type, design_type, value_type,
+               term_0, term_0_5, term_1, term_2, term_3, term_4, term_5, term_6, term_7, term_8,
+               term_10, term_12, term_15, term_20, term_25, term_30, term_35, term_40, term_45, term_50,
+               create_time, create_by, update_time, update_by, is_del
+        from t_dur_account_liability_dv10
+    </sql>
+
+    <!-- 查询分账户负债基点价值DV10列表 -->
+    <select id="selectAccountLiabilityDv10EntityList" parameterType="com.xl.alm.app.query.AccountLiabilityDv10Query" resultMap="AccountLiabilityDv10EntityResult">
+        <include refid="selectAccountLiabilityDv10EntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountPeriod != null and accountPeriod != ''">and account_period = #{accountPeriod}</if>
+            <if test="cashFlowType != null and cashFlowType != ''">and cash_flow_type = #{cashFlowType}</if>
+            <if test="designType != null and designType != ''">and design_type = #{designType}</if>
+            <if test="valueType != null and valueType != ''">and value_type = #{valueType}</if>
+            and is_del = 0
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 根据ID查询分账户负债基点价值DV10 -->
+    <select id="selectAccountLiabilityDv10EntityById" parameterType="Long" resultMap="AccountLiabilityDv10EntityResult">
+        <include refid="selectAccountLiabilityDv10EntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据条件查询分账户负债基点价值DV10 -->
+    <select id="selectAccountLiabilityDv10EntityByCondition" resultMap="AccountLiabilityDv10EntityResult">
+        <include refid="selectAccountLiabilityDv10EntityVo"/>
+        <where>
+            account_period = #{accountPeriod}
+            and cash_flow_type = #{cashFlowType}
+            and design_type = #{designType}
+            and value_type = #{valueType}
+            and is_del = 0
+        </where>
+    </select>
+
+    <!-- 新增分账户负债基点价值DV10 -->
+    <insert id="insertAccountLiabilityDv10Entity" parameterType="com.xl.alm.app.entity.AccountLiabilityDv10Entity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_account_liability_dv10 (
+            account_period, cash_flow_type, design_type, value_type,
+            term_0, term_0_5, term_1, term_2, term_3, term_4, term_5, term_6, term_7, term_8,
+            term_10, term_12, term_15, term_20, term_25, term_30, term_35, term_40, term_45, term_50,
+            create_by, update_by
+        ) values (
+            #{accountPeriod}, #{cashFlowType}, #{designType}, #{valueType},
+            #{term0}, #{term05}, #{term1}, #{term2}, #{term3}, #{term4}, #{term5}, #{term6}, #{term7}, #{term8},
+            #{term10}, #{term12}, #{term15}, #{term20}, #{term25}, #{term30}, #{term35}, #{term40}, #{term45}, #{term50},
+            #{createBy}, #{updateBy}
+        )
+    </insert>
+
+    <!-- 批量新增分账户负债基点价值DV10 -->
+    <insert id="batchInsertAccountLiabilityDv10Entity" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_account_liability_dv10 (
+            account_period, cash_flow_type, design_type, value_type,
+            term_0, term_0_5, term_1, term_2, term_3, term_4, term_5, term_6, term_7, term_8,
+            term_10, term_12, term_15, term_20, term_25, term_30, term_35, term_40, term_45, term_50,
+            create_by, update_by
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod}, #{item.cashFlowType}, #{item.designType}, #{item.valueType},
+            #{item.term0}, #{item.term05}, #{item.term1}, #{item.term2}, #{item.term3}, #{item.term4}, #{item.term5}, #{item.term6}, #{item.term7}, #{item.term8},
+            #{item.term10}, #{item.term12}, #{item.term15}, #{item.term20}, #{item.term25}, #{item.term30}, #{item.term35}, #{item.term40}, #{item.term45}, #{item.term50},
+            #{item.createBy}, #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改分账户负债基点价值DV10 -->
+    <update id="updateAccountLiabilityDv10Entity" parameterType="com.xl.alm.app.entity.AccountLiabilityDv10Entity">
+        update t_dur_account_liability_dv10
+        <set>
+            <if test="accountPeriod != null and accountPeriod != ''">account_period = #{accountPeriod},</if>
+            <if test="cashFlowType != null and cashFlowType != ''">cash_flow_type = #{cashFlowType},</if>
+            <if test="designType != null and designType != ''">design_type = #{designType},</if>
+            <if test="valueType != null and valueType != ''">value_type = #{valueType},</if>
+            <if test="term0 != null">term_0 = #{term0},</if>
+            <if test="term05 != null">term_0_5 = #{term05},</if>
+            <if test="term1 != null">term_1 = #{term1},</if>
+            <if test="term2 != null">term_2 = #{term2},</if>
+            <if test="term3 != null">term_3 = #{term3},</if>
+            <if test="term4 != null">term_4 = #{term4},</if>
+            <if test="term5 != null">term_5 = #{term5},</if>
+            <if test="term6 != null">term_6 = #{term6},</if>
+            <if test="term7 != null">term_7 = #{term7},</if>
+            <if test="term8 != null">term_8 = #{term8},</if>
+            <if test="term10 != null">term_10 = #{term10},</if>
+            <if test="term12 != null">term_12 = #{term12},</if>
+            <if test="term15 != null">term_15 = #{term15},</if>
+            <if test="term20 != null">term_20 = #{term20},</if>
+            <if test="term25 != null">term_25 = #{term25},</if>
+            <if test="term30 != null">term_30 = #{term30},</if>
+            <if test="term35 != null">term_35 = #{term35},</if>
+            <if test="term40 != null">term_40 = #{term40},</if>
+            <if test="term45 != null">term_45 = #{term45},</if>
+            <if test="term50 != null">term_50 = #{term50},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除分账户负债基点价值DV10 -->
+    <update id="deleteAccountLiabilityDv10EntityById" parameterType="Long">
+        update t_dur_account_liability_dv10 set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除分账户负债基点价值DV10 -->
+    <update id="deleteAccountLiabilityDv10EntityByIds" parameterType="Long">
+        update t_dur_account_liability_dv10 set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 删除指定账期的分账户负债基点价值DV10 -->
+    <update id="deleteAccountLiabilityDv10EntityByPeriod" parameterType="String">
+        update t_dur_account_liability_dv10 set is_del = 1 where account_period = #{accountPeriod}
+    </update>
+
+</mapper>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.KeyDurationDiscountCurveMapper">
+
+    <resultMap type="com.xl.alm.app.entity.KeyDurationDiscountCurveEntity" id="KeyDurationDiscountCurveEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="curveType" column="curve_type"/>
+        <result property="keyDuration" column="key_duration"/>
+        <result property="stressDirection" column="stress_direction"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="curveValSet" column="curve_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectKeyDurationDiscountCurveEntityVo">
+        select id, account_period, curve_type, key_duration, stress_direction, duration_type, curve_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_key_duration_discount_curve
+    </sql>
+
+    <!-- 查询关键久期折现曲线列表 -->
+    <select id="selectKeyDurationDiscountCurveEntityList" parameterType="com.xl.alm.app.query.KeyDurationDiscountCurveQuery" resultMap="KeyDurationDiscountCurveEntityResult">
+        <include refid="selectKeyDurationDiscountCurveEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountPeriod != null and accountPeriod != ''">and account_period = #{accountPeriod}</if>
+            <if test="curveType != null and curveType != ''">and curve_type = #{curveType}</if>
+            <if test="keyDuration != null and keyDuration != ''">and key_duration = #{keyDuration}</if>
+            <if test="stressDirection != null and stressDirection != ''">and stress_direction = #{stressDirection}</if>
+            <if test="durationType != null and durationType != ''">and duration_type = #{durationType}</if>
+            and is_del = 0
+        </where>
+        order by
+        CASE key_duration
+            WHEN '0' THEN 1
+            WHEN '0.5' THEN 2
+            WHEN '1' THEN 3
+            WHEN '2' THEN 4
+            WHEN '3' THEN 5
+            WHEN '4' THEN 6
+            WHEN '5' THEN 7
+            WHEN '6' THEN 8
+            WHEN '7' THEN 9
+            WHEN '8' THEN 10
+            WHEN '10' THEN 11
+            WHEN '12' THEN 12
+            WHEN '15' THEN 13
+            WHEN '20' THEN 14
+            WHEN '25' THEN 15
+            WHEN '30' THEN 16
+            WHEN '35' THEN 17
+            WHEN '40' THEN 18
+            WHEN '45' THEN 19
+            WHEN '50' THEN 20
+            ELSE 100
+        END ASC
+    </select>
+
+    <!-- 根据ID查询关键久期折现曲线 -->
+    <select id="selectKeyDurationDiscountCurveEntityById" parameterType="Long" resultMap="KeyDurationDiscountCurveEntityResult">
+        <include refid="selectKeyDurationDiscountCurveEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据条件查询关键久期折现曲线 -->
+    <select id="selectKeyDurationDiscountCurveEntityByCondition" resultMap="KeyDurationDiscountCurveEntityResult">
+        <include refid="selectKeyDurationDiscountCurveEntityVo"/>
+        where account_period = #{accountPeriod}
+        and curve_type = #{curveType}
+        and key_duration = #{keyDuration}
+        and stress_direction = #{stressDirection}
+        and duration_type = #{durationType}
+        and is_del = 0
+    </select>
+
+    <!-- 新增关键久期折现曲线 -->
+    <insert id="insertKeyDurationDiscountCurveEntity" parameterType="com.xl.alm.app.entity.KeyDurationDiscountCurveEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_key_duration_discount_curve
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountPeriod != null">account_period,</if>
+            <if test="curveType != null">curve_type,</if>
+            <if test="keyDuration != null">key_duration,</if>
+            <if test="stressDirection != null">stress_direction,</if>
+            <if test="durationType != null">duration_type,</if>
+            <if test="curveValSet != null">curve_val_set,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountPeriod != null">#{accountPeriod},</if>
+            <if test="curveType != null">#{curveType},</if>
+            <if test="keyDuration != null">#{keyDuration},</if>
+            <if test="stressDirection != null">#{stressDirection},</if>
+            <if test="durationType != null">#{durationType},</if>
+            <if test="curveValSet != null">#{curveValSet},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <!-- 批量新增关键久期折现曲线 -->
+    <insert id="batchInsertKeyDurationDiscountCurveEntity" parameterType="java.util.List">
+        insert into t_dur_key_duration_discount_curve (account_period, curve_type, key_duration, stress_direction, duration_type, curve_val_set, create_by, update_by) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.accountPeriod}, #{item.curveType}, #{item.keyDuration}, #{item.stressDirection}, #{item.durationType}, #{item.curveValSet}, #{item.createBy}, #{item.updateBy})
+        </foreach>
+    </insert>
+
+    <!-- 修改关键久期折现曲线 -->
+    <update id="updateKeyDurationDiscountCurveEntity" parameterType="com.xl.alm.app.entity.KeyDurationDiscountCurveEntity">
+        update t_dur_key_duration_discount_curve
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountPeriod != null">account_period = #{accountPeriod},</if>
+            <if test="curveType != null">curve_type = #{curveType},</if>
+            <if test="keyDuration != null">key_duration = #{keyDuration},</if>
+            <if test="stressDirection != null">stress_direction = #{stressDirection},</if>
+            <if test="durationType != null">duration_type = #{durationType},</if>
+            <if test="curveValSet != null">curve_val_set = #{curveValSet},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP,
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!-- 删除关键久期折现曲线 -->
+    <update id="deleteKeyDurationDiscountCurveEntityById" parameterType="Long">
+        update t_dur_key_duration_discount_curve set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除关键久期折现曲线 -->
+    <update id="deleteKeyDurationDiscountCurveEntityByIds" parameterType="Long">
+        update t_dur_key_duration_discount_curve set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据账期删除关键久期折现曲线 -->
+    <update id="deleteKeyDurationDiscountCurveEntityByAccountPeriod" parameterType="String">
+        update t_dur_key_duration_discount_curve set is_del = 1 where account_period = #{accountPeriod}
+    </update>
+
+</mapper>
