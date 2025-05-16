@@ -226,6 +226,27 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-to-slf4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jeecgframework.jimureport</groupId>
+            <artifactId>jimureport-spring-boot-starter</artifactId>
+            <version>1.9.5.1</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jeecgframework.jimureport</groupId>-->
+<!--            <artifactId>jimureport-nosql-starter</artifactId>-->
+<!--            <version>1.9.5.2</version>-->
+<!--        </dependency>-->
+        <!-- 积木BI大屏依赖 -->
+        <dependency>
+            <groupId>org.jeecgframework.jimureport</groupId>
+            <artifactId>jimubi-spring-boot-starter</artifactId>
+            <version>1.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>4.30.2</version>
+        </dependency>
     </dependencies>
 
     <build>
