@@ -25,9 +25,9 @@
     </sql>
 
     <!-- 根据账期删除关键久期折现因子 -->
-    <update id="deleteByAccountPeriod" parameterType="String">
-        update t_dur_key_duration_discount_factors set is_del = 1 where account_period = #{accountPeriod}
-    </update>
+    <delete id="deleteByAccountPeriod" parameterType="String">
+        delete from t_dur_key_duration_discount_factors where account_period = #{accountPeriod}
+    </delete>
 
     <!-- 批量插入关键久期折现因子 -->
     <insert id="batchInsert" parameterType="java.util.List">

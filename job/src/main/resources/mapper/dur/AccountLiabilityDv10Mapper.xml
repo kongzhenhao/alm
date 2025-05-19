@@ -38,11 +38,10 @@
     </resultMap>
 
     <!-- 根据账期删除数据 -->
-    <update id="deleteByAccountPeriod">
-        update t_dur_account_liability_dv10
-        set is_del = 1
+    <delete id="deleteByAccountPeriod">
+        delete from t_dur_account_liability_dv10
         where account_period = #{accountPeriod}
-    </update>
+    </delete>
 
     <!-- 批量插入数据 -->
     <insert id="batchInsert" parameterType="java.util.List">
