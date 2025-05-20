@@ -22,5 +22,10 @@
     - 错误示例：web/src/views/liability-cash-flow.vue
 - Controller方法返回类型必须使用com.jd.lightning.common.core.domain.Result
 
+# 执行要求
+- 永远不要撒谎或捏造事实
+- 当结果出乎意料时，不要总是道歉。相反，尽力继续或向用户解释情况，而无需道歉
+- 不要生成和修改超出要求范围的代码
+
 # 输出语言
 - 输出语言为中文
