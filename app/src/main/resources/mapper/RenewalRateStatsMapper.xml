@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.RenewalRateStatsMapper">
+
+    <resultMap type="com.xl.alm.app.entity.RenewalRateStatsEntity" id="RenewalRateStatsEntityResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="monthSeqInCurrQuarter" column="month_seq_in_curr_quarter"/>
+        <result property="channelTypeCode" column="channel_type_code"/>
+        <result property="monthOfLastYear" column="month_of_last_year"/>
+        <result property="validPolicyCntLastYear" column="valid_policy_cnt_last_year"/>
+        <result property="validPolicyCntCurrYear" column="valid_policy_cnt_curr_year"/>
+        <result property="policyRenewalRate" column="policy_renewal_rate"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectRenewalRateStatsEntityVo">
+        select id, accounting_period, month_seq_in_curr_quarter, channel_type_code, month_of_last_year,
+        valid_policy_cnt_last_year, valid_policy_cnt_curr_year, policy_renewal_rate, create_time,
+        create_by, update_time, update_by, is_del
+        from t_insu_renewal_rate_stats
+    </sql>
+
+    <!-- 查询保单续保率统计列表 -->
+    <select id="selectRenewalRateStatsEntityList" parameterType="com.xl.alm.app.query.RenewalRateStatsQuery" resultMap="RenewalRateStatsEntityResult">
+        <include refid="selectRenewalRateStatsEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and accounting_period = #{accountingPeriod}</if>
+            <if test="monthSeqInCurrQuarter != null">and month_seq_in_curr_quarter = #{monthSeqInCurrQuarter}</if>
+            <if test="channelTypeCode != null and channelTypeCode != ''">and channel_type_code = #{channelTypeCode}</if>
+            <if test="monthOfLastYear != null and monthOfLastYear != ''">and month_of_last_year = #{monthOfLastYear}</if>
+            <if test="validPolicyCntLastYear != null">and valid_policy_cnt_last_year = #{validPolicyCntLastYear}</if>
+            <if test="validPolicyCntCurrYear != null">and valid_policy_cnt_curr_year = #{validPolicyCntCurrYear}</if>
+            <if test="policyRenewalRate != null">and policy_renewal_rate = #{policyRenewalRate}</if>
+            and is_del = 0
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 查询保单续保率统计详细 -->
+    <select id="selectRenewalRateStatsEntityById" parameterType="Long" resultMap="RenewalRateStatsEntityResult">
+        <include refid="selectRenewalRateStatsEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 新增保单续保率统计 -->
+    <insert id="insertRenewalRateStatsEntity" parameterType="com.xl.alm.app.entity.RenewalRateStatsEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_insu_renewal_rate_stats (
+            accounting_period, month_seq_in_curr_quarter, channel_type_code, month_of_last_year,
+            valid_policy_cnt_last_year, valid_policy_cnt_curr_year, policy_renewal_rate, create_by, update_by
+        ) values (
+            #{accountingPeriod}, #{monthSeqInCurrQuarter}, #{channelTypeCode}, #{monthOfLastYear},
+            #{validPolicyCntLastYear}, #{validPolicyCntCurrYear}, #{policyRenewalRate}, #{createBy}, #{updateBy}
+        )
+    </insert>
+
+    <!-- 批量新增保单续保率统计 -->
+    <insert id="batchInsertRenewalRateStatsEntity" parameterType="java.util.List">
+        insert into t_insu_renewal_rate_stats (
+            accounting_period, month_seq_in_curr_quarter, channel_type_code, month_of_last_year,
+            valid_policy_cnt_last_year, valid_policy_cnt_curr_year, policy_renewal_rate, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.monthSeqInCurrQuarter}, #{item.channelTypeCode}, #{item.monthOfLastYear},
+            #{item.validPolicyCntLastYear}, #{item.validPolicyCntCurrYear}, #{item.policyRenewalRate}, #{item.createBy}, #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改保单续保率统计 -->
+    <update id="updateRenewalRateStatsEntity" parameterType="com.xl.alm.app.entity.RenewalRateStatsEntity">
+        update t_insu_renewal_rate_stats
+        <set>
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period = #{accountingPeriod},</if>
+            <if test="monthSeqInCurrQuarter != null">month_seq_in_curr_quarter = #{monthSeqInCurrQuarter},</if>
+            <if test="channelTypeCode != null and channelTypeCode != ''">channel_type_code = #{channelTypeCode},</if>
+            <if test="monthOfLastYear != null and monthOfLastYear != ''">month_of_last_year = #{monthOfLastYear},</if>
+            <if test="validPolicyCntLastYear != null">valid_policy_cnt_last_year = #{validPolicyCntLastYear},</if>
+            <if test="validPolicyCntCurrYear != null">valid_policy_cnt_curr_year = #{validPolicyCntCurrYear},</if>
+            <if test="policyRenewalRate != null">policy_renewal_rate = #{policyRenewalRate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除保单续保率统计 -->
+    <update id="deleteRenewalRateStatsEntityById" parameterType="Long">
+        update t_insu_renewal_rate_stats set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除保单续保率统计 -->
+    <update id="deleteRenewalRateStatsEntityByIds" parameterType="Long">
+        update t_insu_renewal_rate_stats set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据账期删除保单续保率统计 -->
+    <delete id="deleteRenewalRateStatsEntityByPeriod" parameterType="String">
+        delete from t_insu_renewal_rate_stats where accounting_period = #{accountingPeriod}
+    </delete>
+
+    <!-- 插入保单续保率统计 -->
+    <insert id="calcRenewalRateStats" parameterType="String">
+        insert into t_insu_renewal_rate_stats(accounting_period,
+        month_seq_in_curr_quarter,
+        month_of_last_year,
+        channel_type_code,
+        valid_policy_cnt_last_year,
+        valid_policy_cnt_curr_year,
+        policy_renewal_rate)
+        select
+        accounting_period,
+        month_seq_in_curr_quarter,
+        month_of_last_year,
+        channel_type_code,
+        sum(histo_valid_cnt),
+        sum(now_valid_cnt),
+        sum(now_valid_cnt)/ sum(histo_valid_cnt)
+        from
+        (
+        select
+        m.accounting_period,
+        m.month_seq_in_curr_quarter,
+        m.month_of_last_year,
+        c.channel_type_code,
+        0 histo_valid_cnt,
+        count(*) now_valid_cnt
+        from t_insu_policy_detail p,
+        (
+        select
+        accounting_period,
+        month_seq_in_curr_quarter,
+        month_of_last_year,
+        month_in_curr_quarter
+        from  t_base_renewal_eval_month_cfg
+        where
+        accounting_period = #{accountingPeriod}
+        and is_del = 0) m,
+        t_base_product_attribute a,
+        t_insu_bus_channel_mapping c
+        where
+        p.effective_month = m.month_of_last_year
+        and p.risk_code = a.business_code
+        and p.bus_type_code = c.bus_type_code
+        and a.term_type = 'L'
+        and a.design_type != '04'
+        and a.is_del = 0
+        and c.is_del = 0
+        and (p.pol_status_desc = '有效'
+        or p.pol_status_changed_month > m.month_in_curr_quarter)
+        group by
+        m.accounting_period,
+        m.month_seq_in_curr_quarter,
+        m.month_of_last_year,
+        c.channel_type_code
+        union all
+        select
+        m.accounting_period,
+        m.month_seq_in_curr_quarter,
+        m.month_of_last_year,
+        c.channel_type_code,
+        count(*) histo_valid_cnt,
+        0 now_valid_cnt
+        from t_insu_policy_detail p,
+        (
+        select
+        accounting_period,
+        month_seq_in_curr_quarter,
+        month_of_last_year
+        from t_base_renewal_eval_month_cfg
+        where
+        accounting_period = #{accountingPeriod}
+        and is_del = 0) m,
+        t_base_product_attribute a,
+        t_insu_bus_channel_mapping c
+        where
+        p.effective_month = m.month_of_last_year
+        and p.risk_code = a.business_code
+        and p.bus_type_code = c.bus_type_code
+        and a.term_type = 'L'
+        and a.design_type != '04'
+        and a.is_del = 0
+        and c.is_del = 0
+        group by
+        m.accounting_period,
+        m.month_seq_in_curr_quarter,
+        m.month_of_last_year,
+        c.channel_type_code
+        ) x
+        group by
+        accounting_period,
+        month_seq_in_curr_quarter,
+        month_of_last_year,
+        channel_type_code
+    </insert>
+
+</mapper>
