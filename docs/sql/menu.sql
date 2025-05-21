@@ -196,3 +196,78 @@ INSERT INTO sys_menu (menu_name,parent_id,order_num,path,component,query,is_fram
 ('分账户负债久期汇总删除', @parentId, 4, '#', '', '', 1, 0, 'F', '0', '0', 'dur:sub:account:liability:duration:remove', '#', 'admin', SYSDATE(), '', NULL, ''),
 ('分账户负债久期汇总导出', @parentId, 5, '#', '', '', 1, 0, 'F', '0', '0', 'dur:sub:account:liability:duration:export', '#', 'admin', SYSDATE(), '', NULL, ''),
 ('分账户负债久期汇总导入', @parentId, 6, '#', '', '', 1, 0, 'F', '0', '0', 'dur:sub:account:liability:duration:import', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 最低资本管理主菜单 SQL
+INSERT INTO sys_menu (menu_name,parent_id,order_num,path,component,query,is_frame,is_cache,menu_type,visible,status,perms,icon,create_by,create_time,update_by,update_time,remark) VALUES
+('最低资本管理', 0, 20, 'minc', NULL, '', 1, 0, 'M', '0', '0', '', 'money', 'admin', SYSDATE(), '', NULL, '最低资本管理菜单');
+
+-- 获取最低资本管理菜单ID
+SET @mincMenuId = (SELECT menu_id FROM sys_menu WHERE menu_name = '最低资本管理' AND parent_id = 0 AND path = 'minc');
+
+-- 分部门最低资本明细表菜单 SQL (TB0001)
+INSERT INTO sys_menu (menu_name,parent_id,order_num,path,component,query,is_frame,is_cache,menu_type,visible,status,perms,icon,create_by,create_time,update_by,update_time,remark) VALUES
+('分部门最低资本明细管理', @mincMenuId, 1, 'deptMincapDetail', 'minc/dept/mincap/detail/index', '', 1, 0, 'C', '0', '0', 'minc:dept:mincap:detail:list', 'table', 'admin', SYSDATE(), '', NULL, '分部门最低资本明细菜单');
+
+-- 按钮父菜单ID
+SET @parentId = LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name,parent_id,order_num,path,component,query,is_frame,is_cache,menu_type,visible,status,perms,icon,create_by,create_time,update_by,update_time,remark) VALUES
+('分部门最低资本明细查询', @parentId, 1, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:query', '#', 'admin', SYSDATE(), '', NULL, ''),
+('分部门最低资本明细新增', @parentId, 2, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:add', '#', 'admin', SYSDATE(), '', NULL, ''),
+('分部门最低资本明细修改', @parentId, 3, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:edit', '#', 'admin', SYSDATE(), '', NULL, ''),
+('分部门最低资本明细删除', @parentId, 4, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:remove', '#', 'admin', SYSDATE(), '', NULL, ''),
+('分部门最低资本明细导出', @parentId, 5, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:export', '#', 'admin', SYSDATE(), '', NULL, ''),
+('分部门最低资本明细导入', @parentId, 6, '#', '', '', 1, 0, 'F', '0', '0', 'minc:dept:mincap:detail:import', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 菜单 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额管理', (SELECT menu_id FROM (SELECT menu_id FROM sys_menu WHERE menu_name = '最低资本模块' AND parent_id = 0) t), 2, 'amount', 'minc/risk/item/amount/index', 1, 0, 'C', '0', '0', 'minc:risk:item:amount:list', 'table', 'admin', SYSDATE(), '', NULL, '风险项目金额菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:export', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('风险项目金额导入', @parentId, 6, '#', '', 1, 0, 'F', '0', '0', 'minc:risk:item:amount:import', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 项目定义表菜单 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义管理', @mincMenuId, 3, 'itemDefinition', 'minc/item/definition/index', 1, 0, 'C', '0', '0', 'minc:item:definition:list', 'dict', 'admin', SYSDATE(), '', NULL, '项目定义管理菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:export', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('项目定义导入', @parentId, 6, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:import', '#', 'admin', SYSDATE(), '', NULL, '');
