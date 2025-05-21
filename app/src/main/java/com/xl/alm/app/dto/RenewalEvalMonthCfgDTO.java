@@ -4,6 +4,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.jd.lightning.common.annotation.Excel;
 import com.jd.lightning.common.core.domain.BaseDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import javax.validation.constraints.Min;
  *
  * @author AI Assistant
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class RenewalEvalMonthCfgDTO extends BaseDTO {
     private Long id;

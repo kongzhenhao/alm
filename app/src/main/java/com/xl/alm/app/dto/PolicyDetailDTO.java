@@ -6,6 +6,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.jd.lightning.common.annotation.Excel;
 import com.jd.lightning.common.core.domain.BaseDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ import java.util.Date;
  *
  * @author AI Assistant
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class PolicyDetailDTO extends BaseDTO {
     private Long id;
