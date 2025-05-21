@@ -12,7 +12,9 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Excel相关处理
@@ -75,9 +77,18 @@ public class ExcelUtil<T> {
             response.setCharacterEncoding("utf-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
 
+            Set<String> excludeFieldNames = new HashSet<>();
+            excludeFieldNames.add("createTime");
+            excludeFieldNames.add("updateTime");
+            excludeFieldNames.add("createBy");
+            excludeFieldNames.add("updateBy");
+            excludeFieldNames.add("isDel");
+            excludeFieldNames.add("remark");
+
             // 使用标准的EasyExcel写入方式，添加BigDecimal格式处理
             EasyExcel.write(response.getOutputStream(), clazz)
                     .sheet(sheetName)
+                    .excludeColumnFieldNames(excludeFieldNames)
                     .doWrite(processedList);
         } catch (Exception e) {
             log.error("导出Excel异常", e);
@@ -89,7 +100,7 @@ public class ExcelUtil<T> {
      * 导出模板
      *
      * @param response 响应对象
-     * @param str 模板名称
+     * @param str      模板名称
      */
     public void exportTemplateExcel(HttpServletResponse response, String str) {
         try {
