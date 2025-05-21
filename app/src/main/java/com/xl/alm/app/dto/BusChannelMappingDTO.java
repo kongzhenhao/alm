@@ -1,5 +1,6 @@
 package com.xl.alm.app.dto;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.jd.lightning.common.annotation.Excel;
 import com.jd.lightning.common.core.domain.BaseDTO;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class BusChannelMappingDTO extends BaseDTO {
     @NotBlank(message = "业务类型编码不能为空")
     @Size(max = 20, message = "业务类型编码长度不能超过20个字符")
     @Excel(name = "业务类型编码")
+    @ExcelProperty(value = "业务类型编码")
     private String busTypeCode;
     
     /**
@@ -30,6 +32,7 @@ public class BusChannelMappingDTO extends BaseDTO {
     @NotBlank(message = "渠道类型编码不能为空")
     @Size(max = 20, message = "渠道类型编码长度不能超过20个字符")
     @Excel(name = "渠道类型编码")
+    @ExcelProperty(value = "渠道类型编码")
     private String channelTypeCode;
     
     /**
