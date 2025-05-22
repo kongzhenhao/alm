@@ -26,8 +26,19 @@
         <result property="longTermUnearned" column="long_term_unearned"/>
         <result property="shortTermUnearned" column="short_term_unearned"/>
         <result property="unearnedPremiumReserve" column="unearned_premium_reserve"/>
+        <result property="reportedUnpaid" column="reported_unpaid"/>
+        <result property="incurredUnreported" column="incurred_unreported"/>
+        <result property="claimExpenseReserve" column="claim_expense_reserve"/>
         <result property="outstandingClaimReserve" column="outstanding_claim_reserve"/>
         <result property="totalAccountingReserve" column="total_accounting_reserve"/>
+        <result property="reinsuranceUnearned" column="reinsurance_unearned"/>
+        <result property="reinsuranceReported" column="reinsurance_reported"/>
+        <result property="reinsuranceUnreported" column="reinsurance_unreported"/>
+        <result property="reinsuranceClaimTotal" column="reinsurance_claim_total"/>
+        <result property="reinsuranceTotal" column="reinsurance_total"/>
+        <result property="lapsedPolicyValue" column="lapsed_policy_value"/>
+        <result property="fractionalMonthDividend" column="fractional_month_dividend"/>
+        <result property="unpaidDividend" column="unpaid_dividend"/>
         <result property="remark" column="remark"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -40,7 +51,9 @@
         select id, accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
                valid_policy_count, accumulated_premium, account_value, dividend_provision, best_estimate, risk_margin, residual_margin,
                unmodeled_reserve, waiver_reserve, persistence_bonus_reserve, long_term_unearned, short_term_unearned,
-               unearned_premium_reserve, outstanding_claim_reserve, total_accounting_reserve,
+               unearned_premium_reserve, reported_unpaid, incurred_unreported, claim_expense_reserve, outstanding_claim_reserve,
+               total_accounting_reserve, reinsurance_unearned, reinsurance_reported, reinsurance_unreported,
+               reinsurance_claim_total, reinsurance_total, lapsed_policy_value, fractional_month_dividend, unpaid_dividend,
                remark, create_by, create_time, update_by, update_time, is_del
         from t_base_accounting_reserve_detail
     </sql>
@@ -109,8 +122,19 @@
             <if test="longTermUnearned != null">long_term_unearned,</if>
             <if test="shortTermUnearned != null">short_term_unearned,</if>
             <if test="unearnedPremiumReserve != null">unearned_premium_reserve,</if>
+            <if test="reportedUnpaid != null">reported_unpaid,</if>
+            <if test="incurredUnreported != null">incurred_unreported,</if>
+            <if test="claimExpenseReserve != null">claim_expense_reserve,</if>
             <if test="outstandingClaimReserve != null">outstanding_claim_reserve,</if>
             <if test="totalAccountingReserve != null">total_accounting_reserve,</if>
+            <if test="reinsuranceUnearned != null">reinsurance_unearned,</if>
+            <if test="reinsuranceReported != null">reinsurance_reported,</if>
+            <if test="reinsuranceUnreported != null">reinsurance_unreported,</if>
+            <if test="reinsuranceClaimTotal != null">reinsurance_claim_total,</if>
+            <if test="reinsuranceTotal != null">reinsurance_total,</if>
+            <if test="lapsedPolicyValue != null">lapsed_policy_value,</if>
+            <if test="fractionalMonthDividend != null">fractional_month_dividend,</if>
+            <if test="unpaidDividend != null">unpaid_dividend,</if>
             <if test="remark != null">remark,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
@@ -139,8 +163,19 @@
             <if test="longTermUnearned != null">#{longTermUnearned},</if>
             <if test="shortTermUnearned != null">#{shortTermUnearned},</if>
             <if test="unearnedPremiumReserve != null">#{unearnedPremiumReserve},</if>
+            <if test="reportedUnpaid != null">#{reportedUnpaid},</if>
+            <if test="incurredUnreported != null">#{incurredUnreported},</if>
+            <if test="claimExpenseReserve != null">#{claimExpenseReserve},</if>
             <if test="outstandingClaimReserve != null">#{outstandingClaimReserve},</if>
             <if test="totalAccountingReserve != null">#{totalAccountingReserve},</if>
+            <if test="reinsuranceUnearned != null">#{reinsuranceUnearned},</if>
+            <if test="reinsuranceReported != null">#{reinsuranceReported},</if>
+            <if test="reinsuranceUnreported != null">#{reinsuranceUnreported},</if>
+            <if test="reinsuranceClaimTotal != null">#{reinsuranceClaimTotal},</if>
+            <if test="reinsuranceTotal != null">#{reinsuranceTotal},</if>
+            <if test="lapsedPolicyValue != null">#{lapsedPolicyValue},</if>
+            <if test="fractionalMonthDividend != null">#{fractionalMonthDividend},</if>
+            <if test="unpaidDividend != null">#{unpaidDividend},</if>
             <if test="remark != null">#{remark},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
@@ -173,8 +208,19 @@
             <if test="longTermUnearned != null">long_term_unearned = #{longTermUnearned},</if>
             <if test="shortTermUnearned != null">short_term_unearned = #{shortTermUnearned},</if>
             <if test="unearnedPremiumReserve != null">unearned_premium_reserve = #{unearnedPremiumReserve},</if>
+            <if test="reportedUnpaid != null">reported_unpaid = #{reportedUnpaid},</if>
+            <if test="incurredUnreported != null">incurred_unreported = #{incurredUnreported},</if>
+            <if test="claimExpenseReserve != null">claim_expense_reserve = #{claimExpenseReserve},</if>
             <if test="outstandingClaimReserve != null">outstanding_claim_reserve = #{outstandingClaimReserve},</if>
             <if test="totalAccountingReserve != null">total_accounting_reserve = #{totalAccountingReserve},</if>
+            <if test="reinsuranceUnearned != null">reinsurance_unearned = #{reinsuranceUnearned},</if>
+            <if test="reinsuranceReported != null">reinsurance_reported = #{reinsuranceReported},</if>
+            <if test="reinsuranceUnreported != null">reinsurance_unreported = #{reinsuranceUnreported},</if>
+            <if test="reinsuranceClaimTotal != null">reinsurance_claim_total = #{reinsuranceClaimTotal},</if>
+            <if test="reinsuranceTotal != null">reinsurance_total = #{reinsuranceTotal},</if>
+            <if test="lapsedPolicyValue != null">lapsed_policy_value = #{lapsedPolicyValue},</if>
+            <if test="fractionalMonthDividend != null">fractional_month_dividend = #{fractionalMonthDividend},</if>
+            <if test="unpaidDividend != null">unpaid_dividend = #{unpaidDividend},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
@@ -194,23 +240,78 @@
     </update>
 
     <insert id="batchInsertAccountingReserveDetail" parameterType="java.util.List">
-        insert into t_base_accounting_reserve_detail (
-            accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
-            valid_policy_count, accumulated_premium, account_value, dividend_provision, best_estimate, risk_margin, residual_margin,
-            unmodeled_reserve, waiver_reserve, persistence_bonus_reserve, long_term_unearned, short_term_unearned,
-            unearned_premium_reserve, outstanding_claim_reserve, total_accounting_reserve,
-            remark, create_by, create_time, update_by, update_time, is_del
-        ) values
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName},
-            #{item.termType}, #{item.designType}, #{item.shortTermFlag},
-            #{item.validPolicyCount}, #{item.accumulatedPremium}, #{item.accountValue},
-            #{item.dividendProvision}, #{item.bestEstimate}, #{item.riskMargin}, #{item.residualMargin},
-            #{item.unmodeledReserve}, #{item.waiverReserve}, #{item.persistenceBonusReserve}, #{item.longTermUnearned}, #{item.shortTermUnearned},
-            #{item.unearnedPremiumReserve}, #{item.outstandingClaimReserve}, #{item.totalAccountingReserve},
-            #{item.remark}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, 0
-            )
+        <foreach collection="list" item="item" separator=";">
+            insert into t_base_accounting_reserve_detail
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
+                <if test="item.validPolicyCount != null">valid_policy_count,</if>
+                <if test="item.accumulatedPremium != null">accumulated_premium,</if>
+                <if test="item.accountValue != null">account_value,</if>
+                <if test="item.dividendProvision != null">dividend_provision,</if>
+                <if test="item.bestEstimate != null">best_estimate,</if>
+                <if test="item.riskMargin != null">risk_margin,</if>
+                <if test="item.residualMargin != null">residual_margin,</if>
+                <if test="item.unmodeledReserve != null">unmodeled_reserve,</if>
+                <if test="item.waiverReserve != null">waiver_reserve,</if>
+                <if test="item.persistenceBonusReserve != null">persistence_bonus_reserve,</if>
+                <if test="item.longTermUnearned != null">long_term_unearned,</if>
+                <if test="item.shortTermUnearned != null">short_term_unearned,</if>
+                <if test="item.unearnedPremiumReserve != null">unearned_premium_reserve,</if>
+                <if test="item.reportedUnpaid != null">reported_unpaid,</if>
+                <if test="item.incurredUnreported != null">incurred_unreported,</if>
+                <if test="item.claimExpenseReserve != null">claim_expense_reserve,</if>
+                <if test="item.outstandingClaimReserve != null">outstanding_claim_reserve,</if>
+                <if test="item.totalAccountingReserve != null">total_accounting_reserve,</if>
+                <if test="item.reinsuranceUnearned != null">reinsurance_unearned,</if>
+                <if test="item.reinsuranceReported != null">reinsurance_reported,</if>
+                <if test="item.reinsuranceUnreported != null">reinsurance_unreported,</if>
+                <if test="item.reinsuranceClaimTotal != null">reinsurance_claim_total,</if>
+                <if test="item.reinsuranceTotal != null">reinsurance_total,</if>
+                <if test="item.lapsedPolicyValue != null">lapsed_policy_value,</if>
+                <if test="item.fractionalMonthDividend != null">fractional_month_dividend,</if>
+                <if test="item.unpaidDividend != null">unpaid_dividend,</if>
+                <if test="item.remark != null">remark,</if>
+                <if test="item.createBy != null">create_by,</if>
+                <if test="item.createTime != null">create_time,</if>
+                <if test="item.updateBy != null">update_by,</if>
+                <if test="item.updateTime != null">update_time,</if>
+                is_del
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName}, #{item.termType}, #{item.designType}, #{item.shortTermFlag},
+                <if test="item.validPolicyCount != null">#{item.validPolicyCount},</if>
+                <if test="item.accumulatedPremium != null">#{item.accumulatedPremium},</if>
+                <if test="item.accountValue != null">#{item.accountValue},</if>
+                <if test="item.dividendProvision != null">#{item.dividendProvision},</if>
+                <if test="item.bestEstimate != null">#{item.bestEstimate},</if>
+                <if test="item.riskMargin != null">#{item.riskMargin},</if>
+                <if test="item.residualMargin != null">#{item.residualMargin},</if>
+                <if test="item.unmodeledReserve != null">#{item.unmodeledReserve},</if>
+                <if test="item.waiverReserve != null">#{item.waiverReserve},</if>
+                <if test="item.persistenceBonusReserve != null">#{item.persistenceBonusReserve},</if>
+                <if test="item.longTermUnearned != null">#{item.longTermUnearned},</if>
+                <if test="item.shortTermUnearned != null">#{item.shortTermUnearned},</if>
+                <if test="item.unearnedPremiumReserve != null">#{item.unearnedPremiumReserve},</if>
+                <if test="item.reportedUnpaid != null">#{item.reportedUnpaid},</if>
+                <if test="item.incurredUnreported != null">#{item.incurredUnreported},</if>
+                <if test="item.claimExpenseReserve != null">#{item.claimExpenseReserve},</if>
+                <if test="item.outstandingClaimReserve != null">#{item.outstandingClaimReserve},</if>
+                <if test="item.totalAccountingReserve != null">#{item.totalAccountingReserve},</if>
+                <if test="item.reinsuranceUnearned != null">#{item.reinsuranceUnearned},</if>
+                <if test="item.reinsuranceReported != null">#{item.reinsuranceReported},</if>
+                <if test="item.reinsuranceUnreported != null">#{item.reinsuranceUnreported},</if>
+                <if test="item.reinsuranceClaimTotal != null">#{item.reinsuranceClaimTotal},</if>
+                <if test="item.reinsuranceTotal != null">#{item.reinsuranceTotal},</if>
+                <if test="item.lapsedPolicyValue != null">#{item.lapsedPolicyValue},</if>
+                <if test="item.fractionalMonthDividend != null">#{item.fractionalMonthDividend},</if>
+                <if test="item.unpaidDividend != null">#{item.unpaidDividend},</if>
+                <if test="item.remark != null">#{item.remark},</if>
+                <if test="item.createBy != null">#{item.createBy},</if>
+                <if test="item.createTime != null">#{item.createTime},</if>
+                <if test="item.updateBy != null">#{item.updateBy},</if>
+                <if test="item.updateTime != null">#{item.updateTime},</if>
+                0
+            </trim>
         </foreach>
     </insert>
 </mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.AccountingReserveDetailMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.AccountingReserveDetailEntity" id="AccountingReserveDetailEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="validPolicyCount" column="valid_policy_count"/>
+        <result property="accumulatedPremium" column="accumulated_premium"/>
+        <result property="accountValue" column="account_value"/>
+        <result property="dividendProvision" column="dividend_provision"/>
+        <result property="bestEstimate" column="best_estimate"/>
+        <result property="riskMargin" column="risk_margin"/>
+        <result property="residualMargin" column="residual_margin"/>
+        <result property="unmodeledReserve" column="unmodeled_reserve"/>
+        <result property="waiverReserve" column="waiver_reserve"/>
+        <result property="persistenceBonusReserve" column="persistence_bonus_reserve"/>
+        <result property="longTermUnearned" column="long_term_unearned"/>
+        <result property="shortTermUnearned" column="short_term_unearned"/>
+        <result property="unearnedPremiumReserve" column="unearned_premium_reserve"/>
+        <result property="reportedUnpaid" column="reported_unpaid"/>
+        <result property="incurredUnreported" column="incurred_unreported"/>
+        <result property="claimExpenseReserve" column="claim_expense_reserve"/>
+        <result property="outstandingClaimReserve" column="outstanding_claim_reserve"/>
+        <result property="totalAccountingReserve" column="total_accounting_reserve"/>
+        <result property="reinsuranceUnearned" column="reinsurance_unearned"/>
+        <result property="reinsuranceReported" column="reinsurance_reported"/>
+        <result property="reinsuranceUnreported" column="reinsurance_unreported"/>
+        <result property="reinsuranceClaimTotal" column="reinsurance_claim_total"/>
+        <result property="reinsuranceTotal" column="reinsurance_total"/>
+        <result property="lapsedPolicyValue" column="lapsed_policy_value"/>
+        <result property="fractionalMonthDividend" column="fractional_month_dividend"/>
+        <result property="unpaidDividend" column="unpaid_dividend"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectAccountingReserveDetailVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag,
+               valid_policy_count, accumulated_premium, account_value, dividend_provision, best_estimate, risk_margin,
+               residual_margin, unmodeled_reserve, waiver_reserve, persistence_bonus_reserve, long_term_unearned,
+               short_term_unearned, unearned_premium_reserve, reported_unpaid, incurred_unreported, claim_expense_reserve,
+               outstanding_claim_reserve, total_accounting_reserve, reinsurance_unearned, reinsurance_reported,
+               reinsurance_unreported, reinsurance_claim_total, reinsurance_total, lapsed_policy_value,
+               fractional_month_dividend, unpaid_dividend, remark, create_time, create_by, update_time, update_by, is_del
+        from t_base_accounting_reserve_detail
+    </sql>
+
+    <select id="selectAccountingReserveDetailList" parameterType="com.xl.alm.job.cost.query.AccountingReserveDetailQuery" resultMap="AccountingReserveDetailEntityResult">
+        <include refid="selectAccountingReserveDetailVo"/>
+        <where>
+            is_del = 0
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code = #{actuarialCode}
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code = #{businessCode}
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="termType != null and termType != ''">
+                AND term_type = #{termType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+        </where>
+    </select>
+
+</mapper>

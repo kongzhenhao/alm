@@ -2,8 +2,10 @@ package com.xl.alm.job.cost.processor;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.xl.alm.job.cost.task.AccountEffectiveRateTask;
 import com.xl.alm.job.cost.task.AccountSummaryTask;
 import com.xl.alm.job.cost.task.BusinessTypeSummaryTask;
+import com.xl.alm.job.cost.task.ProductEffectiveRateTask;
 import com.xl.alm.job.cost.task.ProductStatisticsTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
  * 1. 分产品统计处理器 (ProductStatisticsProcessor)
  * 2. 分业务类型汇总处理器 (BusinessTypeSummaryProcessor)
  * 3. 分账户汇总处理器 (AccountSummaryProcessor)
+ * 4. 分产品有效成本率处理器 (ProductEffectiveRateProcessor)
+ * 5. 分账户有效成本率处理器 (AccountEffectiveRateProcessor)
  *
  * @author AI Assistant
  */
@@ -33,6 +37,12 @@ public class CostCalculationProcessor implements BasicProcessor {
 
     @Autowired
     private AccountSummaryTask accountSummaryTask;
+
+    @Autowired
+    private ProductEffectiveRateTask productEffectiveRateTask;
+
+    @Autowired
+    private AccountEffectiveRateTask accountEffectiveRateTask;
 
     @Override
     public ProcessResult process(TaskContext taskContext) {
@@ -75,6 +85,24 @@ public class CostCalculationProcessor implements BasicProcessor {
                 return new ProcessResult(false, "分账户汇总计算失败");
             }
             log.info("分账户汇总计算成功");
+
+            // 4. 执行分产品有效成本率计算任务
+            log.info("开始执行分产品有效成本率计算任务");
+            boolean effectiveRateResult = productEffectiveRateTask.execute(accountingPeriod);
+            if (!effectiveRateResult) {
+                log.error("分产品有效成本率计算失败");
+                return new ProcessResult(false, "分产品有效成本率计算失败");
+            }
+            log.info("分产品有效成本率计算成功");
+
+            // 5. 执行分账户有效成本率计算任务
+            log.info("开始执行分账户有效成本率计算任务");
+            boolean accountEffectiveRateResult = accountEffectiveRateTask.execute(accountingPeriod);
+            if (!accountEffectiveRateResult) {
+                log.error("分账户有效成本率计算失败");
+                return new ProcessResult(false, "分账户有效成本率计算失败");
+            }
+            log.info("分账户有效成本率计算成功");
 
             // 所有任务执行成功
             return new ProcessResult(true, "成本计算处理器执行成功");

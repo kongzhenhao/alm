@@ -45,7 +45,7 @@
     </select>
 
     <delete id="deleteBusinessTypeSummaryByPeriod" parameterType="String">
-        update t_cost_business_type_summary set is_del = 1
+        delete from t_cost_business_type_summary
         where accounting_period = #{accountingPeriod}
     </delete>
 

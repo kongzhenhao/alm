@@ -143,7 +143,8 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
                         entity.setAccumulatedPremium(dto.getAccumulatedPremium());
                     }
                 } else {
-                    entity.setAccumulatedPremium(BigDecimal.ZERO);
+                    // 保留Excel中的原始值（null）
+                    entity.setAccumulatedPremium(null);
                 }
                 entity.setAccountValue(dto.getAccountValue());
                 entity.setDividendProvision(dto.getDividendProvision());
@@ -187,79 +188,14 @@ public class AccountingReserveDetailServiceImpl implements IAccountingReserveDet
                         continue;
                     }
 
-                    // 设置默认值
+                    // 只设置必要的默认值，保留Excel中的原始值
                     if (StringUtils.isBlank(detail.getTermType())) {
                         detail.setTermType("L");
                     }
                     if (StringUtils.isBlank(detail.getShortTermFlag())) {
                         detail.setShortTermFlag("N");
                     }
-                    if (detail.getValidPolicyCount() == null) {
-                        detail.setValidPolicyCount(0);
-                    }
-                    if (detail.getAccumulatedPremium() == null) {
-                        detail.setAccumulatedPremium(BigDecimal.ZERO);
-                    }
-                    if (detail.getAccountValue() == null) {
-                        detail.setAccountValue(BigDecimal.ZERO);
-                    }
-                    if (detail.getDividendProvision() == null) {
-                        detail.setDividendProvision(BigDecimal.ZERO);
-                    }
-                    if (detail.getBestEstimate() == null) {
-                        detail.setBestEstimate(BigDecimal.ZERO);
-                    }
-                    if (detail.getRiskMargin() == null) {
-                        detail.setRiskMargin(BigDecimal.ZERO);
-                    }
-                    if (detail.getResidualMargin() == null) {
-                        detail.setResidualMargin(BigDecimal.ZERO);
-                    }
-                    if (detail.getUnmodeledReserve() == null) {
-                        detail.setUnmodeledReserve(BigDecimal.ZERO);
-                    }
-                    if (detail.getWaiverReserve() == null) {
-                        detail.setWaiverReserve(BigDecimal.ZERO);
-                    }
-                    if (detail.getPersistenceBonusReserve() == null) {
-                        detail.setPersistenceBonusReserve(BigDecimal.ZERO);
-                    }
-                    if (detail.getLongTermUnearned() == null) {
-                        detail.setLongTermUnearned(BigDecimal.ZERO);
-                    }
-                    if (detail.getShortTermUnearned() == null) {
-                        detail.setShortTermUnearned(BigDecimal.ZERO);
-                    }
-                    if (detail.getUnearnedPremiumReserve() == null) {
-                        detail.setUnearnedPremiumReserve(BigDecimal.ZERO);
-                    }
-                    if (detail.getOutstandingClaimReserve() == null) {
-                        detail.setOutstandingClaimReserve(BigDecimal.ZERO);
-                    }
-                    if (detail.getReinsuranceUnearned() == null) {
-                        detail.setReinsuranceUnearned(BigDecimal.ZERO);
-                    }
-                    if (detail.getReinsuranceReported() == null) {
-                        detail.setReinsuranceReported(BigDecimal.ZERO);
-                    }
-                    if (detail.getReinsuranceUnreported() == null) {
-                        detail.setReinsuranceUnreported(BigDecimal.ZERO);
-                    }
-                    if (detail.getReinsuranceClaimTotal() == null) {
-                        detail.setReinsuranceClaimTotal(BigDecimal.ZERO);
-                    }
-                    if (detail.getReinsuranceTotal() == null) {
-                        detail.setReinsuranceTotal(BigDecimal.ZERO);
-                    }
-                    if (detail.getLapsedPolicyValue() == null) {
-                        detail.setLapsedPolicyValue(BigDecimal.ZERO);
-                    }
-                    if (detail.getFractionalMonthDividend() == null) {
-                        detail.setFractionalMonthDividend(BigDecimal.ZERO);
-                    }
-                    if (detail.getUnpaidDividend() == null) {
-                        detail.setUnpaidDividend(BigDecimal.ZERO);
-                    }
+                    // 不再为数值字段设置默认值，保留Excel中的原始值（包括null）
 
                     // 计算会计准备金合计
                     calculateTotalAccountingReserve(detail);

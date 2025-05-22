@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.ProductEffectiveRateMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.ProductEffectiveRateEntity" id="ProductEffectiveRateEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="effectiveRate" column="effective_cost_rate"/>
+        <result property="cashflowSet" column="cash_flow_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectProductEffectiveRateVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, design_type, short_term_flag,
+               effective_cost_rate, cash_flow_set,
+               create_time, create_by, update_time, update_by, is_del
+        from t_cost_product_effective_rate
+    </sql>
+
+    <select id="selectProductEffectiveRateListByPeriod" parameterType="String" resultMap="ProductEffectiveRateEntityResult">
+        <include refid="selectProductEffectiveRateVo"/>
+        where accounting_period = #{accountingPeriod}
+        and is_del = 0
+    </select>
+
+    <delete id="deleteProductEffectiveRateByPeriod" parameterType="String">
+        delete from t_cost_product_effective_rate
+        where accounting_period = #{accountingPeriod}
+    </delete>
+
+    <insert id="batchInsertProductEffectiveRate" parameterType="java.util.List">
+        insert into t_cost_product_effective_rate (
+            accounting_period, actuarial_code, business_code, product_name, design_type, short_term_flag,
+            effective_cost_rate, cash_flow_set,
+            create_time, create_by, is_del
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName},
+            #{item.designType}, #{item.shortTermFlag},
+            #{item.effectiveRate}, #{item.cashflowSet},
+            sysdate(), #{item.createBy}, 0
+            )
+        </foreach>
+    </insert>
+
+</mapper>
