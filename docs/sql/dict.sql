@@ -135,8 +135,10 @@ VALUES (6, '普通账户', 'AC006', 'minc_account', NULL, 'default', 'N', '0', '
 INSERT INTO sys_dict_type(dict_name, dict_type, status, create_by, create_time, update_by, update_time, remark)
 VALUES ('风险项目', 'minc_risk_item', '0', 'admin', SYSDATE(), '', NULL, '最低资本风险项目');
 
-
-
+-- 风险项目字典数据（根据实际数据库中已有数据，这里只添加缺失的项目）
+INSERT INTO sys_dict_data(dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, update_by, update_time, remark)
+VALUES (998, '量化风险最低资本', 'QR002', 'minc_risk_item', NULL, 'primary', 'N', '0', 'admin', SYSDATE(), '', NULL, '量化风险最低资本简化版')
+ON DUPLICATE KEY UPDATE dict_label = VALUES(dict_label);
 
 -- 新增字典类型：风险类型
 INSERT INTO sys_dict_type(dict_name, dict_type, status, create_by, create_time, update_by, update_time, remark)

@@ -314,7 +314,6 @@ CREATE TABLE IF NOT EXISTS `t_minc_correlation_coef` (
 CREATE TABLE IF NOT EXISTS `t_minc_item_definition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `item_code` varchar(20) NOT NULL COMMENT '项目编码，如：MR001',
-  `item_name` varchar(100) NOT NULL COMMENT '项目名称，如：市场风险-利率风险最低资本',
   `risk_type` varchar(50) DEFAULT NULL COMMENT '风险类型，如：市场风险、信用风险',
   `capital_item` varchar(100) DEFAULT NULL COMMENT '边际最低资本贡献率表中的项目名称，如：寿险业务保险风险最低资本合计',
   `correlation_item` varchar(50) DEFAULT NULL COMMENT '相关系数表中的项目名称，如：寿险',

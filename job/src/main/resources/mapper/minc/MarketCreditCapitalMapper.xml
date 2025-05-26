@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.minc.mapper.MarketCreditCapitalMapper">
+
+    <!-- 查询项目定义表中有最低资本计算公式的项目 -->
+    <select id="selectItemDefinitionsWithCapitalFormula" resultType="java.util.Map">
+        SELECT
+            item_code,
+            capital_item,
+            risk_type,
+            capital_calculation_formula
+        FROM t_minc_item_definition
+        WHERE TRIM(status) = '0'
+          AND capital_calculation_formula IS NOT NULL
+          AND TRIM(capital_calculation_formula) != ''
+          AND risk_type IN ('市场风险', '信用风险')
+    </select>
+
+    <!-- 查询指定项目编码和账户编码在TB0007表中的金额 -->
+    <select id="selectAmountFromSummary" resultType="java.math.BigDecimal">
+        SELECT amount
+        FROM t_minc_min_capital_summary
+        WHERE item_code = #{itemCode}
+          AND account_code = #{accountCode}
+          AND accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 查询指定项目编码的公司层面边际最低资本贡献因子 -->
+    <select id="selectCompanyMarginalFactor" resultType="java.math.BigDecimal">
+        SELECT company_marginal_factor
+        FROM t_minc_marginal_capital
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 查询所有账户编码（包含传统、分红、万能、独立账户） -->
+    <select id="selectAllAccountCodes" resultType="java.lang.String">
+        SELECT DISTINCT dict_value
+        FROM sys_dict_data
+        WHERE dict_type = 'minc_account'
+          AND status = '0'
+          AND dict_value IN ('AC001', 'AC002', 'AC003', 'AC005')  -- 传统、分红、万能、独立账户
+        ORDER BY dict_sort
+    </select>
+
+    <!-- 删除指定账期的市场及信用最低资本数据 -->
+    <delete id="deleteByAccountingPeriod">
+        DELETE FROM t_minc_min_capital_by_account
+        WHERE accounting_period = #{accountingPeriod}
+    </delete>
+
+    <!-- 批量插入市场及信用最低资本数据 -->
+    <insert id="batchInsertMarketCreditCapital">
+        INSERT INTO t_minc_min_capital_by_account (
+            accounting_period,
+            item_code,
+            account_code,
+            amount,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.accountingPeriod},
+                #{item.itemCode},
+                #{item.accountCode},
+                #{item.amount},
+                #{item.createBy},
+                #{item.createTime},
+                #{item.updateBy},
+                #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 查询指定账期的市场及信用最低资本数据 -->
+    <select id="selectByAccountingPeriod" resultType="com.xl.alm.job.minc.entity.MarketCreditCapitalEntity">
+        SELECT
+            accounting_period,
+            item_code,
+            account_code,
+            amount,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        FROM t_minc_min_capital_by_account
+        WHERE accounting_period = #{accountingPeriod}
+        ORDER BY item_code, account_code
+    </select>
+
+    <!-- 按风险类型和账户汇总金额 -->
+    <select id="selectSummaryByRiskTypeAndAccount" resultType="java.util.Map">
+        SELECT
+            def.risk_type,
+            cap.account_code,
+            SUM(cap.amount) as total_amount
+        FROM t_minc_min_capital_by_account cap
+        INNER JOIN t_minc_item_definition def ON cap.item_code = def.item_code
+        WHERE cap.accounting_period = #{accountingPeriod}
+          AND def.status = '0'
+          AND def.risk_type IN ('市场风险', '信用风险')
+        GROUP BY def.risk_type, cap.account_code
+        ORDER BY def.risk_type, cap.account_code
+    </select>
+
+</mapper>

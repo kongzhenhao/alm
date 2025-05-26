@@ -271,3 +271,98 @@ VALUES ('项目定义导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:
 
 INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
 VALUES ('项目定义导入', @parentId, 6, '#', '', 1, 0, 'F', '0', '0', 'minc:item:definition:import', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 相关系数表菜单 SQL (TB0004)
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数管理', @mincMenuId, 4, 'correlationCoef', 'minc/correlation/coef/index', 1, 0, 'C', '0', '0', 'minc:correlation:coef:list', 'table', 'admin', SYSDATE(), '', NULL, '相关系数管理菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:export', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('相关系数导入', @parentId, 6, '#', '', 1, 0, 'F', '0', '0', 'minc:correlation:coef:import', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 边际最低资本贡献率表菜单 SQL (TB0006)
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际最低资本管理', @mincMenuId, 5, 'marginalCapital', 'minc/marginal/capital/index', 1, 0, 'C', '0', '0', 'minc:marginal:capital:list', 'money', 'admin', SYSDATE(), '', NULL, '边际最低资本管理菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际资本查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:marginal:capital:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际资本新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:marginal:capital:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际资本修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:marginal:capital:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际资本删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:marginal:capital:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('边际资本导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:marginal:capital:export', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 最低资本明细汇总表菜单 SQL (TB0007)
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('最低资本明细汇总', @mincMenuId, 6, 'minCapitalSummary', 'minc/min/capital/summary/index', 1, 0, 'C', '0', '0', 'minc:min:capital:summary:list', 'table', 'admin', SYSDATE(), '', NULL, '最低资本明细汇总菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('明细汇总查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:summary:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('明细汇总新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:summary:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('明细汇总修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:summary:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('明细汇总删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:summary:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('明细汇总导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:summary:export', '#', 'admin', SYSDATE(), '', NULL, '');
+
+-- 市场及信用最低资本表菜单 SQL
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本管理', @mincMenuId, '7', 'minCapitalByAccount', 'minc/min/capital/by/account/index', 1, 0, 'C', '0', '0', 'minc:min:capital:by:account:list', '#', 'admin', sysdate(), '', null, '市场及信用最低资本表菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本表查询', @parentId, '1',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:query',        '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本表新增', @parentId, '2',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:add',          '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本表修改', @parentId, '3',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:edit',         '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本表删除', @parentId, '4',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:remove',       '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('市场及信用最低资本表导出', @parentId, '5',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:export',       '#', 'admin', sysdate(), '', null, '');

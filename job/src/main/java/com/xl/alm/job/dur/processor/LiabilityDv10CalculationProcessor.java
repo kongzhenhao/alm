@@ -50,34 +50,34 @@ public class LiabilityDv10CalculationProcessor implements BasicProcessor {
                 return new ProcessResult(false, "任务参数错误，缺少accountPeriod参数");
             }
 
-//            // 步骤1：计算关键久期折现曲线
-//            log.info("步骤1：开始计算关键久期折现曲线");
-//            String curveResult = keyDurationDiscountCurveTask.calculateKeyDurationDiscountCurve(accountPeriod);
-//            if (!"success".equals(curveResult)) {
-//                log.error("计算关键久期折现曲线失败：{}", curveResult);
-//                return new ProcessResult(false, "计算关键久期折现曲线失败：" + curveResult);
-//            }
-//            log.info("步骤1：计算关键久期折现曲线成功");
-//
-//            // 步骤2：计算关键久期折现因子
-//            log.info("步骤2：开始计算关键久期折现因子");
-//            String factorsResult = keyDurationDiscountFactorsTask.calculateKeyDurationDiscountFactors(accountPeriod);
-//            if (!"success".equals(factorsResult)) {
-//                log.error("计算关键久期折现因子失败：{}", factorsResult);
-//                return new ProcessResult(false, "计算关键久期折现因子失败：" + factorsResult);
-//            }
-//            log.info("步骤2：计算关键久期折现因子成功");
+            // 步骤1：计算关键久期折现曲线
+            log.info("步骤1：开始计算关键久期折现曲线");
+            String curveResult = keyDurationDiscountCurveTask.calculateKeyDurationDiscountCurve(accountPeriod);
+            if (!"success".equals(curveResult)) {
+                log.error("计算关键久期折现曲线失败：{}", curveResult);
+                return new ProcessResult(false, "计算关键久期折现曲线失败：" + curveResult);
+            }
+            log.info("步骤1：计算关键久期折现曲线成功");
 
-            // 步骤3：计算分中短负债基点价值DV10
-//            log.info("步骤3：开始计算分中短负债基点价值DV10");
-//            String dv10Result = liabilityDv10ByDurationTask.calculateLiabilityDv10ByDuration(accountPeriod);
-//            if (!"success".equals(dv10Result)) {
-//                log.error("计算分中短负债基点价值DV10失败：{}", dv10Result);
-//                return new ProcessResult(false, "计算分中短负债基点价值DV10失败：" + dv10Result);
-//            }
-//            log.info("步骤3：计算分中短负债基点价值DV10成功");
-//
-//            log.info("关键久期计算处理器执行成功");
+            // 步骤2：计算关键久期折现因子
+            log.info("步骤2：开始计算关键久期折现因子");
+            String factorsResult = keyDurationDiscountFactorsTask.calculateKeyDurationDiscountFactors(accountPeriod);
+            if (!"success".equals(factorsResult)) {
+                log.error("计算关键久期折现因子失败：{}", factorsResult);
+                return new ProcessResult(false, "计算关键久期折现因子失败：" + factorsResult);
+            }
+            log.info("步骤2：计算关键久期折现因子成功");
+
+            //步骤3：计算分中短负债基点价值DV10
+            log.info("步骤3：开始计算分中短负债基点价值DV10");
+            String dv10Result = liabilityDv10ByDurationTask.calculateLiabilityDv10ByDuration(accountPeriod);
+            if (!"success".equals(dv10Result)) {
+                log.error("计算分中短负债基点价值DV10失败：{}", dv10Result);
+                return new ProcessResult(false, "计算分中短负债基点价值DV10失败：" + dv10Result);
+            }
+            log.info("步骤3：计算分中短负债基点价值DV10成功");
+
+            log.info("关键久期计算处理器执行成功");
             return new ProcessResult(true, "关键久期计算处理器执行成功");
         } catch (Exception e) {
             log.error("关键久期计算处理器执行异常", e);
@@ -85,14 +85,14 @@ public class LiabilityDv10CalculationProcessor implements BasicProcessor {
         }
     }
 
-//    @PostConstruct
-//    public void init() {
-//        TaskContext tc = new TaskContext();
-//        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
-//        try {
-//            process(tc);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    /*@PostConstruct
+    public void init() {
+        TaskContext tc = new TaskContext();
+        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
+        try {
+            process(tc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 }

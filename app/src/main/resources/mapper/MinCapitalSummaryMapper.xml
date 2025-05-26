@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.MinCapitalSummaryMapper">
+
+    <resultMap type="com.xl.alm.app.entity.MinCapitalSummaryEntity" id="MinCapitalSummaryEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="accountCode" column="account_code"/>
+        <result property="amount" column="amount"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <!-- 关联查询结果映射 -->
+    <resultMap type="com.xl.alm.app.dto.MinCapitalSummaryDTO" id="MinCapitalSummaryDTOResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="accountCode" column="account_code"/>
+        <result property="amount" column="amount"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+        <!-- 关联字段 -->
+        <result property="itemName" column="item_name"/>
+        <result property="riskType" column="risk_type"/>
+        <result property="accountName" column="account_name"/>
+    </resultMap>
+
+    <sql id="selectMinCapitalSummaryEntityVo">
+        select id, accounting_period, item_code, account_code, amount,
+               create_time, create_by, update_time, update_by, is_del
+        from t_minc_min_capital_summary
+    </sql>
+
+    <!-- 查询最低资本明细汇总表列表（关联项目定义表和字典表） -->
+    <select id="selectMinCapitalSummaryDtoList" parameterType="com.xl.alm.app.query.MinCapitalSummaryQuery" resultMap="MinCapitalSummaryDTOResult">
+        select s.id, s.accounting_period, s.item_code, s.account_code, s.amount,
+               s.create_time, s.create_by, s.update_time, s.update_by, s.is_del,
+               d.capital_item as item_name, d.risk_type,
+               dict.dict_label as account_name
+        from t_minc_min_capital_summary s
+        left join t_minc_item_definition d on s.item_code = d.item_code and d.is_del = 0
+        left join sys_dict_data dict on s.account_code = dict.dict_value and dict.dict_type = 'minc_account'
+        <where>
+            <if test="id != null">and s.id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and s.accounting_period = #{accountingPeriod}</if>
+            <if test="itemCode != null and itemCode != ''">
+                and (s.item_code like concat('%', #{itemCode}, '%')
+                     or d.capital_item like concat('%', #{itemCode}, '%')
+                     or d.risk_type like concat('%', #{itemCode}, '%'))
+            </if>
+            <if test="accountCode != null and accountCode != ''">and s.account_code = #{accountCode}</if>
+            <if test="isDel != null">and s.is_del = #{isDel}</if>
+            <if test="isDel == null">and s.is_del = 0</if>
+        </where>
+        order by
+            d.risk_type,
+            d.capital_item,
+            s.account_code
+    </select>
+
+    <!-- 查询最低资本明细汇总表列表（原始查询，用于内部操作） -->
+    <select id="selectMinCapitalSummaryEntityList" parameterType="com.xl.alm.app.query.MinCapitalSummaryQuery" resultMap="MinCapitalSummaryEntityResult">
+        <include refid="selectMinCapitalSummaryEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and accounting_period = #{accountingPeriod}</if>
+            <if test="itemCode != null and itemCode != ''">and item_code like concat('%', #{itemCode}, '%')</if>
+            <if test="accountCode != null and accountCode != ''">and account_code = #{accountCode}</if>
+            <if test="isDel != null">and is_del = #{isDel}</if>
+            <if test="isDel == null">and is_del = 0</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 查询最低资本明细汇总表详情 -->
+    <select id="selectMinCapitalSummaryEntityById" parameterType="Long" resultMap="MinCapitalSummaryEntityResult">
+        <include refid="selectMinCapitalSummaryEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期、项目编码和账户编码查询最低资本明细汇总表详情 -->
+    <select id="selectMinCapitalSummaryEntityByUniqueKey" resultMap="MinCapitalSummaryEntityResult">
+        <include refid="selectMinCapitalSummaryEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and account_code = #{accountCode}
+          and (is_del = 0 or is_del is null)
+    </select>
+
+    <!-- 根据账期、项目编码和账户编码查询有效的最低资本明细汇总表详情（用于检查） -->
+    <select id="selectValidMinCapitalSummaryEntityByUniqueKey" resultMap="MinCapitalSummaryEntityResult">
+        <include refid="selectMinCapitalSummaryEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and account_code = #{accountCode}
+          and COALESCE(is_del, 0) = 0
+    </select>
+
+    <!-- 根据账期、项目编码和账户编码查询任何记录（包括已删除的，用于调试） -->
+    <select id="selectAnyMinCapitalSummaryEntityByUniqueKey" resultMap="MinCapitalSummaryEntityResult">
+        <include refid="selectMinCapitalSummaryEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and account_code = #{accountCode}
+    </select>
+
+    <!-- 新增最低资本明细汇总表 -->
+    <insert id="insertMinCapitalSummaryEntity" parameterType="com.xl.alm.app.entity.MinCapitalSummaryEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_min_capital_summary (
+            accounting_period, item_code, account_code, amount,
+            create_by, update_by, is_del
+        ) values (
+            #{accountingPeriod}, #{itemCode}, #{accountCode}, #{amount},
+            #{createBy}, #{updateBy}, COALESCE(#{isDel}, 0)
+        )
+    </insert>
+
+    <!-- 批量新增最低资本明细汇总表 -->
+    <insert id="batchInsertMinCapitalSummaryEntity" parameterType="java.util.List">
+        insert into t_minc_min_capital_summary (
+            accounting_period, item_code, account_code, amount,
+            create_by, update_by, is_del
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.itemCode}, #{item.accountCode}, #{item.amount},
+            #{item.createBy}, #{item.updateBy}, COALESCE(#{item.isDel}, 0)
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改最低资本明细汇总表 -->
+    <update id="updateMinCapitalSummaryEntity" parameterType="com.xl.alm.app.entity.MinCapitalSummaryEntity">
+        update t_minc_min_capital_summary
+        <set>
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period = #{accountingPeriod},</if>
+            <if test="itemCode != null and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="accountCode != null and accountCode != ''">account_code = #{accountCode},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDel != null">is_del = #{isDel},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除最低资本明细汇总表 -->
+    <update id="deleteMinCapitalSummaryEntityById" parameterType="Long">
+        update t_minc_min_capital_summary set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除最低资本明细汇总表 -->
+    <update id="deleteMinCapitalSummaryEntityByIds" parameterType="Long">
+        update t_minc_min_capital_summary set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 物理删除最低资本明细汇总表 -->
+    <delete id="physicalDeleteByUniqueKey">
+        delete from t_minc_min_capital_summary
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and account_code = #{accountCode}
+    </delete>
+</mapper>
