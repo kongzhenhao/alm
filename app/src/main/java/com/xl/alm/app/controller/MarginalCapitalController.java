@@ -60,7 +60,7 @@ public class MarginalCapitalController extends BaseController {
                     .filter(item -> item.getCapitalItem() != null && !item.getCapitalItem().trim().isEmpty())
                     .collect(java.util.stream.Collectors.toList());
 
-            log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", allList.size(), filteredList.size());
+            //log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", allList.size(), filteredList.size());
             if (filteredList.size() > 0) {
                 log.info("第一条有效数据示例: itemCode={}, capitalItem={}",
                         filteredList.get(0).getItemCode(), filteredList.get(0).getCapitalItem());

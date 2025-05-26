@@ -50,7 +50,7 @@ public class MinCapitalByAccountController extends BaseController {
     public Result getItemDefinitions() {
         try {
             List<ItemDefinitionDTO> itemDefinitions = itemDefinitionService.selectItemDefinitionDtoList(new ItemDefinitionQuery());
-            log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", itemDefinitions.size(), itemDefinitions.size());
+            //log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", itemDefinitions.size(), itemDefinitions.size());
             return Result.success(itemDefinitions);
         } catch (Exception e) {
             log.error("获取项目定义列表失败", e);

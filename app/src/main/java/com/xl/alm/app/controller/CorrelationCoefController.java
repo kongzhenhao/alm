@@ -66,7 +66,7 @@ public class CorrelationCoefController extends BaseController {
                     })
                     .collect(java.util.stream.Collectors.toList());
 
-            log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", allList.size(), filteredList.size());
+            //log.info("获取项目定义列表，总数量: {}, 过滤后数量: {}", allList.size(), filteredList.size());
             if (filteredList.size() > 0) {
                 log.info("第一条有效数据示例: itemCode={}, correlationItem={}",
                         filteredList.get(0).getItemCode(), filteredList.get(0).getCorrelationItem());
