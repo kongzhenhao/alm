@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.RiskItemAmountMapper">
+
+    <resultMap type="com.xl.alm.app.entity.RiskItemAmountEntity" id="RiskItemAmountResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="s05Amount" column="s05_amount"/>
+        <result property="ir05Amount" column="ir05_amount"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectRiskItemAmountVo">
+        select id, accounting_period, item_code, s05_amount, ir05_amount, create_time, create_by, update_time, update_by, is_del
+        from t_minc_risk_item_amount
+    </sql>
+
+    <select id="selectRiskItemAmountEntityList" parameterType="com.xl.alm.app.query.RiskItemAmountQuery" resultMap="RiskItemAmountResult">
+        <include refid="selectRiskItemAmountVo"/>
+        <where>
+            is_del = 0
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                AND item_code like concat('%', #{itemCode}, '%')
+            </if>
+            <if test="itemName != null and itemName != ''">
+                AND item_code IN (
+                    SELECT dict_value FROM sys_dict_data
+                    WHERE dict_type = 'minc_risk_item'
+                    AND dict_label like concat('%', #{itemName}, '%')
+                    AND status = '0'
+                )
+            </if>
+        </where>
+        order by
+            -- 首先按层级深度排序
+            CHAR_LENGTH(item_code) - CHAR_LENGTH(REPLACE(item_code, '_', '')) + 1,
+            -- 然后按风险类型前缀排序
+            CASE SUBSTRING(item_code, 1, 2)
+                WHEN 'NR' THEN 1
+                WHEN 'MR' THEN 2
+                WHEN 'CR' THEN 3
+                WHEN 'IR' THEN 4
+                WHEN 'OR' THEN 5
+                WHEN 'LR' THEN 6
+                ELSE 99
+            END,
+            -- 最后按项目编码排序
+            item_code
+    </select>
+
+    <select id="selectRiskItemAmountEntityById" parameterType="Long" resultMap="RiskItemAmountResult">
+        <include refid="selectRiskItemAmountVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <insert id="insertRiskItemAmountEntity" parameterType="com.xl.alm.app.entity.RiskItemAmountEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_risk_item_amount
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period,</if>
+            <if test="itemCode != null">item_code,</if>
+            <if test="s05Amount != null">s05_amount,</if>
+            <if test="ir05Amount != null">ir05_amount,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">#{accountingPeriod},</if>
+            <if test="itemCode != null">#{itemCode},</if>
+            <if test="s05Amount != null">#{s05Amount},</if>
+            <if test="ir05Amount != null">#{ir05Amount},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertRiskItemAmountEntity" parameterType="java.util.List">
+        insert into t_minc_risk_item_amount (
+        accounting_period, item_code, s05_amount, ir05_amount, create_by, update_by
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.itemCode}, #{item.s05Amount}, #{item.ir05Amount},
+            #{item.createBy}, #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateRiskItemAmountEntity" parameterType="com.xl.alm.app.entity.RiskItemAmountEntity">
+        update t_minc_risk_item_amount
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="itemCode != null">item_code = #{itemCode},</if>
+            <if test="s05Amount != null">s05_amount = #{s05Amount},</if>
+            <if test="ir05Amount != null">ir05_amount = #{ir05Amount},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP,
+        </trim>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <update id="deleteRiskItemAmountEntityById" parameterType="Long">
+        update t_minc_risk_item_amount set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteRiskItemAmountEntityByIds" parameterType="Long">
+        update t_minc_risk_item_amount set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteRiskItemAmountEntityByPeriod" parameterType="String">
+        update t_minc_risk_item_amount set is_del = 1 where accounting_period = #{accountingPeriod}
+    </update>
+
+    <update id="deleteRiskItemAmountEntityByCondition">
+        update t_minc_risk_item_amount set is_del = 1
+        where accounting_period = #{accountingPeriod} and item_code = #{itemCode}
+    </update>
+
+</mapper>

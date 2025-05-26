@@ -13,6 +13,8 @@ import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
+import javax.annotation.PostConstruct;
+
 /**
  * 负债计算处理器
  * 合并了以下处理器的功能：
@@ -89,7 +91,7 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
                 return new ProcessResult(false, "分账户负债久期汇总失败");
             }
             log.info("分账户负债久期汇总成功");
-            
+
             // 所有任务执行成功
             return new ProcessResult(true, "负债计算处理器执行成功");
         } catch (Exception e) {
@@ -98,14 +100,14 @@ public class LiabilityCalculationProcessor implements BasicProcessor {
         }
     }
 
-//    @PostConstruct
-//    public void init() {
-//        TaskContext tc = new TaskContext();
-//        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
-//        try {
-//            process(tc);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    /*@PostConstruct
+    public void init() {
+        TaskContext tc = new TaskContext();
+        tc.setJobParams("{\"accountPeriod\":\"202412\"}");
+        try {
+            process(tc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 }

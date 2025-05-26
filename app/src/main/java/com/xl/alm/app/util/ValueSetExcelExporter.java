@@ -75,13 +75,18 @@ public class ValueSetExcelExporter {
                 }
             }
 
-            // 获取所有字段（排除值集字段和isDel字段）
+            // 获取所有字段（排除值集字段、isDel字段、serialVersionUID和id字段，以及静态字段）
             List<Field> normalFields = new ArrayList<>();
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
                 String fieldName = field.getName();
-                // 排除值集字段和isDel字段
-                if (!valueSetFieldMap.containsKey(fieldName) && !"isDel".equals(fieldName)) {
+                int modifiers = field.getModifiers();
+
+                // 排除值集字段、isDel字段、serialVersionUID和静态字段，但保留id字段
+                if (!valueSetFieldMap.containsKey(fieldName) &&
+                    !"isDel".equals(fieldName) &&
+                    !"serialVersionUID".equals(fieldName) &&
+                    !java.lang.reflect.Modifier.isStatic(modifiers)) {
                     normalFields.add(field);
                 }
             }
@@ -107,7 +112,48 @@ public class ValueSetExcelExporter {
             // 为每个值集字段创建日期映射
             Map<String, Map<Integer, String>> fieldDateMaps = new HashMap<>();
             for (String fieldName : valueSetFields) {
-                Map<Integer, String> dateMap = new TreeMap<>();
+                // 使用自定义比较器，按照指定顺序排序
+                Map<Integer, String> dateMap = new TreeMap<>(new Comparator<Integer>() {
+                    // 定义自定义排序顺序
+                    private final List<String> customOrder = Arrays.asList(
+                        "0", "0.5", "1", "2", "3", "4", "5", "6", "7", "8", "10",
+                        "12", "15", "20", "25", "30", "35", "40", "45", "50"
+                    );
+
+                    // 将整数转换为字符串表示，特殊处理0.5
+                    private String getKeyString(Integer key) {
+                        if (key == 5) {
+                            // 特殊处理：5表示0.5
+                            return "0.5";
+                        }
+                        return String.valueOf(key);
+                    }
+
+                    @Override
+                    public int compare(Integer a, Integer b) {
+                        String keyA = getKeyString(a);
+                        String keyB = getKeyString(b);
+
+                        // 如果两个值都在自定义顺序中，按照自定义顺序排序
+                        int indexA = customOrder.indexOf(keyA);
+                        int indexB = customOrder.indexOf(keyB);
+                        if (indexA != -1 && indexB != -1) {
+                            return Integer.compare(indexA, indexB);
+                        }
+
+                        // 如果只有一个值在自定义顺序中，将其排在前面
+                        if (indexA != -1) {
+                            return -1;
+                        }
+                        if (indexB != -1) {
+                            return 1;
+                        }
+
+                        // 如果都不在自定义顺序中，按照自然顺序排序
+                        return Integer.compare(a, b);
+                    }
+                });
+
                 Field field = valueSetFieldMap.get(fieldName);
 
                 // 解析值集数据，获取所有序号和日期
@@ -304,13 +350,18 @@ public class ValueSetExcelExporter {
                 throw new ServiceException("值集字段 " + valueSetField + " 不存在");
             }
 
-            // 获取所有字段（排除值集字段和isDel字段）
+            // 获取所有字段（排除值集字段、isDel字段、serialVersionUID和id字段，以及静态字段）
             List<Field> normalFields = new ArrayList<>();
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
                 String fieldName = field.getName();
-                // 排除值集字段和isDel字段
-                if (!fieldName.equals(valueSetField) && !"isDel".equals(fieldName)) {
+                int modifiers = field.getModifiers();
+
+                // 排除值集字段、isDel字段、serialVersionUID和静态字段，但保留id字段
+                if (!fieldName.equals(valueSetField) &&
+                    !"isDel".equals(fieldName) &&
+                    !"serialVersionUID".equals(fieldName) &&
+                    !java.lang.reflect.Modifier.isStatic(modifiers)) {
                     normalFields.add(field);
                 }
             }

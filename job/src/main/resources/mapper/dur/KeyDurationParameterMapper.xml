@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.KeyDurationParameterMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.KeyDurationParameterEntity" id="KeyDurationParameterEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="keyDuration" column="key_duration"/>
+        <result property="parameterValSet" column="parameter_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectKeyDurationParameterEntityVo">
+        select id, account_period, key_duration, parameter_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_key_duration_parameter
+    </sql>
+
+    <!-- 根据账期删除关键久期参数 -->
+    <update id="deleteByAccountPeriod" parameterType="String">
+        update t_dur_key_duration_parameter set is_del = 1 where account_period = #{accountPeriod}
+    </update>
+
+    <!-- 批量插入关键久期参数 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into t_dur_key_duration_parameter(
+            account_period, key_duration, parameter_val_set, create_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod}, #{item.keyDuration}, #{item.parameterValSet}, #{item.createTime}, #{item.isDel}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

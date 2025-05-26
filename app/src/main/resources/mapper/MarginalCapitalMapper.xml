@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.MarginalCapitalMapper">
+
+    <resultMap type="com.xl.alm.app.entity.MarginalCapitalEntity" id="MarginalCapitalEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="reinsuAfterAmount" column="reinsu_after_amount"/>
+        <result property="subRiskMarginalFactor" column="sub_risk_marginal_factor"/>
+        <result property="companyMarginalFactor" column="company_marginal_factor"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <!-- 关联查询结果映射 -->
+    <resultMap type="com.xl.alm.app.dto.MarginalCapitalDTO" id="MarginalCapitalDTOResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="reinsuAfterAmount" column="reinsu_after_amount"/>
+        <result property="subRiskMarginalFactor" column="sub_risk_marginal_factor"/>
+        <result property="companyMarginalFactor" column="company_marginal_factor"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+        <!-- 关联项目定义表的字段 -->
+        <result property="itemName" column="item_name"/>
+        <result property="riskType" column="risk_type"/>
+    </resultMap>
+
+    <sql id="selectMarginalCapitalEntityVo">
+        select id, accounting_period, item_code, reinsu_after_amount, sub_risk_marginal_factor, company_marginal_factor,
+               create_time, create_by, update_time, update_by, is_del
+        from t_minc_marginal_capital
+    </sql>
+
+    <!-- 查询边际最低资本贡献率表列表（关联项目定义表） -->
+    <select id="selectMarginalCapitalDtoList" parameterType="com.xl.alm.app.query.MarginalCapitalQuery" resultMap="MarginalCapitalDTOResult">
+        select m.id, m.accounting_period, m.item_code, m.reinsu_after_amount, m.sub_risk_marginal_factor, m.company_marginal_factor,
+               m.create_time, m.create_by, m.update_time, m.update_by, m.is_del,
+               d.capital_item as item_name, d.risk_type
+        from t_minc_marginal_capital m
+        left join t_minc_item_definition d on m.item_code = d.item_code and d.is_del = 0
+        <where>
+            <if test="id != null">and m.id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and m.accounting_period = #{accountingPeriod}</if>
+            <if test="itemCode != null and itemCode != ''">
+                and (m.item_code like concat('%', #{itemCode}, '%')
+                     or d.capital_item like concat('%', #{itemCode}, '%'))
+            </if>
+            <if test="isDel != null">and m.is_del = #{isDel}</if>
+            <if test="isDel == null">and m.is_del = 0</if>
+        </where>
+        order by
+            -- 首先按层级深度排序（下划线数量）
+            CHAR_LENGTH(m.item_code) - CHAR_LENGTH(REPLACE(m.item_code, '_', '')) + 1,
+            -- 然后按风险类型前缀排序
+            CASE SUBSTRING(m.item_code, 1, 2)
+                WHEN 'NR' THEN 1
+                WHEN 'MR' THEN 2
+                WHEN 'CR' THEN 3
+                WHEN 'IR' THEN 4
+                WHEN 'OR' THEN 5
+                WHEN 'LR' THEN 6
+                ELSE 99
+            END,
+            -- 最后按项目编码字符串排序
+            m.item_code
+    </select>
+
+    <!-- 查询边际最低资本贡献率表列表（原始查询，用于内部操作） -->
+    <select id="selectMarginalCapitalEntityList" parameterType="com.xl.alm.app.query.MarginalCapitalQuery" resultMap="MarginalCapitalEntityResult">
+        <include refid="selectMarginalCapitalEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and accounting_period = #{accountingPeriod}</if>
+            <if test="itemCode != null and itemCode != ''">and item_code like concat('%', #{itemCode}, '%')</if>
+            <if test="isDel != null">and is_del = #{isDel}</if>
+            <if test="isDel == null">and is_del = 0</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 查询边际最低资本贡献率表详情 -->
+    <select id="selectMarginalCapitalEntityById" parameterType="Long" resultMap="MarginalCapitalEntityResult">
+        <include refid="selectMarginalCapitalEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期和项目编码查询边际最低资本贡献率表详情 -->
+    <select id="selectMarginalCapitalEntityByUniqueKey" resultMap="MarginalCapitalEntityResult">
+        <include refid="selectMarginalCapitalEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and (is_del = 0 or is_del is null)
+    </select>
+
+    <!-- 根据账期和项目编码查询有效的边际最低资本贡献率表详情（用于导入检查） -->
+    <select id="selectValidMarginalCapitalEntityByUniqueKey" resultMap="MarginalCapitalEntityResult">
+        <include refid="selectMarginalCapitalEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+          and COALESCE(is_del, 0) = 0
+    </select>
+
+    <!-- 新增边际最低资本贡献率表 -->
+    <insert id="insertMarginalCapitalEntity" parameterType="com.xl.alm.app.entity.MarginalCapitalEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_marginal_capital (
+            accounting_period, item_code, reinsu_after_amount, sub_risk_marginal_factor, company_marginal_factor,
+            create_by, update_by, is_del
+        ) values (
+            #{accountingPeriod}, #{itemCode}, #{reinsuAfterAmount}, #{subRiskMarginalFactor}, #{companyMarginalFactor},
+            #{createBy}, #{updateBy}, COALESCE(#{isDel}, 0)
+        )
+    </insert>
+
+    <!-- 批量新增边际最低资本贡献率表 -->
+    <insert id="batchInsertMarginalCapitalEntity" parameterType="java.util.List">
+        insert into t_minc_marginal_capital (
+            accounting_period, item_code, reinsu_after_amount, sub_risk_marginal_factor, company_marginal_factor,
+            create_by, update_by, is_del
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.itemCode}, #{item.reinsuAfterAmount}, #{item.subRiskMarginalFactor}, #{item.companyMarginalFactor},
+            #{item.createBy}, #{item.updateBy}, COALESCE(#{item.isDel}, 0)
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改边际最低资本贡献率表 -->
+    <update id="updateMarginalCapitalEntity" parameterType="com.xl.alm.app.entity.MarginalCapitalEntity">
+        update t_minc_marginal_capital
+        <set>
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period = #{accountingPeriod},</if>
+            <if test="itemCode != null and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="reinsuAfterAmount != null">reinsu_after_amount = #{reinsuAfterAmount},</if>
+            <if test="subRiskMarginalFactor != null">sub_risk_marginal_factor = #{subRiskMarginalFactor},</if>
+            <if test="companyMarginalFactor != null">company_marginal_factor = #{companyMarginalFactor},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDel != null">is_del = #{isDel},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除边际最低资本贡献率表 -->
+    <update id="deleteMarginalCapitalEntityById" parameterType="Long">
+        update t_minc_marginal_capital set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除边际最低资本贡献率表 -->
+    <update id="deleteMarginalCapitalEntityByIds" parameterType="Long">
+        update t_minc_marginal_capital set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 物理删除边际最低资本贡献率表 -->
+    <delete id="physicalDeleteByUniqueKey">
+        delete from t_minc_marginal_capital
+        where accounting_period = #{accountingPeriod}
+          and item_code = #{itemCode}
+    </delete>
+</mapper>

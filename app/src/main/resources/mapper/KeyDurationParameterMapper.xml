@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.KeyDurationParameterMapper">
+
+    <resultMap type="com.xl.alm.app.entity.KeyDurationParameterEntity" id="KeyDurationParameterEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="keyDuration" column="key_duration"/>
+        <result property="parameterValSet" column="parameter_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectKeyDurationParameterEntityVo">
+        select id, account_period, key_duration, parameter_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_key_duration_parameter
+    </sql>
+
+    <sql id="selectKeyDurationParameterEntityWithoutValSetVo">
+        select id, account_period, key_duration, create_time, create_by, update_time, update_by, is_del
+        from t_dur_key_duration_parameter
+    </sql>
+
+    <!-- 查询关键久期参数列表（包含参数值集） -->
+    <select id="selectKeyDurationParameterEntityList" parameterType="com.xl.alm.app.query.KeyDurationParameterQuery" resultMap="KeyDurationParameterEntityResult">
+        <include refid="selectKeyDurationParameterEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountPeriod != null and accountPeriod != ''">and account_period = #{accountPeriod}</if>
+            <if test="keyDuration != null and keyDuration != ''">and key_duration = #{keyDuration}</if>
+            and is_del = 0
+        </where>
+        order by
+        CASE key_duration
+            WHEN '0' THEN 1
+            WHEN '0.5' THEN 2
+            WHEN '1' THEN 3
+            WHEN '2' THEN 4
+            WHEN '3' THEN 5
+            WHEN '4' THEN 6
+            WHEN '5' THEN 7
+            WHEN '6' THEN 8
+            WHEN '7' THEN 9
+            WHEN '8' THEN 10
+            WHEN '10' THEN 11
+            WHEN '12' THEN 12
+            WHEN '15' THEN 13
+            WHEN '20' THEN 14
+            WHEN '25' THEN 15
+            WHEN '30' THEN 16
+            WHEN '35' THEN 17
+            WHEN '40' THEN 18
+            WHEN '45' THEN 19
+            WHEN '50' THEN 20
+            ELSE 100
+        END ASC
+    </select>
+
+    <!-- 根据ID查询关键久期参数 -->
+    <select id="selectKeyDurationParameterEntityById" parameterType="Long" resultMap="KeyDurationParameterEntityResult">
+        <include refid="selectKeyDurationParameterEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期和关键期限点查询关键久期参数 -->
+    <select id="selectKeyDurationParameterEntityByCondition" resultMap="KeyDurationParameterEntityResult">
+        <include refid="selectKeyDurationParameterEntityVo"/>
+        where account_period = #{accountPeriod} and key_duration = #{keyDuration} and is_del = 0
+    </select>
+
+    <!-- 新增关键久期参数 -->
+    <insert id="insertKeyDurationParameterEntity" parameterType="com.xl.alm.app.entity.KeyDurationParameterEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_dur_key_duration_parameter
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountPeriod != null">account_period,</if>
+            <if test="keyDuration != null">key_duration,</if>
+            <if test="parameterValSet != null">parameter_val_set,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountPeriod != null">#{accountPeriod},</if>
+            <if test="keyDuration != null">#{keyDuration},</if>
+            <if test="parameterValSet != null">#{parameterValSet},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <!-- 批量新增关键久期参数 -->
+    <insert id="batchInsertKeyDurationParameterEntity" parameterType="java.util.List">
+        insert into t_dur_key_duration_parameter (account_period, key_duration, parameter_val_set, create_by, update_by) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.accountPeriod}, #{item.keyDuration}, #{item.parameterValSet}, #{item.createBy}, #{item.updateBy})
+        </foreach>
+    </insert>
+
+    <!-- 修改关键久期参数 -->
+    <update id="updateKeyDurationParameterEntity" parameterType="com.xl.alm.app.entity.KeyDurationParameterEntity">
+        update t_dur_key_duration_parameter
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountPeriod != null">account_period = #{accountPeriod},</if>
+            <if test="keyDuration != null">key_duration = #{keyDuration},</if>
+            <if test="parameterValSet != null">parameter_val_set = #{parameterValSet},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = CURRENT_TIMESTAMP,
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!-- 删除关键久期参数 -->
+    <update id="deleteKeyDurationParameterEntityById" parameterType="Long">
+        update t_dur_key_duration_parameter set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除关键久期参数 -->
+    <update id="deleteKeyDurationParameterEntityByIds" parameterType="Long">
+        update t_dur_key_duration_parameter set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据账期删除关键久期参数 -->
+    <update id="deleteKeyDurationParameterEntityByAccountPeriod" parameterType="String">
+        update t_dur_key_duration_parameter set is_del = 1 where account_period = #{accountPeriod}
+    </update>
+
+    <!-- 根据ID查询关键久期参数（包含参数值集） -->
+    <select id="selectKeyDurationParameterEntityWithValSetById" parameterType="Long" resultMap="KeyDurationParameterEntityResult">
+        <include refid="selectKeyDurationParameterEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+</mapper>

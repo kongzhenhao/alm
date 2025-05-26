@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.CorrelationCoefMapper">
+
+    <resultMap type="com.xl.alm.app.entity.CorrelationCoefEntity" id="CorrelationCoefEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCodeX" column="item_code_x"/>
+        <result property="itemCodeY" column="item_code_y"/>
+        <result property="correlationValue" column="correlation_value"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <!-- 关联查询结果映射 -->
+    <resultMap type="com.xl.alm.app.dto.CorrelationCoefDTO" id="CorrelationCoefDTOResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCodeX" column="item_code_x"/>
+        <result property="itemCodeY" column="item_code_y"/>
+        <result property="correlationValue" column="correlation_value"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+        <!-- 关联项目定义表的字段 -->
+        <result property="itemNameX" column="item_name_x"/>
+        <result property="itemNameY" column="item_name_y"/>
+        <result property="riskTypeX" column="risk_type_x"/>
+        <result property="riskTypeY" column="risk_type_y"/>
+    </resultMap>
+
+    <sql id="selectCorrelationCoefEntityVo">
+        select id, accounting_period, item_code_x, item_code_y, correlation_value,
+               create_time, create_by, update_time, update_by, is_del
+        from t_minc_correlation_coef
+    </sql>
+
+    <!-- 查询相关系数表列表（关联项目定义表） -->
+    <select id="selectCorrelationCoefDtoList" parameterType="com.xl.alm.app.query.CorrelationCoefQuery" resultMap="CorrelationCoefDTOResult">
+        select c.id, c.accounting_period, c.item_code_x, c.item_code_y, c.correlation_value,
+               c.create_time, c.create_by, c.update_time, c.update_by, c.is_del,
+               dx.correlation_item as item_name_x, dx.risk_type as risk_type_x,
+               dy.correlation_item as item_name_y, dy.risk_type as risk_type_y
+        from t_minc_correlation_coef c
+        left join t_minc_item_definition dx on c.item_code_x = dx.item_code and dx.is_del = 0
+        left join t_minc_item_definition dy on c.item_code_y = dy.item_code and dy.is_del = 0
+        <where>
+            <if test="id != null">and c.id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and c.accounting_period = #{accountingPeriod}</if>
+            <if test="itemCodeX != null and itemCodeX != ''">
+                and (c.item_code_x like concat('%', #{itemCodeX}, '%')
+                     or dx.correlation_item like concat('%', #{itemCodeX}, '%'))
+            </if>
+            <if test="itemCodeY != null and itemCodeY != ''">
+                and (c.item_code_y like concat('%', #{itemCodeY}, '%')
+                     or dy.correlation_item like concat('%', #{itemCodeY}, '%'))
+            </if>
+            <if test="isDel != null">and c.is_del = #{isDel}</if>
+            <if test="isDel == null">and c.is_del = 0</if>
+        </where>
+        order by
+            -- 首先按项目X的层级深度排序
+            CHAR_LENGTH(c.item_code_x) - CHAR_LENGTH(REPLACE(c.item_code_x, '_', '')) + 1,
+            -- 然后按项目X的风险类型前缀排序
+            CASE SUBSTRING(c.item_code_x, 1, 2)
+                WHEN 'NR' THEN 1
+                WHEN 'MR' THEN 2
+                WHEN 'CR' THEN 3
+                WHEN 'IR' THEN 4
+                WHEN 'OR' THEN 5
+                WHEN 'LR' THEN 6
+                ELSE 99
+            END,
+            -- 按项目X编码排序
+            c.item_code_x,
+            -- 再按项目Y的层级深度排序
+            CHAR_LENGTH(c.item_code_y) - CHAR_LENGTH(REPLACE(c.item_code_y, '_', '')) + 1,
+            -- 然后按项目Y的风险类型前缀排序
+            CASE SUBSTRING(c.item_code_y, 1, 2)
+                WHEN 'NR' THEN 1
+                WHEN 'MR' THEN 2
+                WHEN 'CR' THEN 3
+                WHEN 'IR' THEN 4
+                WHEN 'OR' THEN 5
+                WHEN 'LR' THEN 6
+                ELSE 99
+            END,
+            -- 最后按项目Y编码排序
+            c.item_code_y
+    </select>
+
+    <!-- 查询相关系数表列表（原始查询，用于内部操作） -->
+    <select id="selectCorrelationCoefEntityList" parameterType="com.xl.alm.app.query.CorrelationCoefQuery" resultMap="CorrelationCoefEntityResult">
+        <include refid="selectCorrelationCoefEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and accounting_period = #{accountingPeriod}</if>
+            <if test="itemCodeX != null and itemCodeX != ''">and item_code_x like concat('%', #{itemCodeX}, '%')</if>
+            <if test="itemCodeY != null and itemCodeY != ''">and item_code_y like concat('%', #{itemCodeY}, '%')</if>
+            <if test="isDel != null">and is_del = #{isDel}</if>
+            <if test="isDel == null">and is_del = 0</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 查询相关系数表详情 -->
+    <select id="selectCorrelationCoefEntityById" parameterType="Long" resultMap="CorrelationCoefEntityResult">
+        <include refid="selectCorrelationCoefEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据账期和项目编码查询相关系数表详情 -->
+    <select id="selectCorrelationCoefEntityByUniqueKey" resultMap="CorrelationCoefEntityResult">
+        <include refid="selectCorrelationCoefEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code_x = #{itemCodeX}
+          and item_code_y = #{itemCodeY}
+          and (is_del = 0 or is_del is null)
+    </select>
+
+    <!-- 根据账期和项目编码查询有效的相关系数表详情（用于导入检查） -->
+    <select id="selectValidCorrelationCoefEntityByUniqueKey" resultMap="CorrelationCoefEntityResult">
+        <include refid="selectCorrelationCoefEntityVo"/>
+        where accounting_period = #{accountingPeriod}
+          and item_code_x = #{itemCodeX}
+          and item_code_y = #{itemCodeY}
+          and COALESCE(is_del, 0) = 0
+    </select>
+
+    <!-- 新增相关系数表 -->
+    <insert id="insertCorrelationCoefEntity" parameterType="com.xl.alm.app.entity.CorrelationCoefEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_correlation_coef (
+            accounting_period, item_code_x, item_code_y, correlation_value,
+            create_by, update_by, is_del
+        ) values (
+            #{accountingPeriod}, #{itemCodeX}, #{itemCodeY}, #{correlationValue},
+            #{createBy}, #{updateBy}, COALESCE(#{isDel}, 0)
+        )
+    </insert>
+
+    <!-- 批量新增相关系数表 -->
+    <insert id="batchInsertCorrelationCoefEntity" parameterType="java.util.List">
+        insert into t_minc_correlation_coef (
+            accounting_period, item_code_x, item_code_y, correlation_value,
+            create_by, update_by, is_del
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.itemCodeX}, #{item.itemCodeY}, #{item.correlationValue},
+            #{item.createBy}, #{item.updateBy}, COALESCE(#{item.isDel}, 0)
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改相关系数表 -->
+    <update id="updateCorrelationCoefEntity" parameterType="com.xl.alm.app.entity.CorrelationCoefEntity">
+        update t_minc_correlation_coef
+        <set>
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period = #{accountingPeriod},</if>
+            <if test="itemCodeX != null and itemCodeX != ''">item_code_x = #{itemCodeX},</if>
+            <if test="itemCodeY != null and itemCodeY != ''">item_code_y = #{itemCodeY},</if>
+            <if test="correlationValue != null">correlation_value = #{correlationValue},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDel != null">is_del = #{isDel},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除相关系数表 -->
+    <update id="deleteCorrelationCoefEntityById" parameterType="Long">
+        update t_minc_correlation_coef set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除相关系数表 -->
+    <update id="deleteCorrelationCoefEntityByIds" parameterType="Long">
+        update t_minc_correlation_coef set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 物理删除相关系数表 -->
+    <delete id="physicalDeleteByUniqueKey">
+        delete from t_minc_correlation_coef
+        where accounting_period = #{accountingPeriod}
+          and item_code_x = #{itemCodeX}
+          and item_code_y = #{itemCodeY}
+    </delete>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.AccountLiabilityDv10Mapper">
+
+    <resultMap id="AccountLiabilityDv10EntityResult" type="com.xl.alm.job.dur.entity.AccountLiabilityDv10Entity">
+        <id property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="cashFlowType" column="cash_flow_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="valueType" column="value_type"/>
+        <result property="term0" column="term_0"/>
+        <result property="term05" column="term_0_5"/>
+        <result property="term1" column="term_1"/>
+        <result property="term2" column="term_2"/>
+        <result property="term3" column="term_3"/>
+        <result property="term4" column="term_4"/>
+        <result property="term5" column="term_5"/>
+        <result property="term6" column="term_6"/>
+        <result property="term7" column="term_7"/>
+        <result property="term8" column="term_8"/>
+        <result property="term10" column="term_10"/>
+        <result property="term12" column="term_12"/>
+        <result property="term15" column="term_15"/>
+        <result property="term20" column="term_20"/>
+        <result property="term25" column="term_25"/>
+        <result property="term30" column="term_30"/>
+        <result property="term35" column="term_35"/>
+        <result property="term40" column="term_40"/>
+        <result property="term45" column="term_45"/>
+        <result property="term50" column="term_50"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <!-- 根据账期删除数据 -->
+    <delete id="deleteByAccountPeriod">
+        delete from t_dur_account_liability_dv10
+        where account_period = #{accountPeriod}
+    </delete>
+
+    <!-- 批量插入数据 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into t_dur_account_liability_dv10 (
+            account_period, cash_flow_type, design_type, value_type,
+            term_0, term_0_5, term_1, term_2, term_3, term_4, term_5, term_6, term_7, term_8,
+            term_10, term_12, term_15, term_20, term_25, term_30, term_35, term_40, term_45, term_50,
+            create_time, create_by, update_time, update_by, is_del
+        ) values
+        <foreach collection="entities" item="entity" separator=",">
+            (
+            #{entity.accountPeriod}, #{entity.cashFlowType}, #{entity.designType}, #{entity.valueType},
+            #{entity.term0}, #{entity.term05}, #{entity.term1}, #{entity.term2}, #{entity.term3}, #{entity.term4}, #{entity.term5}, #{entity.term6}, #{entity.term7}, #{entity.term8},
+            #{entity.term10}, #{entity.term12}, #{entity.term15}, #{entity.term20}, #{entity.term25}, #{entity.term30}, #{entity.term35}, #{entity.term40}, #{entity.term45}, #{entity.term50},
+            #{entity.createTime}, #{entity.createBy}, #{entity.updateTime}, #{entity.updateBy}, #{entity.isDel}
+            )
+        </foreach>
+    </insert>
+</mapper>

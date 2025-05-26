@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.dur.mapper.KeyDurationDiscountFactorsMapper">
+
+    <resultMap type="com.xl.alm.job.dur.entity.KeyDurationDiscountFactorsEntity" id="KeyDurationDiscountFactorsEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountPeriod" column="account_period"/>
+        <result property="curveType" column="curve_type"/>
+        <result property="keyDuration" column="key_duration"/>
+        <result property="stressDirection" column="stress_direction"/>
+        <result property="durationType" column="duration_type"/>
+        <result property="factorValSet" column="factor_val_set"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectKeyDurationDiscountFactorsEntityVo">
+        select id, account_period, curve_type, key_duration, stress_direction, duration_type, factor_val_set, create_time, create_by, update_time, update_by, is_del
+        from t_dur_key_duration_discount_factors
+    </sql>
+
+    <!-- 根据账期删除关键久期折现因子 -->
+    <delete id="deleteByAccountPeriod" parameterType="String">
+        delete from t_dur_key_duration_discount_factors where account_period = #{accountPeriod}
+    </delete>
+
+    <!-- 批量插入关键久期折现因子 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into t_dur_key_duration_discount_factors(
+            account_period, curve_type, key_duration, stress_direction, duration_type, factor_val_set, create_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountPeriod}, #{item.curveType}, #{item.keyDuration}, #{item.stressDirection}, #{item.durationType}, #{item.factorValSet}, #{item.createTime}, #{item.isDel}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 执行SQL删除语句 -->
+    <update id="deleteBySql" parameterType="String">
+        ${sql}
+    </update>
+
+</mapper>

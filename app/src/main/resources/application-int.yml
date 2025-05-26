@@ -52,9 +52,9 @@ spring:
     open-in-view: false
   #配置redis数据库连接
   redis:
-    host: 10.2.13.149
+    host: redis-r60q4y5gnwnt-svc.redis-r60q4y5gnwnt-hb.jvessel2.jdcloud.com
     port: 6379
-    password: User123$
+    password: FX4vIeGU90G
     timeout: 5000
     database: 2
 

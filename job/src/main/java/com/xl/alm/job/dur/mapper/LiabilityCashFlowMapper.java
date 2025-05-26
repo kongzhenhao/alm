@@ -1,5 +1,6 @@
 package com.xl.alm.job.dur.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +13,7 @@ import java.util.List;
  * @author AI Assistant
  */
 @Mapper
-public interface LiabilityCashFlowMapper {
+public interface LiabilityCashFlowMapper extends BaseMapper<LiabilityCashFlowEntity> {
 
     /**
      * 查询负债现金流列表
@@ -36,4 +37,20 @@ public interface LiabilityCashFlowMapper {
             @Param("cashFlowType") String cashFlowType,
             @Param("bpType") String bpType,
             @Param("durationType") String durationType);
+
+    /**
+     * 根据账期删除负债现金流
+     *
+     * @param accountPeriod 账期
+     * @return 结果
+     */
+    int deleteByAccountPeriod(@Param("accountPeriod") String accountPeriod);
+
+    /**
+     * 批量插入负债现金流
+     *
+     * @param list 负债现金流列表
+     * @return 结果
+     */
+    int batchInsert(List<LiabilityCashFlowEntity> list);
 }

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.minc.mapper.MarginalCapitalCalculationMapper">
+
+    <resultMap type="com.xl.alm.job.minc.entity.MarginalCapitalCalculationEntity" id="MarginalCapitalCalculationResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="reinsuAfterAmount" column="reinsu_after_amount"/>
+        <result property="subRiskMarginalFactor" column="sub_risk_marginal_factor"/>
+        <result property="companyMarginalFactor" column="company_marginal_factor"/>
+        <result property="isDel" column="is_del"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 查询风险项目金额表数据，获取再保后金额 -->
+    <select id="selectRiskItemAmounts" parameterType="String" resultType="java.util.Map">
+        SELECT
+            item_code,
+            CASE
+                WHEN s05_amount IS NOT NULL AND s05_amount != 0 THEN s05_amount
+                WHEN ir05_amount IS NOT NULL AND ir05_amount != 0 THEN ir05_amount
+                ELSE 0
+            END as reinsu_after_amount
+        FROM t_minc_risk_item_amount
+        WHERE accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 查询所有项目定义表数据 -->
+    <select id="selectAllItemDefinitions" resultType="java.util.Map">
+        SELECT
+            item_code,
+            risk_type
+        FROM t_minc_item_definition
+        WHERE TRIM(status) = '0'
+    </select>
+
+    <!-- 查询项目定义表中有子风险公式的项目 -->
+    <select id="selectItemDefinitionsWithSubRiskFormula" resultType="java.util.Map">
+        SELECT
+            item_code,
+            risk_type,
+            sub_risk_factor_formula
+        FROM t_minc_item_definition
+        WHERE TRIM(status) = '0'
+          AND sub_risk_factor_formula IS NOT NULL
+          AND TRIM(sub_risk_factor_formula) != ''
+    </select>
+
+    <!-- 查询项目定义表中有公司层面公式的项目 -->
+    <select id="selectItemDefinitionsWithCompanyFormula" resultType="java.util.Map">
+        SELECT
+            item_code,
+            risk_type,
+            company_factor_formula
+        FROM t_minc_item_definition
+        WHERE TRIM(status) = '0'
+          AND company_factor_formula IS NOT NULL
+          AND TRIM(company_factor_formula) != ''
+    </select>
+
+    <!-- 查询指定项目编码的再保后金额 -->
+    <select id="selectAmountByItemCode" resultType="java.math.BigDecimal">
+        SELECT
+            CASE
+                WHEN s05_amount IS NOT NULL AND s05_amount != 0 THEN s05_amount
+                WHEN ir05_amount IS NOT NULL AND ir05_amount != 0 THEN ir05_amount
+                ELSE 0
+            END as amount
+        FROM t_minc_risk_item_amount
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 查询两个项目之间的相关系数 -->
+    <select id="selectCorrelationValue" resultType="java.math.BigDecimal">
+        SELECT correlation_value
+        FROM t_minc_correlation_coef
+        WHERE item_code_x = #{itemCodeX}
+          AND item_code_y = #{itemCodeY}
+          AND accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 删除指定账期的边际最低资本贡献率表数据 -->
+    <delete id="deleteMarginalCapitalByPeriod" parameterType="String">
+        DELETE FROM t_minc_marginal_capital
+        WHERE accounting_period = #{accountingPeriod}
+    </delete>
+
+    <!-- 批量插入边际最低资本贡献率表数据 -->
+    <insert id="batchInsertMarginalCapital" parameterType="java.util.List">
+        INSERT INTO t_minc_marginal_capital (
+            accounting_period,
+            item_code,
+            reinsu_after_amount,
+            sub_risk_marginal_factor,
+            company_marginal_factor,
+            is_del,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.accountingPeriod},
+                #{item.itemCode},
+                #{item.reinsuAfterAmount},
+                #{item.subRiskMarginalFactor},
+                #{item.companyMarginalFactor},
+                #{item.isDel},
+                #{item.createBy},
+                #{item.createTime},
+                #{item.updateBy},
+                #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新子风险层面边际最低资本贡献因子 -->
+    <update id="updateSubRiskMarginalFactor">
+        UPDATE t_minc_marginal_capital
+        SET sub_risk_marginal_factor = #{subRiskMarginalFactor},
+            update_by = 'system',
+            update_time = NOW()
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+    </update>
+
+    <!-- 查询指定项目的子风险层面边际最低资本贡献因子 -->
+    <select id="selectSubRiskMarginalFactor" resultType="java.math.BigDecimal">
+        SELECT sub_risk_marginal_factor
+        FROM t_minc_marginal_capital
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+    </select>
+
+    <!-- 更新公司层面边际最低资本贡献因子 -->
+    <update id="updateCompanyMarginalFactor">
+        UPDATE t_minc_marginal_capital
+        SET company_marginal_factor = #{companyMarginalFactor},
+            update_by = 'system',
+            update_time = NOW()
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+    </update>
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.minc.mapper.MinCapitalSummaryCalculationMapper">
+
+    <resultMap type="com.xl.alm.job.minc.entity.MinCapitalSummaryCalculationEntity" id="MinCapitalSummaryCalculationResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="accountCode" column="account_code"/>
+        <result property="amount" column="amount"/>
+        <result property="isDel" column="is_del"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 从分部门最低资本明细表汇总数据，只计算风险类型为"市场风险"和"信用风险"的项目 -->
+    <select id="selectSummaryFromDeptMincapDetail" parameterType="String" resultMap="MinCapitalSummaryCalculationResult">
+        SELECT
+            #{accountingPeriod} as accounting_period,
+            d.item_code,
+            d.account_code,
+            SUM(d.amount) as amount,
+            0 as is_del,
+            'system' as create_by,
+            NOW() as create_time,
+            'system' as update_by,
+            NOW() as update_time
+        FROM t_minc_dept_mincap_detail d
+        INNER JOIN t_minc_item_definition def ON d.item_code = def.item_code
+        WHERE d.accounting_period = #{accountingPeriod}
+          AND d.is_del = 0
+          AND TRIM(def.status) = '0'
+          AND TRIM(def.risk_type) IN ('市场风险', '信用风险')
+        GROUP BY d.item_code, d.account_code
+        HAVING SUM(d.amount) IS NOT NULL
+    </select>
+
+    <!-- 删除指定账期的最低资本明细汇总表数据 -->
+    <delete id="deleteMinCapitalSummaryByPeriod" parameterType="String">
+        DELETE FROM t_minc_min_capital_summary
+        WHERE accounting_period = #{accountingPeriod}
+    </delete>
+
+    <!-- 批量插入最低资本明细汇总表数据 -->
+    <insert id="batchInsertMinCapitalSummary" parameterType="java.util.List">
+        INSERT INTO t_minc_min_capital_summary (
+            accounting_period,
+            item_code,
+            account_code,
+            amount,
+            is_del,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.accountingPeriod},
+                #{item.itemCode},
+                #{item.accountCode},
+                #{item.amount},
+                #{item.isDel},
+                #{item.createBy},
+                #{item.createTime},
+                #{item.updateBy},
+                #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

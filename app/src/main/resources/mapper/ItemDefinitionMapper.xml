@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.ItemDefinitionMapper">
+
+    <resultMap type="com.xl.alm.app.entity.ItemDefinitionEntity" id="ItemDefinitionEntityResult">
+        <result property="id" column="id"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="riskType" column="risk_type"/>
+        <result property="capitalItem" column="capital_item"/>
+        <result property="correlationItem" column="correlation_item"/>
+        <result property="parentItemCode" column="parent_item_code"/>
+        <result property="subRiskFactorFormula" column="sub_risk_factor_formula"/>
+        <result property="companyFactorFormula" column="company_factor_formula"/>
+        <result property="capitalCalculationFormula" column="capital_calculation_formula"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectItemDefinitionEntityVo">
+        select id, item_code, risk_type, capital_item, correlation_item, parent_item_code,
+               sub_risk_factor_formula, company_factor_formula, capital_calculation_formula, status,
+               create_time, create_by, update_time, update_by, is_del
+        from t_minc_item_definition
+    </sql>
+
+    <!-- 查询项目定义表列表 -->
+    <select id="selectItemDefinitionEntityList" parameterType="com.xl.alm.app.query.ItemDefinitionQuery" resultMap="ItemDefinitionEntityResult">
+        <include refid="selectItemDefinitionEntityVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="itemCode != null and itemCode != ''">and item_code like concat('%', #{itemCode}, '%')</if>
+            <if test="riskType != null and riskType != ''">and risk_type like concat('%', #{riskType}, '%')</if>
+            <if test="capitalItem != null and capitalItem != ''">and capital_item like concat('%', #{capitalItem}, '%')</if>
+            <if test="correlationItem != null and correlationItem != ''">and correlation_item like concat('%', #{correlationItem}, '%')</if>
+            <if test="parentItemCode != null and parentItemCode != ''">and parent_item_code = #{parentItemCode}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="isDel != null">and is_del = #{isDel}</if>
+            <if test="isDel == null">and is_del = 0</if>
+        </where>
+        order by
+            -- 首先按层级深度排序
+            CHAR_LENGTH(item_code) - CHAR_LENGTH(REPLACE(item_code, '_', '')) + 1,
+            -- 然后按风险类型前缀排序
+            CASE SUBSTRING(item_code, 1, 2)
+                WHEN 'NR' THEN 1
+                WHEN 'MR' THEN 2
+                WHEN 'CR' THEN 3
+                WHEN 'IR' THEN 4
+                WHEN 'OR' THEN 5
+                WHEN 'LR' THEN 6
+                ELSE 99
+            END,
+            -- 最后按项目编码排序
+            item_code
+    </select>
+
+    <!-- 查询项目定义表详情 -->
+    <select id="selectItemDefinitionEntityById" parameterType="Long" resultMap="ItemDefinitionEntityResult">
+        <include refid="selectItemDefinitionEntityVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <!-- 根据项目编码查询项目定义表详情 -->
+    <select id="selectItemDefinitionEntityByItemCode" parameterType="String" resultMap="ItemDefinitionEntityResult">
+        <include refid="selectItemDefinitionEntityVo"/>
+        where item_code = #{itemCode} and (is_del = 0 or is_del is null)
+    </select>
+
+    <!-- 根据项目编码查询有效的项目定义表详情（用于导入检查） -->
+    <select id="selectValidItemDefinitionEntityByItemCode" parameterType="String" resultMap="ItemDefinitionEntityResult">
+        <include refid="selectItemDefinitionEntityVo"/>
+        where item_code = #{itemCode} and COALESCE(is_del, 0) = 0
+    </select>
+
+    <!-- 调试查询：查看所有数据（包括已删除的） -->
+    <select id="selectAllByItemCode" parameterType="String" resultMap="ItemDefinitionEntityResult">
+        <include refid="selectItemDefinitionEntityVo"/>
+        where item_code = #{itemCode}
+    </select>
+
+    <!-- 新增项目定义表 -->
+    <insert id="insertItemDefinitionEntity" parameterType="com.xl.alm.app.entity.ItemDefinitionEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_item_definition (
+            item_code, risk_type, capital_item, correlation_item, parent_item_code,
+            sub_risk_factor_formula, company_factor_formula, capital_calculation_formula, status,
+            create_by, update_by, is_del
+        ) values (
+            #{itemCode}, #{riskType}, #{capitalItem}, #{correlationItem}, #{parentItemCode},
+            #{subRiskFactorFormula}, #{companyFactorFormula}, #{capitalCalculationFormula}, #{status},
+            #{createBy}, #{updateBy}, COALESCE(#{isDel}, 0)
+        )
+    </insert>
+
+    <!-- 批量新增项目定义表 -->
+    <insert id="batchInsertItemDefinitionEntity" parameterType="java.util.List">
+        insert into t_minc_item_definition (
+            item_code, risk_type, capital_item, correlation_item, parent_item_code,
+            sub_risk_factor_formula, company_factor_formula, capital_calculation_formula, status,
+            create_by, update_by, is_del
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.itemCode}, #{item.riskType}, #{item.capitalItem}, #{item.correlationItem}, #{item.parentItemCode},
+            #{item.subRiskFactorFormula}, #{item.companyFactorFormula}, #{item.capitalCalculationFormula}, #{item.status},
+            #{item.createBy}, #{item.updateBy}, COALESCE(#{item.isDel}, 0)
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改项目定义表 -->
+    <update id="updateItemDefinitionEntity" parameterType="com.xl.alm.app.entity.ItemDefinitionEntity">
+        update t_minc_item_definition
+        <set>
+            <if test="itemCode != null and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="riskType != null">risk_type = #{riskType},</if>
+            <if test="capitalItem != null">capital_item = #{capitalItem},</if>
+            <if test="correlationItem != null">correlation_item = #{correlationItem},</if>
+            <if test="parentItemCode != null">parent_item_code = #{parentItemCode},</if>
+            <if test="subRiskFactorFormula != null">sub_risk_factor_formula = #{subRiskFactorFormula},</if>
+            <if test="companyFactorFormula != null">company_factor_formula = #{companyFactorFormula},</if>
+            <if test="capitalCalculationFormula != null">capital_calculation_formula = #{capitalCalculationFormula},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDel != null">is_del = #{isDel},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 删除项目定义表 -->
+    <update id="deleteItemDefinitionEntityById" parameterType="Long">
+        update t_minc_item_definition set is_del = 1 where id = #{id}
+    </update>
+
+    <!-- 批量删除项目定义表 -->
+    <update id="deleteItemDefinitionEntityByIds" parameterType="Long">
+        update t_minc_item_definition set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 物理删除项目定义表 -->
+    <delete id="physicalDeleteByItemCode" parameterType="String">
+        delete from t_minc_item_definition where item_code = #{itemCode}
+    </delete>
+</mapper>
