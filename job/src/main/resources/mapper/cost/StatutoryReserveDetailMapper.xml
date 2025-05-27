@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.StatutoryReserveDetailMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.StatutoryReserveDetailEntity" id="StatutoryReserveDetailEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="accountValue" column="account_value"/>
+        <result property="totalStatutoryReserve" column="total_statutory_reserve"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectStatutoryReserveDetailVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag, 
+               account_value, total_statutory_reserve, 
+               create_time, create_by, update_time, update_by, is_del
+        from t_base_statutory_reserve_detail
+    </sql>
+
+    <select id="selectStatutoryReserveDetailList" parameterType="com.xl.alm.job.cost.query.StatutoryReserveDetailQuery" resultMap="StatutoryReserveDetailEntityResult">
+        <include refid="selectStatutoryReserveDetailVo"/>
+        <where>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            AND is_del = 0
+        </where>
+    </select>
+
+</mapper>

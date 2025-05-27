@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.UniversalAvgSettlementRateMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.UniversalAvgSettlementRateEntity" id="UniversalAvgSettlementRateEntityResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="avgSettlementRateT0" column="avg_settlement_rate_t0"/>
+        <result property="avgSettlementRateT1" column="avg_settlement_rate_t1"/>
+        <result property="avgSettlementRateT2" column="avg_settlement_rate_t2"/>
+        <result property="avgSettlementRateT3" column="avg_settlement_rate_t3"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectUniversalAvgSettlementRateVo">
+        select id, accounting_period, actuarial_code, business_code, product_name,
+               avg_rate_t0 as avg_settlement_rate_t0,
+               avg_rate_t1 as avg_settlement_rate_t1,
+               avg_rate_t2 as avg_settlement_rate_t2,
+               avg_rate_t3 as avg_settlement_rate_t3,
+               create_time, create_by, update_time, update_by, is_del
+        from t_base_universal_avg_settlement_rate
+    </sql>
+
+    <select id="selectUniversalAvgSettlementRateList" parameterType="com.xl.alm.job.cost.query.UniversalAvgSettlementRateQuery" resultMap="UniversalAvgSettlementRateEntityResult">
+        <include refid="selectUniversalAvgSettlementRateVo"/>
+        <where>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            AND is_del = 0
+        </where>
+    </select>
+
+</mapper>

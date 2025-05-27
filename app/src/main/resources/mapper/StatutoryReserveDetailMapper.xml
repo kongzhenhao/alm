@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.StatutoryReserveDetailMapper">
+
+    <resultMap type="com.xl.alm.app.entity.StatutoryReserveDetailEntity" id="StatutoryReserveDetailResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="validPolicyCount" column="valid_policy_count"/>
+        <result property="accumulatedPremium" column="accumulated_premium"/>
+        <result property="accountValue" column="account_value"/>
+        <result property="statutoryReserve" column="statutory_reserve"/>
+        <result property="unearnedPremiumReserve" column="unearned_premium_reserve"/>
+        <result property="outstandingClaimReserve" column="outstanding_claim_reserve"/>
+        <result property="totalStatutoryReserve" column="total_statutory_reserve"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectStatutoryReserveDetailVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag, 
+               valid_policy_count, accumulated_premium, account_value, statutory_reserve, 
+               unearned_premium_reserve, outstanding_claim_reserve, total_statutory_reserve, 
+               remark, create_by, create_time, update_by, update_time, is_del
+        from t_base_statutory_reserve_detail
+    </sql>
+
+    <select id="selectStatutoryReserveDetailList" parameterType="com.xl.alm.app.query.StatutoryReserveDetailQuery" resultMap="StatutoryReserveDetailResult">
+        <include refid="selectStatutoryReserveDetailVo"/>
+        <where>
+            is_del = 0
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code like concat('%', #{actuarialCode}, '%')
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code like concat('%', #{businessCode}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="termType != null and termType != ''">
+                AND term_type = #{termType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectStatutoryReserveDetailById" parameterType="Long" resultMap="StatutoryReserveDetailResult">
+        <include refid="selectStatutoryReserveDetailVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectStatutoryReserveDetailByCode" resultMap="StatutoryReserveDetailResult">
+        <include refid="selectStatutoryReserveDetailVo"/>
+        where actuarial_code = #{actuarialCode} and accounting_period = #{accountingPeriod} and is_del = 0
+    </select>
+
+    <insert id="insertStatutoryReserveDetail" parameterType="com.xl.alm.app.entity.StatutoryReserveDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_base_statutory_reserve_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period,</if>
+            <if test="actuarialCode != null">actuarial_code,</if>
+            <if test="businessCode != null">business_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="termType != null">term_type,</if>
+            <if test="designType != null">design_type,</if>
+            <if test="shortTermFlag != null">short_term_flag,</if>
+            <if test="validPolicyCount != null">valid_policy_count,</if>
+            <if test="accumulatedPremium != null">accumulated_premium,</if>
+            <if test="accountValue != null">account_value,</if>
+            <if test="statutoryReserve != null">statutory_reserve,</if>
+            <if test="unearnedPremiumReserve != null">unearned_premium_reserve,</if>
+            <if test="outstandingClaimReserve != null">outstanding_claim_reserve,</if>
+            <if test="totalStatutoryReserve != null">total_statutory_reserve,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            is_del
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">#{accountingPeriod},</if>
+            <if test="actuarialCode != null">#{actuarialCode},</if>
+            <if test="businessCode != null">#{businessCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="termType != null">#{termType},</if>
+            <if test="designType != null">#{designType},</if>
+            <if test="shortTermFlag != null">#{shortTermFlag},</if>
+            <if test="validPolicyCount != null">#{validPolicyCount},</if>
+            <if test="accumulatedPremium != null">#{accumulatedPremium},</if>
+            <if test="accountValue != null">#{accountValue},</if>
+            <if test="statutoryReserve != null">#{statutoryReserve},</if>
+            <if test="unearnedPremiumReserve != null">#{unearnedPremiumReserve},</if>
+            <if test="outstandingClaimReserve != null">#{outstandingClaimReserve},</if>
+            <if test="totalStatutoryReserve != null">#{totalStatutoryReserve},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            0
+        </trim>
+    </insert>
+
+    <update id="updateStatutoryReserveDetail" parameterType="com.xl.alm.app.entity.StatutoryReserveDetailEntity">
+        update t_base_statutory_reserve_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="actuarialCode != null">actuarial_code = #{actuarialCode},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="termType != null">term_type = #{termType},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="shortTermFlag != null">short_term_flag = #{shortTermFlag},</if>
+            <if test="validPolicyCount != null">valid_policy_count = #{validPolicyCount},</if>
+            <if test="accumulatedPremium != null">accumulated_premium = #{accumulatedPremium},</if>
+            <if test="accountValue != null">account_value = #{accountValue},</if>
+            <if test="statutoryReserve != null">statutory_reserve = #{statutoryReserve},</if>
+            <if test="unearnedPremiumReserve != null">unearned_premium_reserve = #{unearnedPremiumReserve},</if>
+            <if test="outstandingClaimReserve != null">outstanding_claim_reserve = #{outstandingClaimReserve},</if>
+            <if test="totalStatutoryReserve != null">total_statutory_reserve = #{totalStatutoryReserve},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteStatutoryReserveDetailById" parameterType="Long">
+        update t_base_statutory_reserve_detail set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteStatutoryReserveDetailByIds" parameterType="Long">
+        update t_base_statutory_reserve_detail set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsertStatutoryReserveDetail" parameterType="java.util.List">
+        insert into t_base_statutory_reserve_detail (
+            accounting_period, actuarial_code, business_code, product_name, term_type, design_type, short_term_flag, 
+            valid_policy_count, accumulated_premium, account_value, statutory_reserve, 
+            unearned_premium_reserve, outstanding_claim_reserve, total_statutory_reserve, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName}, 
+            #{item.termType}, #{item.designType}, #{item.shortTermFlag},
+            #{item.validPolicyCount}, #{item.accumulatedPremium}, #{item.accountValue}, #{item.statutoryReserve},
+            #{item.unearnedPremiumReserve}, #{item.outstandingClaimReserve}, #{item.totalStatutoryReserve},
+            #{item.remark}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, 0
+            )
+        </foreach>
+    </insert>
+</mapper>

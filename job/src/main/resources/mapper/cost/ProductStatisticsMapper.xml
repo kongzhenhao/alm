@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.ProductStatisticsMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.ProductStatisticsEntity" id="ProductStatisticsResult">
+        <id property="id" column="id"/>
+        <result property="scenarioName" column="scenario_name"/>
+        <result property="businessType" column="business_type"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="statutoryReserveT0" column="statutory_reserve_t0"/>
+        <result property="statutoryReserveT1" column="statutory_reserve_t1"/>
+        <result property="statutoryReserveT2" column="statutory_reserve_t2"/>
+        <result property="statutoryReserveT3" column="statutory_reserve_t3"/>
+        <result property="fundCostRateT0" column="fund_cost_rate_t0"/>
+        <result property="fundCostRateT1" column="fund_cost_rate_t1"/>
+        <result property="fundCostRateT2" column="fund_cost_rate_t2"/>
+        <result property="fundCostRateT3" column="fund_cost_rate_t3"/>
+        <result property="guaranteedCostRateT0" column="guaranteed_cost_rate_t0"/>
+        <result property="guaranteedCostRateT1" column="guaranteed_cost_rate_t1"/>
+        <result property="guaranteedCostRateT2" column="guaranteed_cost_rate_t2"/>
+        <result property="guaranteedCostRateT3" column="guaranteed_cost_rate_t3"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectProductStatisticsVo">
+        select id, scenario_name, business_type, accounting_period, actuarial_code, business_code, 
+               product_name, term_type, design_type, short_term_flag, 
+               statutory_reserve_t0, statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3, 
+               fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3, 
+               guaranteed_cost_rate_t0, guaranteed_cost_rate_t1, guaranteed_cost_rate_t2, guaranteed_cost_rate_t3, 
+               create_by, create_time, update_by, update_time, remark, is_del
+        from t_cost_product_statistics
+    </sql>
+
+    <select id="selectProductStatisticsListByPeriod" parameterType="String" resultMap="ProductStatisticsResult">
+        <include refid="selectProductStatisticsVo"/>
+        where accounting_period = #{accountingPeriod} and is_del = 0
+    </select>
+
+    <delete id="deleteProductStatisticsByPeriod" parameterType="String">
+        delete from t_cost_product_statistics where accounting_period = #{accountingPeriod}
+    </delete>
+
+    <insert id="batchInsertProductStatistics" parameterType="java.util.List">
+        insert into t_cost_product_statistics (
+            scenario_name, business_type, accounting_period, actuarial_code, business_code, 
+            product_name, term_type, design_type, short_term_flag, 
+            statutory_reserve_t0, statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3, 
+            fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3, 
+            guaranteed_cost_rate_t0, guaranteed_cost_rate_t1, guaranteed_cost_rate_t2, guaranteed_cost_rate_t3, 
+            create_by, create_time, update_by, update_time, remark, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.scenarioName}, #{item.businessType}, #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode},
+            #{item.productName}, #{item.termType}, #{item.designType}, #{item.shortTermFlag},
+            #{item.statutoryReserveT0}, #{item.statutoryReserveT1}, #{item.statutoryReserveT2}, #{item.statutoryReserveT3},
+            #{item.fundCostRateT0}, #{item.fundCostRateT1}, #{item.fundCostRateT2}, #{item.fundCostRateT3},
+            #{item.guaranteedCostRateT0}, #{item.guaranteedCostRateT1}, #{item.guaranteedCostRateT2}, #{item.guaranteedCostRateT3},
+            #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime}, #{item.remark}, #{item.isDel}
+            )
+        </foreach>
+    </insert>
+</mapper>
