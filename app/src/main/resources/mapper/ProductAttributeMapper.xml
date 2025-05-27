@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.ProductAttributeMapper">
+
+    <resultMap type="com.xl.alm.app.entity.ProductAttributeEntity" id="ProductAttributeResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="insuranceMainType" column="insurance_main_type"/>
+        <result property="insuranceSubType" column="insurance_sub_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="regMidId" column="reg_mid_id"/>
+        <result property="guaranteedCostRate" column="guaranteed_cost_rate"/>
+        <result property="subAccount" column="sub_account"/>
+        <result property="newBusinessFlag" column="new_business_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectProductAttributeVo">
+        select id, accounting_period, actuarial_code, business_code, product_name, term_type, 
+               insurance_main_type, insurance_sub_type, design_type, short_term_flag, reg_mid_id, 
+               guaranteed_cost_rate, sub_account, new_business_flag, remark, create_by, create_time, 
+               update_by, update_time, is_del
+        from t_base_product_attribute
+    </sql>
+
+    <select id="selectProductAttributeList" parameterType="com.xl.alm.app.entity.ProductAttributeEntity" resultMap="ProductAttributeResult">
+        <include refid="selectProductAttributeVo"/>
+        <where>
+            is_del = 0
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code like concat('%', #{actuarialCode}, '%')
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code like concat('%', #{businessCode}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="termType != null and termType != ''">
+                AND term_type = #{termType}
+            </if>
+            <if test="insuranceMainType != null and insuranceMainType != ''">
+                AND insurance_main_type = #{insuranceMainType}
+            </if>
+            <if test="insuranceSubType != null and insuranceSubType != ''">
+                AND insurance_sub_type = #{insuranceSubType}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+            <if test="regMidId != null and regMidId != ''">
+                AND reg_mid_id = #{regMidId}
+            </if>
+            <if test="newBusinessFlag != null and newBusinessFlag != ''">
+                AND new_business_flag = #{newBusinessFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectProductAttributeById" parameterType="Long" resultMap="ProductAttributeResult">
+        <include refid="selectProductAttributeVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectProductAttributeByCode" resultMap="ProductAttributeResult">
+        <include refid="selectProductAttributeVo"/>
+        where actuarial_code = #{actuarialCode} and accounting_period = #{accountingPeriod} and is_del = 0
+    </select>
+
+    <insert id="insertProductAttribute" parameterType="com.xl.alm.app.entity.ProductAttributeEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_base_product_attribute
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period,</if>
+            <if test="actuarialCode != null">actuarial_code,</if>
+            <if test="businessCode != null">business_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="termType != null">term_type,</if>
+            <if test="insuranceMainType != null">insurance_main_type,</if>
+            <if test="insuranceSubType != null">insurance_sub_type,</if>
+            <if test="designType != null">design_type,</if>
+            <if test="shortTermFlag != null">short_term_flag,</if>
+            <if test="regMidId != null">reg_mid_id,</if>
+            <if test="guaranteedCostRate != null">guaranteed_cost_rate,</if>
+            <if test="subAccount != null">sub_account,</if>
+            <if test="newBusinessFlag != null">new_business_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            is_del
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null">#{accountingPeriod},</if>
+            <if test="actuarialCode != null">#{actuarialCode},</if>
+            <if test="businessCode != null">#{businessCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="termType != null">#{termType},</if>
+            <if test="insuranceMainType != null">#{insuranceMainType},</if>
+            <if test="insuranceSubType != null">#{insuranceSubType},</if>
+            <if test="designType != null">#{designType},</if>
+            <if test="shortTermFlag != null">#{shortTermFlag},</if>
+            <if test="regMidId != null">#{regMidId},</if>
+            <if test="guaranteedCostRate != null">#{guaranteedCostRate},</if>
+            <if test="subAccount != null">#{subAccount},</if>
+            <if test="newBusinessFlag != null">#{newBusinessFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            0
+        </trim>
+    </insert>
+
+    <update id="updateProductAttribute" parameterType="com.xl.alm.app.entity.ProductAttributeEntity">
+        update t_base_product_attribute
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="actuarialCode != null">actuarial_code = #{actuarialCode},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="termType != null">term_type = #{termType},</if>
+            <if test="insuranceMainType != null">insurance_main_type = #{insuranceMainType},</if>
+            <if test="insuranceSubType != null">insurance_sub_type = #{insuranceSubType},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="shortTermFlag != null">short_term_flag = #{shortTermFlag},</if>
+            <if test="regMidId != null">reg_mid_id = #{regMidId},</if>
+            <if test="guaranteedCostRate != null">guaranteed_cost_rate = #{guaranteedCostRate},</if>
+            <if test="subAccount != null">sub_account = #{subAccount},</if>
+            <if test="newBusinessFlag != null">new_business_flag = #{newBusinessFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteProductAttributeById" parameterType="Long">
+        update t_base_product_attribute set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteProductAttributeByIds" parameterType="Long">
+        update t_base_product_attribute set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsertProductAttribute" parameterType="java.util.List">
+        insert into t_base_product_attribute (
+            accounting_period, actuarial_code, business_code, product_name, term_type, 
+            insurance_main_type, insurance_sub_type, design_type, short_term_flag, reg_mid_id, 
+            guaranteed_cost_rate, sub_account, new_business_flag, remark, create_by, 
+            create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.businessCode}, #{item.productName}, #{item.termType},
+            #{item.insuranceMainType}, #{item.insuranceSubType}, #{item.designType}, #{item.shortTermFlag}, #{item.regMidId},
+            #{item.guaranteedCostRate}, #{item.subAccount}, #{item.newBusinessFlag}, #{item.remark}, #{item.createBy},
+            #{item.createTime}, #{item.updateBy}, #{item.updateTime}, 0
+            )
+        </foreach>
+    </insert>
+</mapper>

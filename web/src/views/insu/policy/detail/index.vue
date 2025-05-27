@@ -128,11 +128,6 @@
         </template>
       </el-table-column>
       <el-table-column label="设计类型" align="center" prop="designType" width="120" />
-      <el-table-column label="长短期标识" align="center" prop="termType" width="120">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.insu_term_type" :value="scope.row.termType"/>
-        </template>
-      </el-table-column>
       <el-table-column label="业务类型编码" align="center" prop="busTypeCode" width="120" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -196,16 +191,6 @@
         <el-form-item label="设计类型" prop="designType">
           <el-input v-model="form.designType" placeholder="请输入设计类型" />
         </el-form-item>
-        <el-form-item label="长短期标识" prop="termType">
-          <el-select v-model="form.termType" placeholder="请选择长短期标识">
-            <el-option
-              v-for="dict in dict.type.insu_term_type"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="业务类型编码" prop="busTypeCode">
           <el-input v-model="form.busTypeCode" placeholder="请输入业务类型编码" />
         </el-form-item>
@@ -234,7 +219,7 @@
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip text-center" slot="tip">
           <span>仅允许导入xls、xlsx格式文件。</span>
-          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="importTemplate">下载模板</el-link>
+          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="downloadTemplate">下载模板</el-link>
         </div>
       </el-upload>
       <div slot="footer" class="dialog-footer">
@@ -254,13 +239,12 @@ import {
   updatePolicyDetail,
   delPolicyDetail,
   exportPolicyDetail,
-  importTemplatePolicyDetail
+  downloadTemplate
 } from "@/api/insu/policyDetail";
 import { getToken } from "@/utils/auth";
 
 export default {
   name: "PolicyDetail",
-  dicts: ['insu_term_type'],
   data() {
     return {
       // 遮罩层
@@ -294,7 +278,6 @@ export default {
         polStatusDesc: null,
         polStatusChangedTime: null,
         designType: null,
-        termType: null,
         busTypeCode: null
       },
       // 表单参数
@@ -326,9 +309,6 @@ export default {
         designType: [
           { required: true, message: "设计类型不能为空", trigger: "blur" },
           { max: 50, message: "设计类型长度不能超过50个字符", trigger: "blur" }
-        ],
-        termType: [
-          { required: true, message: "长短期标识不能为空", trigger: "change" }
         ],
         busTypeCode: [
           { required: true, message: "业务类型编码不能为空", trigger: "blur" },
@@ -383,7 +363,6 @@ export default {
         polStatusDesc: null,
         polStatusChangedTime: null,
         designType: null,
-        termType: null,
         busTypeCode: null
       };
       this.resetForm("form");
@@ -467,9 +446,9 @@ export default {
       this.upload.open = true;
     },
     /** 下载模板操作 */
-    importTemplate() {
-      importTemplatePolicyDetail().then(response => {
-        this.download(response.msg);
+    downloadTemplate() {
+      downloadTemplate().then(response => {
+        this.downloadFile(response, `policy_detail_template_${new Date().getTime()}.xlsx`);
       });
     },
     // 文件上传中处理
@@ -487,6 +466,15 @@ export default {
     // 提交上传文件
     submitFileForm() {
       this.$refs.upload.submit();
+    },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
     }
   }
 };
