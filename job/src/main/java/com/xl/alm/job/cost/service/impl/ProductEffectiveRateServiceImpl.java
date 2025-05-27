@@ -341,7 +341,7 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
 
         // 处理现金流入
         for (LiabilityCashFlowEntity cashflow : cashflowInList) {
-            String cashValSet = cashflow.getCashValSet();
+            String cashValSet = cashflow.getCashFlowValSet();
             if (cashValSet != null && !cashValSet.isEmpty()) {
                 try {
                     JSONObject cashValJson = JSON.parseObject(cashValSet);
@@ -364,7 +364,7 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
 
         // 处理现金流出（流出现金流*(-1)）
         for (LiabilityCashFlowEntity cashflow : cashflowOutList) {
-            String cashValSet = cashflow.getCashValSet();
+            String cashValSet = cashflow.getCashFlowValSet();
             if (cashValSet != null && !cashValSet.isEmpty()) {
                 try {
                     JSONObject cashValJson = JSON.parseObject(cashValSet);
