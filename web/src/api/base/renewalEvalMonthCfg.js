@@ -52,11 +52,12 @@ export function exportRenewalEvalMonthCfg(query) {
   });
 }
 
-// 获取续保率评估月份配置导入模板
-export function importTemplateRenewalEvalMonthCfg() {
+// 下载续保率评估月份配置模板
+export function downloadTemplate() {
   return request({
-    url: '/base/renewal/eval/month/cfg/importTemplate',
+    url: '/base/renewal/eval/month/cfg/exportTemplate',
     method: 'post',
+    responseType: 'blob'
   });
 }
 

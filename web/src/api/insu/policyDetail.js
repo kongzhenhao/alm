@@ -52,11 +52,12 @@ export function exportPolicyDetail(query) {
   });
 }
 
-// 获取保单数据明细导入模板
-export function importTemplatePolicyDetail() {
+// 下载保单数据明细模板
+export function downloadTemplate() {
   return request({
-    url: '/insu/policy/detail/importTemplate',
+    url: '/insu/policy/detail/exportTemplate',
     method: 'post',
+    responseType: 'blob'
   });
 }
 

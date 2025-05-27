@@ -110,7 +110,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -153,7 +153,7 @@
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip text-center" slot="tip">
           <span>仅允许导入xls、xlsx格式文件。</span>
-          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="importTemplate">下载模板</el-link>
+          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="downloadTemplate">下载模板</el-link>
         </div>
       </el-upload>
       <div slot="footer" class="dialog-footer">
@@ -166,14 +166,14 @@
 </template>
 
 <script>
-import { 
-  listBusChannelMapping, 
-  getBusChannelMapping, 
-  addBusChannelMapping, 
-  updateBusChannelMapping, 
+import {
+  listBusChannelMapping,
+  getBusChannelMapping,
+  addBusChannelMapping,
+  updateBusChannelMapping,
   delBusChannelMapping,
   exportBusChannelMapping,
-  importTemplateBusChannelMapping
+  downloadTemplate
 } from "@/api/insu/busChannelMapping";
 import { getToken } from "@/utils/auth";
 
@@ -341,9 +341,9 @@ export default {
       this.upload.open = true;
     },
     /** 下载模板操作 */
-    importTemplate() {
-      importTemplateBusChannelMapping().then(response => {
-        this.download(response.msg);
+    downloadTemplate() {
+      downloadTemplate().then(response => {
+        this.downloadFile(response, `bus_channel_mapping_template_${new Date().getTime()}.xlsx`);
       });
     },
     // 文件上传中处理
@@ -361,6 +361,15 @@ export default {
     // 提交上传文件
     submitFileForm() {
       this.$refs.upload.submit();
+    },
+    // 下载文件
+    downloadFile(response, fileName) {
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
     }
   }
 };
