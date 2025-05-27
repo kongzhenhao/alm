@@ -110,8 +110,8 @@ public class PolicyDetailController extends BaseController {
      * 获取保单数据明细导入模板
      */
     @PreAuthorize("@ss.hasPermi('insu:policy:detail:import')")
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response) {
+    @PostMapping("/exportTemplate")
+    public void exportTemplate(HttpServletResponse response) {
         ExcelUtil<PolicyDetailDTO> util = new ExcelUtil<>(PolicyDetailDTO.class);
         util.exportTemplateExcel(response, "保单数据明细");
     }
