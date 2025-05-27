@@ -1,6 +1,6 @@
 package com.xl.alm.job.minc.entity;
 
-import com.jd.lightning.common.core.domain.BaseEntity;
+import com.xl.alm.job.common.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -87,4 +87,14 @@ public interface RiskItemAmountMapper {
      */
     int deleteRiskItemAmountEntityByCondition(@Param("accountingPeriod") String accountingPeriod,
                                              @Param("itemCode") String itemCode);
+
+    /**
+     * 根据账期和项目编码删除风险项目金额
+     *
+     * @param accountingPeriod 账期
+     * @param itemCode 项目编码
+     * @return 结果
+     */
+    int deleteByAccountingPeriodAndItemCode(@Param("accountingPeriod") String accountingPeriod,
+                                           @Param("itemCode") String itemCode);
 }

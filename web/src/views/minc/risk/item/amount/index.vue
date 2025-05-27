@@ -84,13 +84,13 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="账期" align="center" prop="accountingPeriod" width="100" />
       <!-- 隐藏项目编码列 -->
-      <el-table-column label="项目名称" align="center" prop="itemName" width="200" />
-      <el-table-column label="S05-最低资本表的期末金额" align="center" prop="s05Amount" width="250">
+      <el-table-column label="项目名称" align="left" prop="itemName" width="200" :show-overflow-tooltip="true" />
+      <el-table-column label="S05-最低资本表的期末金额" align="left" prop="s05Amount" width="250" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ formatAmount(scope.row.s05Amount) }}
         </template>
       </el-table-column>
-      <el-table-column label="IR05-寿险业务保险风险表的期末金额" align="center" prop="ir05Amount" width="300">
+      <el-table-column label="IR05-寿险业务保险风险表的期末金额" align="left" prop="ir05Amount" width="300" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ formatAmount(scope.row.ir05Amount) }}
         </template>
@@ -285,62 +285,9 @@ export default {
       };
 
       listRiskItemAmount(params).then(response => {
-        let data = response.rows || [];
-
-        // 按项目编码层级排序
-        data.sort((a, b) => {
-          const getItemCodeOrder = (itemCode) => {
-            if (!itemCode) return 'ZZZZ_999_999_999_999';
-
-            // 分析项目编码的层级结构
-            const analyzeItemCode = (code) => {
-              // 计算层级深度（通过下划线分隔符数量）
-              const parts = code.split('_');
-              const level = parts.length;
-
-              // 提取前缀（风险类型）
-              let prefix = '';
-              const firstPart = parts[0] || '';
-              const prefixMatch = firstPart.match(/^([A-Z]{2})/);
-              if (prefixMatch) {
-                prefix = prefixMatch[1];
-              }
-
-              // 风险类型排序
-              const prefixOrder = {
-                'NR': '01',  // 一般风险
-                'MR': '02',  // 市场风险
-                'CR': '03',  // 信用风险
-                'IR': '04',  // 保险风险
-                'OR': '05',  // 操作风险
-                'LR': '06'   // 流动性风险
-              };
-
-              const orderPrefix = prefixOrder[prefix] || '99';
-
-              // 构建排序键：层级_风险类型_各部分编号
-              const paddedParts = parts.map(part => {
-                // 提取数字部分并补零
-                const numberMatch = part.match(/(\d+)/g);
-                if (numberMatch) {
-                  return numberMatch.map(num => num.padStart(3, '0')).join('_');
-                }
-                return part.padEnd(10, '0');
-              });
-
-              return `${String(level).padStart(2, '0')}_${orderPrefix}_${paddedParts.join('_')}`;
-            };
-
-            return analyzeItemCode(itemCode);
-          };
-
-          const aOrder = getItemCodeOrder(a.itemCode);
-          const bOrder = getItemCodeOrder(b.itemCode);
-
-          return aOrder.localeCompare(bOrder);
-        });
-
-        this.riskItemAmountList = data;
+        // 直接使用后端返回的数据，不进行前端排序
+        // 后端已经按照 sort_order 字段排序，保持导入时的顺序
+        this.riskItemAmountList = response.rows || [];
         this.total = response.total;
         this.loading = false;
       });

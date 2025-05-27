@@ -68,7 +68,7 @@ public class MinCapitalSummaryCalculationProcessor implements BasicProcessor {
     /**
      * 用于本地测试的初始化方法
      */
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         // 本地测试时取消注释
         TaskContext tc = new TaskContext();
@@ -78,5 +78,5 @@ public class MinCapitalSummaryCalculationProcessor implements BasicProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

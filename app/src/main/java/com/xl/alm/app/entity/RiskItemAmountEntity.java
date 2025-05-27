@@ -47,6 +47,12 @@ public class RiskItemAmountEntity {
     private BigDecimal ir05Amount;
 
     /**
+     * 导入时的行号，用于保持导入顺序
+     */
+    @TableField("sort_order")
+    private Integer sortOrder;
+
+    /**
      * 创建时间
      */
     @TableField("create_time")

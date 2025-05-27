@@ -46,6 +46,16 @@ public interface MarketCreditCapitalMapper {
                                           @Param("accountingPeriod") String accountingPeriod);
 
     /**
+     * 查询指定项目编码的子风险层面边际最低资本贡献因子
+     *
+     * @param itemCode 项目编码
+     * @param accountingPeriod 账期
+     * @return 子风险层面边际最低资本贡献因子
+     */
+    BigDecimal selectSubRiskMarginalFactor(@Param("itemCode") String itemCode,
+                                          @Param("accountingPeriod") String accountingPeriod);
+
+    /**
      * 查询所有账户编码
      *
      * @return 账户编码列表

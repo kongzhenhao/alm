@@ -76,30 +76,34 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" v-if="false" />
       <el-table-column label="账期" align="center" prop="accountingPeriod" width="100" />
-      <el-table-column label="项目" align="center" prop="itemName" :show-overflow-tooltip="true" />
-      <el-table-column label="传统保险账户" align="center" prop="traditionalAmount" width="150">
+      <el-table-column label="项目" align="left" prop="itemName" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.traditionalAmount | formatNumber }}
+          <span style="white-space: nowrap;">{{ scope.row.itemName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="分红保险账户" align="center" prop="dividendAmount" width="150">
+      <el-table-column label="传统保险账户" align="left" prop="traditionalAmount" width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.dividendAmount | formatNumber }}
+          <span style="white-space: nowrap;">{{ scope.row.traditionalAmount | formatNumber }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="万能保险账户" align="center" prop="universalAmount" width="150">
+      <el-table-column label="分红保险账户" align="left" prop="dividendAmount" width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.universalAmount | formatNumber }}
+          <span style="white-space: nowrap;">{{ scope.row.dividendAmount | formatNumber }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="独立账户" align="center" prop="independentAmount" width="150">
+      <el-table-column label="万能保险账户" align="left" prop="universalAmount" width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.independentAmount | formatNumber }}
+          <span style="white-space: nowrap;">{{ scope.row.universalAmount | formatNumber }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="资本补充债账户" align="center" prop="companyTotalAmount" width="150">
+      <el-table-column label="独立账户" align="left" prop="independentAmount" width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.companyTotalAmount | formatNumber }}
+          <span style="white-space: nowrap;">{{ scope.row.independentAmount | formatNumber }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="资本补充债账户" align="left" prop="companyTotalAmount" width="150" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <span style="white-space: nowrap;">{{ scope.row.companyTotalAmount | formatNumber }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

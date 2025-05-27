@@ -297,8 +297,8 @@ public class AviatorFormulaUtil {
         while (amountMatcher.find()) {
             String itemCode = amountMatcher.group();
 
-            // 跳过公司层面贡献因子变量（以_COMPANY结尾）
-            if (itemCode.endsWith("_COMPANY")) {
+            // 跳过公司层面贡献因子变量（以_COMPANY结尾）和子风险层面贡献因子变量（以_SUB结尾）
+            if (itemCode.endsWith("_COMPANY") || itemCode.endsWith("_SUB")) {
                 continue;
             }
 
@@ -325,6 +325,23 @@ public class AviatorFormulaUtil {
             BigDecimal companyFactor = marketCreditCapitalMapper.selectCompanyMarginalFactor(itemCode, accountingPeriod);
             env.put(companyFactorVar, companyFactor != null ? companyFactor : BigDecimal.ZERO);
             log.info("添加公司层面贡献因子变量：{} = {}", companyFactorVar, companyFactor);
+        }
+
+        // 提取公式中的子风险层面贡献因子变量（格式：项目编码_SUB）
+        Pattern subRiskFactorPattern = Pattern.compile("\\b[A-Z]{2}\\d{3}(?:_\\d{2})*_SUB\\b");
+        Matcher subRiskFactorMatcher = subRiskFactorPattern.matcher(formula);
+
+        while (subRiskFactorMatcher.find()) {
+            String subRiskFactorVar = subRiskFactorMatcher.group();
+            // 提取项目编码（去掉_SUB后缀）
+            String itemCode = subRiskFactorVar.replace("_SUB", "");
+
+            log.info("找到子风险层面贡献因子变量：{} -> 项目编码：{}", subRiskFactorVar, itemCode);
+
+            // 从TB0006表查询子风险层面边际最低资本贡献因子
+            BigDecimal subRiskFactor = marketCreditCapitalMapper.selectSubRiskMarginalFactor(itemCode, accountingPeriod);
+            env.put(subRiskFactorVar, subRiskFactor != null ? subRiskFactor : BigDecimal.ZERO);
+            log.info("添加子风险层面贡献因子变量：{} = {}", subRiskFactorVar, subRiskFactor);
         }
 
         log.info("市场及信用最低资本公式变量解析完成，共{}个变量", env.size());

@@ -116,4 +116,11 @@ public interface MarginalCapitalCalculationMapper {
     int updateCompanyMarginalFactor(@Param("itemCode") String itemCode,
                                    @Param("accountingPeriod") String accountingPeriod,
                                    @Param("companyMarginalFactor") BigDecimal companyMarginalFactor);
+
+    /**
+     * 查询所有一级风险项目（项目编码不包含下划线的项目）
+     *
+     * @return 一级风险项目列表
+     */
+    List<Map<String, Object>> selectFirstLevelRiskItems();
 }

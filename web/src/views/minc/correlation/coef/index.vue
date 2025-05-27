@@ -93,26 +93,26 @@
     <el-table v-loading="loading" :data="correlationCoefList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="账期" align="center" prop="accountingPeriod" width="100" />
-      <el-table-column label="项目X" align="center" width="180">
+      <el-table-column label="项目X" align="left" width="250" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <div>
-            <div style="font-weight: bold; color: #409EFF; font-size: 14px;">{{ scope.row.itemNameX || scope.row.itemCodeX }}</div>
-            <div style="font-size: 11px; color: #999;">{{ scope.row.itemCodeX }}</div>
-          </div>
+          <span style="white-space: nowrap;">
+            {{ scope.row.itemNameX || scope.row.itemCodeX }}
+            <span v-if="scope.row.itemNameX && scope.row.itemCodeX" style="color: #999;">（{{ scope.row.itemCodeX }}）</span>
+          </span>
         </template>
       </el-table-column>
-      <el-table-column label="项目Y" align="center" width="180">
+      <el-table-column label="项目Y" align="left" width="250" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <div>
-            <div style="font-weight: bold; color: #409EFF; font-size: 14px;">{{ scope.row.itemNameY || scope.row.itemCodeY }}</div>
-            <div style="font-size: 11px; color: #999;">{{ scope.row.itemCodeY }}</div>
-          </div>
+          <span style="white-space: nowrap;">
+            {{ scope.row.itemNameY || scope.row.itemCodeY }}
+            <span v-if="scope.row.itemNameY && scope.row.itemCodeY" style="color: #999;">（{{ scope.row.itemCodeY }}）</span>
+          </span>
         </template>
       </el-table-column>
-      <el-table-column label="相关系数" align="center" prop="correlationValue" width="120" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="相关系数" align="left" prop="correlationValue" width="120" :show-overflow-tooltip="true" />
+      <el-table-column label="创建时间" align="left" prop="createTime" width="180" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span style="white-space: nowrap;">{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -345,71 +345,8 @@ export default {
     getList() {
       this.loading = true;
       listCorrelationCoef(this.queryParams).then(response => {
-        let data = response.rows || [];
-
-        // 按项目编码层级排序
-        data.sort((a, b) => {
-          const getItemCodeOrder = (itemCode) => {
-            if (!itemCode) return 'ZZZZ_999_999_999_999';
-
-            // 分析项目编码的层级结构
-            const analyzeItemCode = (code) => {
-              // 计算层级深度（通过下划线分隔符数量）
-              const parts = code.split('_');
-              const level = parts.length;
-
-              // 提取前缀（风险类型）
-              let prefix = '';
-              const firstPart = parts[0] || '';
-              const prefixMatch = firstPart.match(/^([A-Z]{2})/);
-              if (prefixMatch) {
-                prefix = prefixMatch[1];
-              }
-
-              // 风险类型排序
-              const prefixOrder = {
-                'NR': '01',  // 一般风险
-                'MR': '02',  // 市场风险
-                'CR': '03',  // 信用风险
-                'IR': '04',  // 保险风险
-                'OR': '05',  // 操作风险
-                'LR': '06'   // 流动性风险
-              };
-
-              const orderPrefix = prefixOrder[prefix] || '99';
-
-              // 构建排序键：层级_风险类型_各部分编号
-              const paddedParts = parts.map(part => {
-                // 提取数字部分并补零
-                const numberMatch = part.match(/(\d+)/g);
-                if (numberMatch) {
-                  return numberMatch.map(num => num.padStart(3, '0')).join('_');
-                }
-                return part.padEnd(10, '0');
-              });
-
-              return `${String(level).padStart(2, '0')}_${orderPrefix}_${paddedParts.join('_')}`;
-            };
-
-            return analyzeItemCode(itemCode);
-          };
-
-          // 首先按项目X排序
-          const aOrderX = getItemCodeOrder(a.itemCodeX);
-          const bOrderX = getItemCodeOrder(b.itemCodeX);
-
-          if (aOrderX !== bOrderX) {
-            return aOrderX.localeCompare(bOrderX);
-          }
-
-          // 项目X相同时，按项目Y排序
-          const aOrderY = getItemCodeOrder(a.itemCodeY);
-          const bOrderY = getItemCodeOrder(b.itemCodeY);
-
-          return aOrderY.localeCompare(bOrderY);
-        });
-
-        this.correlationCoefList = data;
+        // 直接使用后端返回的数据，不进行前端排序
+        this.correlationCoefList = response.rows || [];
         this.total = response.total;
         this.loading = false;
       });

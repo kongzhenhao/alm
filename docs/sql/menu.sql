@@ -366,3 +366,26 @@ values('市场及信用最低资本表删除', @parentId, '4',  '#', '', 1, 0, '
 
 insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
 values('市场及信用最低资本表导出', @parentId, '5',  '#', '', 1, 0, 'F', '0', '0', 'minc:min:capital:by:account:export',       '#', 'admin', sysdate(), '', null, '');
+
+-- 利率风险对冲率表菜单 SQL (TB0009)
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率管理', @mincMenuId, 8, 'irHedgeRatio', 'minc/ir/hedge/ratio/index', 1, 0, 'C', '0', '0', 'minc:irHedgeRatio:list', 'chart', 'admin', SYSDATE(), '', NULL, '利率风险对冲率管理菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率查询', @parentId, 1, '#', '', 1, 0, 'F', '0', '0', 'minc:irHedgeRatio:query', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', 'minc:irHedgeRatio:add', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', 'minc:irHedgeRatio:edit', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', 'minc:irHedgeRatio:remove', '#', 'admin', SYSDATE(), '', NULL, '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+VALUES ('利率风险对冲率导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', 'minc:irHedgeRatio:export', '#', 'admin', SYSDATE(), '', NULL, '');

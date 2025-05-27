@@ -48,14 +48,14 @@ public class MarginalCapitalCalculationProcessor implements BasicProcessor {
             }
 
             // 步骤1：执行子风险层面边际最低资本贡献因子计算
-//            log.info("步骤1：开始执行子风险层面边际最低资本贡献因子计算，账期：{}", accountPeriod);
-//            boolean subRiskResult = marginalCapitalCalculationTask.executeSubRiskCalculation(accountPeriod);
-//
-//            if (!subRiskResult) {
-//                log.error("步骤1：子风险层面边际最低资本贡献因子计算失败，账期：{}", accountPeriod);
-//                return ProcessResultUtil.fail("子风险层面边际最低资本贡献因子计算失败");
-//            }
-//            log.info("步骤1：子风险层面边际最低资本贡献因子计算成功");
+            log.info("步骤1：开始执行子风险层面边际最低资本贡献因子计算，账期：{}", accountPeriod);
+            boolean subRiskResult = marginalCapitalCalculationTask.executeSubRiskCalculation(accountPeriod);
+
+            if (!subRiskResult) {
+                log.error("步骤1：子风险层面边际最低资本贡献因子计算失败，账期：{}", accountPeriod);
+                return ProcessResultUtil.fail("子风险层面边际最低资本贡献因子计算失败");
+            }
+            log.info("步骤1：子风险层面边际最低资本贡献因子计算成功");
 
             // 步骤2：执行公司层面边际最低资本贡献因子计算
             log.info("步骤2：开始执行公司层面边际最低资本贡献因子计算，账期：{}", accountPeriod);
@@ -79,7 +79,7 @@ public class MarginalCapitalCalculationProcessor implements BasicProcessor {
     /**
      * 用于本地测试的初始化方法
      */
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         // 本地测试时取消注释
         TaskContext tc = new TaskContext();
@@ -89,5 +89,5 @@ public class MarginalCapitalCalculationProcessor implements BasicProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
