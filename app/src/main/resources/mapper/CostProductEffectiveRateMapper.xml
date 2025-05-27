@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.CostProductEffectiveRateMapper">
+
+    <resultMap type="com.xl.alm.app.entity.CostProductEffectiveRateEntity" id="CostProductEffectiveRateResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="effectiveCostRate" column="effective_cost_rate"/>
+        <result property="cashFlowSet" column="cash_flow_set"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectCostProductEffectiveRateVo">
+        select id, accounting_period, actuarial_code, design_type, short_term_flag, business_code, product_name, 
+               effective_cost_rate, cash_flow_set, remark, create_by, create_time, update_by, update_time, is_del
+        from t_cost_product_effective_rate
+    </sql>
+
+    <select id="selectCostProductEffectiveRateList" parameterType="com.xl.alm.app.query.CostProductEffectiveRateQuery" resultMap="CostProductEffectiveRateResult">
+        <include refid="selectCostProductEffectiveRateVo"/>
+        <where>
+            is_del = 0
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="actuarialCode != null and actuarialCode != ''">
+                AND actuarial_code like concat('%', #{actuarialCode}, '%')
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="shortTermFlag != null and shortTermFlag != ''">
+                AND short_term_flag = #{shortTermFlag}
+            </if>
+            <if test="businessCode != null and businessCode != ''">
+                AND business_code like concat('%', #{businessCode}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectCostProductEffectiveRateById" parameterType="Long" resultMap="CostProductEffectiveRateResult">
+        <include refid="selectCostProductEffectiveRateVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectCostProductEffectiveRateByKey" resultMap="CostProductEffectiveRateResult">
+        <include refid="selectCostProductEffectiveRateVo"/>
+        where accounting_period = #{accountingPeriod} 
+        and actuarial_code = #{actuarialCode}
+        and design_type = #{designType}
+        and short_term_flag = #{shortTermFlag}
+        and is_del = 0
+        limit 1
+    </select>
+
+    <insert id="insertCostProductEffectiveRate" parameterType="com.xl.alm.app.entity.CostProductEffectiveRateEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_cost_product_effective_rate (
+            accounting_period, actuarial_code, design_type, short_term_flag, business_code, product_name, 
+            effective_cost_rate, cash_flow_set, remark, create_by, create_time, update_by, update_time, is_del
+        ) values (
+            #{accountingPeriod}, #{actuarialCode}, #{designType}, #{shortTermFlag}, #{businessCode}, #{productName}, 
+            #{effectiveCostRate}, #{cashFlowSet}, #{remark}, #{createBy}, sysdate(), #{updateBy}, sysdate(), 0
+        )
+    </insert>
+
+    <insert id="batchInsertCostProductEffectiveRate" parameterType="java.util.List">
+        insert into t_cost_product_effective_rate (
+            accounting_period, actuarial_code, design_type, short_term_flag, business_code, product_name, 
+            effective_cost_rate, cash_flow_set, remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.actuarialCode}, #{item.designType}, #{item.shortTermFlag}, #{item.businessCode}, #{item.productName}, 
+            #{item.effectiveCostRate}, #{item.cashFlowSet}, #{item.remark}, #{item.createBy}, sysdate(), #{item.updateBy}, sysdate(), 0
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateCostProductEffectiveRate" parameterType="com.xl.alm.app.entity.CostProductEffectiveRateEntity">
+        update t_cost_product_effective_rate
+        <set>
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="actuarialCode != null">actuarial_code = #{actuarialCode},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="shortTermFlag != null">short_term_flag = #{shortTermFlag},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="effectiveCostRate != null">effective_cost_rate = #{effectiveCostRate},</if>
+            <if test="cashFlowSet != null">cash_flow_set = #{cashFlowSet},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <update id="deleteCostProductEffectiveRateById" parameterType="Long">
+        update t_cost_product_effective_rate set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteCostProductEffectiveRateByIds" parameterType="Long">
+        update t_cost_product_effective_rate set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

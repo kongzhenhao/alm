@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.IrHedgeRatioMapper">
+
+    <resultMap type="com.xl.alm.app.entity.IrHedgeRatioEntity" id="IrHedgeRatioResult">
+        <result property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="itemName" column="item_name"/>
+        <result property="accountCode" column="account_code"/>
+        <result property="sensitivityRate" column="sensitivity_rate"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectIrHedgeRatioVo">
+        select id, accounting_period, item_name, account_code, sensitivity_rate, 
+               create_time, create_by, update_time, update_by, is_del
+        from t_minc_ir_hedge_ratio
+    </sql>
+
+    <select id="selectIrHedgeRatioEntityList" parameterType="com.xl.alm.app.query.IrHedgeRatioQuery" resultMap="IrHedgeRatioResult">
+        <include refid="selectIrHedgeRatioVo"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">and accounting_period = #{accountingPeriod}</if>
+            <if test="itemName != null and itemName != ''">and item_name like concat('%', #{itemName}, '%')</if>
+            <if test="accountCode != null and accountCode != ''">and account_code = #{accountCode}</if>
+            <if test="sensitivityRate != null">and sensitivity_rate = #{sensitivityRate}</if>
+            <if test="isDel != null">and is_del = #{isDel}</if>
+        </where>
+        order by accounting_period desc, item_name, account_code
+    </select>
+
+    <select id="selectIrHedgeRatioEntityById" parameterType="Long" resultMap="IrHedgeRatioResult">
+        <include refid="selectIrHedgeRatioVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectIrHedgeRatioEntityByUniqueKey" resultMap="IrHedgeRatioResult">
+        <include refid="selectIrHedgeRatioVo"/>
+        where accounting_period = #{accountingPeriod} 
+          and item_name = #{itemName} 
+          and account_code = #{accountCode} 
+          and is_del = 0
+    </select>
+
+    <insert id="insertIrHedgeRatioEntity" parameterType="com.xl.alm.app.entity.IrHedgeRatioEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_minc_ir_hedge_ratio
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period,</if>
+            <if test="itemName != null and itemName != ''">item_name,</if>
+            <if test="accountCode != null and accountCode != ''">account_code,</if>
+            <if test="sensitivityRate != null">sensitivity_rate,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="isDel != null">is_del,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountingPeriod != null and accountingPeriod != ''">#{accountingPeriod},</if>
+            <if test="itemName != null and itemName != ''">#{itemName},</if>
+            <if test="accountCode != null and accountCode != ''">#{accountCode},</if>
+            <if test="sensitivityRate != null">#{sensitivityRate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="isDel != null">#{isDel},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertIrHedgeRatioEntity" parameterType="java.util.List">
+        insert into t_minc_ir_hedge_ratio (accounting_period, item_name, account_code, sensitivity_rate, create_by, update_by, is_del)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.accountingPeriod}, #{item.itemName}, #{item.accountCode}, #{item.sensitivityRate}, 
+             #{item.createBy}, #{item.updateBy}, #{item.isDel})
+        </foreach>
+    </insert>
+
+    <update id="updateIrHedgeRatioEntity" parameterType="com.xl.alm.app.entity.IrHedgeRatioEntity">
+        update t_minc_ir_hedge_ratio
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountingPeriod != null and accountingPeriod != ''">accounting_period = #{accountingPeriod},</if>
+            <if test="itemName != null and itemName != ''">item_name = #{itemName},</if>
+            <if test="accountCode != null and accountCode != ''">account_code = #{accountCode},</if>
+            <if test="sensitivityRate != null">sensitivity_rate = #{sensitivityRate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = now()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteIrHedgeRatioEntityById" parameterType="Long">
+        update t_minc_ir_hedge_ratio set is_del = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteIrHedgeRatioEntityByIds" parameterType="String">
+        update t_minc_ir_hedge_ratio set is_del = 1 where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteIrHedgeRatioEntityByPeriod" parameterType="String">
+        update t_minc_ir_hedge_ratio set is_del = 1 where accounting_period = #{accountingPeriod}
+    </delete>
+
+</mapper>

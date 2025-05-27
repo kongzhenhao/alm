@@ -52,11 +52,12 @@ export function exportBusChannelMapping(query) {
   });
 }
 
-// 获取渠道码映射配置导入模板
-export function importTemplateBusChannelMapping() {
+// 下载渠道码映射配置模板
+export function downloadTemplate() {
   return request({
-    url: '/insu/bus/channel/mapping/importTemplate',
+    url: '/insu/bus/channel/mapping/exportTemplate',
     method: 'post',
+    responseType: 'blob'
   });
 }
 

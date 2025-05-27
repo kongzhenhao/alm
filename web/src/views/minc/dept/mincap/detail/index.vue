@@ -94,33 +94,29 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" v-if="false" />
       <el-table-column label="账期" align="center" prop="accountingPeriod" width="100" />
-      <el-table-column label="部门名称" align="center" prop="department" :show-overflow-tooltip="true" width="150">
-        <template slot-scope="scope">
-          <span :style="getDepartmentStyle(scope.row, scope.$index)">{{ scope.row.department }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="项目" align="center" prop="itemName" :show-overflow-tooltip="true" />
-      <el-table-column label="传统保险账户" align="center" prop="traditionalAmount" width="150">
+      <el-table-column label="部门名称" align="left" prop="department" :show-overflow-tooltip="true" width="150" />
+      <el-table-column label="项目" align="left" prop="itemName" :show-overflow-tooltip="true" />
+      <el-table-column label="传统保险账户" align="left" prop="traditionalAmount" width="150">
         <template slot-scope="scope">
           {{ scope.row.traditionalAmount | formatNumber }}
         </template>
       </el-table-column>
-      <el-table-column label="分红保险账户" align="center" prop="dividendAmount" width="150">
+      <el-table-column label="分红保险账户" align="left" prop="dividendAmount" width="150">
         <template slot-scope="scope">
           {{ scope.row.dividendAmount | formatNumber }}
         </template>
       </el-table-column>
-      <el-table-column label="万能保险账户" align="center" prop="universalAmount" width="150">
+      <el-table-column label="万能保险账户" align="left" prop="universalAmount" width="150">
         <template slot-scope="scope">
           {{ scope.row.universalAmount | formatNumber }}
         </template>
       </el-table-column>
-      <el-table-column label="独立账户" align="center" prop="independentAmount" width="150">
+      <el-table-column label="独立账户" align="left" prop="independentAmount" width="150">
         <template slot-scope="scope">
           {{ scope.row.independentAmount | formatNumber }}
         </template>
       </el-table-column>
-      <el-table-column label="资本补充债账户" align="center" prop="companyTotalAmount" width="150">
+      <el-table-column label="资本补充债账户" align="left" prop="companyTotalAmount" width="150">
         <template slot-scope="scope">
           {{ scope.row.companyTotalAmount | formatNumber }}
         </template>
@@ -685,29 +681,7 @@ export default {
     submitFileForm() {
       this.$refs.upload.submit();
     },
-    /** 获取部门样式，用于分组显示 */
-    getDepartmentStyle(row, index) {
-      // 检查当前行的部门是否与上一行相同
-      const currentDept = row.department;
-      const prevRow = index > 0 ? this.deptMincapDetailList[index - 1] : null;
-      const prevDept = prevRow ? prevRow.department : null;
 
-      // 如果是部门的第一行，显示粗体
-      if (currentDept !== prevDept) {
-        return {
-          'font-weight': 'bold',
-          'color': '#409EFF',
-          'border-top': '2px solid #409EFF',
-          'padding-top': '8px'
-        };
-      }
-
-      // 同一部门的其他行，显示较淡的颜色
-      return {
-        'color': '#909399',
-        'font-size': '12px'
-      };
-    }
   }
 };
 </script>

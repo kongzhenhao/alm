@@ -64,7 +64,7 @@
           AND TRIM(company_factor_formula) != ''
     </select>
 
-    <!-- 查询指定项目编码的再保后金额 -->
+    <!-- 查询指定项目编码的再保后金额（取第一个项目的金额） -->
     <select id="selectAmountByItemCode" resultType="java.math.BigDecimal">
         SELECT
             CASE
@@ -75,6 +75,7 @@
         FROM t_minc_risk_item_amount
         WHERE item_code = #{itemCode}
           AND accounting_period = #{accountingPeriod}
+        LIMIT 1
     </select>
 
     <!-- 查询两个项目之间的相关系数 -->
@@ -138,6 +139,7 @@
         FROM t_minc_marginal_capital
         WHERE item_code = #{itemCode}
           AND accounting_period = #{accountingPeriod}
+          AND sub_risk_marginal_factor IS NOT NULL
     </select>
 
     <!-- 更新公司层面边际最低资本贡献因子 -->
@@ -149,5 +151,13 @@
         WHERE item_code = #{itemCode}
           AND accounting_period = #{accountingPeriod}
     </update>
+
+    <!-- 查询所有一级风险项目（项目编码不包含下划线的项目） -->
+    <select id="selectFirstLevelRiskItems" resultType="java.util.Map">
+        SELECT DISTINCT item_code
+        FROM t_minc_item_definition
+        WHERE item_code NOT LIKE '%_%'
+        ORDER BY item_code
+    </select>
 
 </mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.minc.mapper.IrHedgeRatioCalculationMapper">
+
+    <!-- 查询分部门最低资本明细表数据，筛选特定项目编码并按项目编码和账户编码分组汇总 -->
+    <select id="selectDeptMincapDetailData" resultType="java.util.Map">
+        SELECT 
+            item_code,
+            account_code,
+            SUM(amount) as total_amount
+        FROM t_minc_dept_mincap_detail
+        WHERE accounting_period = #{accountingPeriod}
+          AND item_code IN ('AA001', 'AA002', 'PV001', 'PV002')
+          AND is_del = 0
+        GROUP BY item_code, account_code
+        ORDER BY item_code, account_code
+    </select>
+
+    <!-- 批量插入利率风险对冲率数据 -->
+    <insert id="batchInsertHedgeRatios">
+        INSERT INTO t_minc_ir_hedge_ratio (
+            accounting_period,
+            item_name,
+            account_code,
+            sensitivity_rate,
+            create_time,
+            create_by,
+            update_time,
+            update_by,
+            is_del
+        ) VALUES
+        <foreach collection="hedgeRatios" item="item" separator=",">
+            (
+                #{item.accounting_period},
+                #{item.item_name},
+                #{item.account_code},
+                #{item.sensitivity_rate},
+                NOW(),
+                'system',
+                NOW(),
+                'system',
+                0
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据账期删除利率风险对冲率数据 -->
+    <delete id="deleteByAccountingPeriod">
+        DELETE FROM t_minc_ir_hedge_ratio
+        WHERE accounting_period = #{accountingPeriod}
+    </delete>
+
+</mapper>

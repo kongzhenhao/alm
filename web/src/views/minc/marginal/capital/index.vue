@@ -74,32 +74,29 @@
     <el-table v-loading="loading" :data="marginalCapitalList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="账期" align="center" prop="accountingPeriod" width="100" />
-      <el-table-column label="项目" align="center" width="200">
+      <el-table-column label="项目" align="left" width="250" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <div>
-            <div style="font-weight: bold; color: #409EFF; font-size: 14px;">{{ scope.row.itemName || scope.row.itemCode }}</div>
-            <div style="font-size: 11px; color: #999;">{{ scope.row.itemCode }}</div>
-          </div>
+          <span style="white-space: nowrap;">{{ scope.row.itemName || scope.row.itemCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="再保后金额" align="center" prop="reinsuAfterAmount" width="150">
+      <el-table-column label="再保后金额" align="left" prop="reinsuAfterAmount" width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{ formatNumber(scope.row.reinsuAfterAmount) }}</span>
+          <span style="white-space: nowrap;">{{ formatNumber(scope.row.reinsuAfterAmount) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="子风险边际因子" align="center" prop="subRiskMarginalFactor" width="140">
+      <el-table-column label="子风险边际因子" align="left" prop="subRiskMarginalFactor" width="140" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{ formatPercent(scope.row.subRiskMarginalFactor) }}</span>
+          <span style="white-space: nowrap;">{{ formatPercent(scope.row.subRiskMarginalFactor) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="公司边际因子" align="center" prop="companyMarginalFactor" width="140">
+      <el-table-column label="公司边际因子" align="left" prop="companyMarginalFactor" width="140" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{ formatPercent(scope.row.companyMarginalFactor) }}</span>
+          <span style="white-space: nowrap;">{{ formatPercent(scope.row.companyMarginalFactor) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="创建时间" align="left" prop="createTime" width="180" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span style="white-space: nowrap;">{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -288,62 +285,8 @@ export default {
     getList() {
       this.loading = true;
       listMarginalCapital(this.queryParams).then(response => {
-        let data = response.rows || [];
-
-        // 按项目编码层级深度排序
-        data.sort((a, b) => {
-          const getItemCodeOrder = (itemCode) => {
-            if (!itemCode) return 'ZZZZ_999_999_999_999';
-
-            // 分析项目编码的层级结构
-            const analyzeItemCode = (code) => {
-              // 计算层级深度（通过下划线分隔符数量）
-              const parts = code.split('_');
-              const level = parts.length;
-
-              // 提取前缀（风险类型）
-              let prefix = '';
-              const firstPart = parts[0] || '';
-              const prefixMatch = firstPart.match(/^([A-Z]{2})/);
-              if (prefixMatch) {
-                prefix = prefixMatch[1];
-              }
-
-              // 风险类型排序
-              const prefixOrder = {
-                'NR': '01',  // 一般风险
-                'MR': '02',  // 市场风险
-                'CR': '03',  // 信用风险
-                'IR': '04',  // 保险风险
-                'OR': '05',  // 操作风险
-                'LR': '06'   // 流动性风险
-              };
-
-              const orderPrefix = prefixOrder[prefix] || '99';
-
-              // 构建排序键：层级_风险类型_各部分编号
-              const paddedParts = parts.map(part => {
-                // 提取数字部分并补零
-                const numberMatch = part.match(/(\d+)/g);
-                if (numberMatch) {
-                  return numberMatch.map(num => num.padStart(3, '0')).join('_');
-                }
-                return part.padEnd(10, '0');
-              });
-
-              return `${String(level).padStart(2, '0')}_${orderPrefix}_${paddedParts.join('_')}`;
-            };
-
-            return analyzeItemCode(itemCode);
-          };
-
-          const aOrder = getItemCodeOrder(a.itemCode);
-          const bOrder = getItemCodeOrder(b.itemCode);
-
-          return aOrder.localeCompare(bOrder);
-        });
-
-        this.marginalCapitalList = data;
+        // 直接使用后端返回的数据，不进行前端排序
+        this.marginalCapitalList = response.rows || [];
         this.total = response.total;
         this.loading = false;
       });

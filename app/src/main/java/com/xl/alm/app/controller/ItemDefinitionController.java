@@ -124,9 +124,36 @@ public class ItemDefinitionController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, ItemDefinitionQuery query) {
         try {
+            // 查询数据
             List<ItemDefinitionDTO> list = itemDefinitionService.selectItemDefinitionDtoList(query);
-            ExcelUtil<ItemDefinitionDTO> util = new ExcelUtil<>(ItemDefinitionDTO.class);
-            util.exportExcel(list, "项目定义表数据", response);
+
+            // 转换为导出DTO
+            List<ItemDefinitionExportDTO> exportList = new ArrayList<>();
+            for (ItemDefinitionDTO dto : list) {
+                ItemDefinitionExportDTO exportDto = new ItemDefinitionExportDTO();
+                exportDto.setItemCode(dto.getItemCode());
+                exportDto.setRiskType(dto.getRiskType());
+                exportDto.setCapitalItem(dto.getCapitalItem());
+                exportDto.setCorrelationItem(dto.getCorrelationItem());
+                exportDto.setParentItemCode(dto.getParentItemCode());
+                exportDto.setSubRiskFactorFormula(dto.getSubRiskFactorFormula());
+                exportDto.setCompanyFactorFormula(dto.getCompanyFactorFormula());
+                exportDto.setCapitalCalculationFormula(dto.getCapitalCalculationFormula());
+                exportDto.setStatus(dto.getStatus());
+                exportList.add(exportDto);
+            }
+
+            // 设置下载文件的名称和类型
+            String fileName = URLEncoder.encode("项目定义表数据", "UTF-8").replaceAll("\\+", "%20");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+
+            // 使用EasyExcel导出，自动调整列宽
+            EasyExcel.write(response.getOutputStream(), ItemDefinitionExportDTO.class)
+                    .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+                    .sheet("项目定义表")
+                    .doWrite(exportList);
         } catch (Exception e) {
             log.error("导出项目定义表失败", e);
         }

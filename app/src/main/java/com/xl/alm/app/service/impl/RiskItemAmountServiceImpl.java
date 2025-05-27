@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -200,6 +202,7 @@ public class RiskItemAmountServiceImpl implements RiskItemAmountService {
 
         List<RiskItemAmountEntity> entityList = new ArrayList<>();
 
+        int sortOrder = 1; // 从1开始的行号
         for (RiskItemAmountDTO dto : dtoList) {
             try {
                 // 检查必要字段
@@ -233,6 +236,8 @@ public class RiskItemAmountServiceImpl implements RiskItemAmountService {
 
                 // 转换为实体对象
                 RiskItemAmountEntity entity = EntityDtoConvertUtil.convertToEntity(dto, RiskItemAmountEntity.class);
+                // 设置导入顺序
+                entity.setSortOrder(sortOrder++);
                 entityList.add(entity);
 
                 successNum++;
@@ -246,51 +251,11 @@ public class RiskItemAmountServiceImpl implements RiskItemAmountService {
             }
         }
 
-        // 处理数据，避免重复插入
+        // 方案1：直接插入所有数据，允许重复（需要先删除数据库唯一索引）
         if (!entityList.isEmpty()) {
-            // 按照唯一键分组，避免重复插入
-            Map<String, RiskItemAmountEntity> uniqueMap = new HashMap<>();
-
-            for (RiskItemAmountEntity entity : entityList) {
-                // 构建唯一键
-                String uniqueKey = entity.getAccountingPeriod() + "-" + entity.getItemCode();
-
-                // 如果已存在相同的唯一键，则使用最新的记录
-                uniqueMap.put(uniqueKey, entity);
-            }
-
-            // 转换为列表
-            List<RiskItemAmountEntity> uniqueEntityList = new ArrayList<>(uniqueMap.values());
-
-            // 查询已存在的记录
-            for (RiskItemAmountEntity entity : uniqueEntityList) {
-                // 构建查询条件
-                RiskItemAmountQuery query = new RiskItemAmountQuery();
-                query.setAccountingPeriod(entity.getAccountingPeriod());
-                query.setItemCode(entity.getItemCode());
-
-                List<RiskItemAmountEntity> existingList = riskItemAmountMapper.selectRiskItemAmountEntityList(query);
-
-                if (!existingList.isEmpty()) {
-                    // 已存在记录
-                    if (updateSupport) {
-                        // 如果支持更新，则执行更新
-                        RiskItemAmountEntity existingEntity = existingList.get(0);
-                        existingEntity.setS05Amount(entity.getS05Amount());
-                        existingEntity.setIr05Amount(entity.getIr05Amount());
-                        existingEntity.setUpdateBy(entity.getUpdateBy());
-                        riskItemAmountMapper.updateRiskItemAmountEntity(existingEntity);
-                        log.info("更新记录：" + entity.getAccountingPeriod() + "-" + entity.getItemCode());
-                    } else {
-                        // 如果不支持更新，则跳过
-                        log.info("跳过已存在记录：" + entity.getAccountingPeriod() + "-" + entity.getItemCode());
-                    }
-                } else {
-                    // 不存在记录，执行插入
-                    riskItemAmountMapper.insertRiskItemAmountEntity(entity);
-                    log.info("插入新记录：" + entity.getAccountingPeriod() + "-" + entity.getItemCode());
-                }
-            }
+            // 批量插入所有数据，不检查重复
+            riskItemAmountMapper.batchInsertRiskItemAmountEntity(entityList);
+            log.info("批量插入{}条记录", entityList.size());
         }
 
         if (failureNum > 0) {
@@ -367,6 +332,11 @@ public class RiskItemAmountServiceImpl implements RiskItemAmountService {
         itemCodeNameMap.put("MR003_01", "风险分散效应");
         itemCodeNameMap.put("MR003_02", "控制风险最低资本");
 
+        // 量化风险相关（备用映射）
+        itemCodeNameMap.put("QR001", "量化风险最低资本");
+        itemCodeNameMap.put("QR002", "量化风险最低资本（未考虑特征系数前）");
+        itemCodeNameMap.put("QR003", "量化风险分散效应");
+
         // 未知项目
         itemCodeNameMap.put("UNKNOWN", "未知项目");
 
@@ -385,29 +355,70 @@ public class RiskItemAmountServiceImpl implements RiskItemAmountService {
             // 清理项目名称（去除前后空格、换行符等）
             String cleanItemName = itemName != null ? itemName.trim().replaceAll("\\s+", " ") : "";
 
-            // 获取项目编码和名称的映射表
-            Map<String, String> itemCodeNameMap = getItemCodeNameMap();
-
-            // 反转映射表，使用项目名称作为键，项目编码作为值
-            Map<String, String> itemNameCodeMap = new HashMap<>();
-            for (Map.Entry<String, String> entry : itemCodeNameMap.entrySet()) {
-                String dictLabel = entry.getValue().trim(); // 也清理字典中的名称
-                itemNameCodeMap.put(dictLabel, entry.getKey());
+            // 直接从字典服务查询
+            ISysDictTypeService dictTypeService = SpringUtils.getBean(ISysDictTypeService.class);
+            if (dictTypeService != null) {
+                List<SysDictData> dictDataList = dictTypeService.selectDictDataByType("minc_risk_item");
+                if (dictDataList != null && !dictDataList.isEmpty()) {
+                    // 直接遍历字典数据，找到匹配的项目名称
+                    for (SysDictData dictData : dictDataList) {
+                        String dictLabel = dictData.getDictLabel() != null ? dictData.getDictLabel().trim() : "";
+                        if (cleanItemName.equals(dictLabel)) {
+                            String itemCode = dictData.getDictValue();
+                            log.debug("找到匹配项目：{} -> {}", cleanItemName, itemCode);
+                            return itemCode;
+                        }
+                    }
+                }
             }
 
-            // 精确匹配
-            if (itemNameCodeMap.containsKey(cleanItemName)) {
-                String itemCode = itemNameCodeMap.get(cleanItemName);
-                log.debug("找到匹配项目：{} -> {}", cleanItemName, itemCode);
+            // 如果没有找到，尝试使用备用映射表
+            Map<String, String> backupMap = getBackupItemNameCodeMap();
+            if (backupMap.containsKey(cleanItemName)) {
+                String itemCode = backupMap.get(cleanItemName);
+                log.debug("从备用映射表找到匹配项目：{} -> {}", cleanItemName, itemCode);
                 return itemCode;
             }
 
             // 如果没有找到，则返回未知项目编码
             log.warn("未找到项目名称对应的项目编码：{}", cleanItemName);
+            log.warn("可用的项目名称列表：");
+            if (dictTypeService != null) {
+                List<SysDictData> dictDataList = dictTypeService.selectDictDataByType("minc_risk_item");
+                if (dictDataList != null) {
+                    for (SysDictData dictData : dictDataList) {
+                        log.warn("  {} -> {}", dictData.getDictLabel(), dictData.getDictValue());
+                    }
+                }
+            }
             return "UNKNOWN";
         } catch (Exception e) {
             log.error("获取项目编码时出错：" + itemName, e);
             return "UNKNOWN";
         }
+    }
+
+    /**
+     * 获取备用的项目名称到编码的映射表
+     *
+     * @return 备用映射表
+     */
+    private Map<String, String> getBackupItemNameCodeMap() {
+        Map<String, String> backupMap = new HashMap<>();
+
+        // 基础风险项目
+        backupMap.put("寿险业务保险风险最低资本", "MR001_01");
+        backupMap.put("非寿险业务保险风险最低资本", "MR001_02");
+        backupMap.put("市场风险最低资本", "MR002_01");
+        backupMap.put("信用风险最低资本", "MR002_02");
+        backupMap.put("风险分散效应", "MR003_01");
+        backupMap.put("控制风险最低资本", "MR003_02");
+
+        // 量化风险相关
+        backupMap.put("量化风险最低资本", "QR001");  // 使用QR001避免与QR002冲突
+        backupMap.put("量化风险最低资本（未考虑特征系数前）", "QR002");
+        backupMap.put("量化风险分散效应", "QR003");
+
+        return backupMap;
     }
 }

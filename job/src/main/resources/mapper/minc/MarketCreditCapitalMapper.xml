@@ -35,6 +35,15 @@
           AND accounting_period = #{accountingPeriod}
     </select>
 
+    <!-- 查询指定项目编码的子风险层面边际最低资本贡献因子 -->
+    <select id="selectSubRiskMarginalFactor" resultType="java.math.BigDecimal">
+        SELECT sub_risk_marginal_factor
+        FROM t_minc_marginal_capital
+        WHERE item_code = #{itemCode}
+          AND accounting_period = #{accountingPeriod}
+          AND sub_risk_marginal_factor IS NOT NULL
+    </select>
+
     <!-- 查询所有账户编码（包含传统、分红、万能、独立账户） -->
     <select id="selectAllAccountCodes" resultType="java.lang.String">
         SELECT DISTINCT dict_value

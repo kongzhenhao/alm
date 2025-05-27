@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.job.cost.mapper.StatutoryReserveForecastMapper">
+
+    <resultMap type="com.xl.alm.job.cost.entity.StatutoryReserveForecastEntity" id="StatutoryReserveForecastEntityResult">
+        <result property="id" column="id"/>
+        <result property="businessType" column="business_type"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="actuarialCode" column="actuarial_code"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="termType" column="term_type"/>
+        <result property="designType" column="design_type"/>
+        <result property="shortTermFlag" column="short_term_flag"/>
+        <result property="statutoryReserveT1" column="statutory_reserve_t1"/>
+        <result property="statutoryReserveT2" column="statutory_reserve_t2"/>
+        <result property="statutoryReserveT3" column="statutory_reserve_t3"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectStatutoryReserveForecastVo">
+        select id, business_type, accounting_period, actuarial_code, business_code, product_name,
+               design_type, short_term_flag,
+               statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3,
+               create_time, create_by, update_time, update_by, is_del
+        from t_base_statutory_reserve_forecast
+    </sql>
+
+    <select id="selectStatutoryReserveForecastList" parameterType="com.xl.alm.job.cost.query.StatutoryReserveForecastQuery" resultMap="StatutoryReserveForecastEntityResult">
+        <include refid="selectStatutoryReserveForecastVo"/>
+        <where>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            AND is_del = 0
+        </where>
+    </select>
+
+</mapper>

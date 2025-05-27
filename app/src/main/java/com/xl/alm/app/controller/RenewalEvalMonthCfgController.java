@@ -110,8 +110,8 @@ public class RenewalEvalMonthCfgController extends BaseController {
      * 获取续保率评估月份配置导入模板
      */
     @PreAuthorize("@ss.hasPermi('base:renewal:eval:month:cfg:import')")
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response) {
+    @PostMapping("/exportTemplate")
+    public void exportTemplate(HttpServletResponse response) {
         ExcelUtil<RenewalEvalMonthCfgDTO> util = new ExcelUtil<>(RenewalEvalMonthCfgDTO.class);
         util.exportTemplateExcel(response, "续保率评估月份配置");
     }

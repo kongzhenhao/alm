@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableEncryptableProperties
 @EnableAsync
 @ComponentScan(basePackages = {"com.jd.finance.**","com.xl.alm.job.**"})
-@MapperScan({"com.xl.alm.job.**.mapper","com.jd.finance.*.mapper", "com.jd.finance.job.*.mapper"})
+@MapperScan({"com.xl.alm.job.**.mapper", "com.jd.finance.*.mapper", "com.jd.finance.job.*.mapper"})
 public class JobStarter {
 
     public static void main(String[] args) {

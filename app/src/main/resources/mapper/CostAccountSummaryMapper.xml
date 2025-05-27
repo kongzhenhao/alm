@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.CostAccountSummaryMapper">
+
+    <resultMap type="com.xl.alm.app.entity.CostAccountSummaryEntity" id="CostAccountSummaryResult">
+        <id property="id" column="id"/>
+        <result property="scenarioName" column="scenario_name"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="designType" column="design_type"/>
+        <result property="statutoryReserveT0" column="statutory_reserve_t0"/>
+        <result property="statutoryReserveT1" column="statutory_reserve_t1"/>
+        <result property="statutoryReserveT2" column="statutory_reserve_t2"/>
+        <result property="statutoryReserveT3" column="statutory_reserve_t3"/>
+        <result property="fundCostRateT0" column="fund_cost_rate_t0"/>
+        <result property="fundCostRateT1" column="fund_cost_rate_t1"/>
+        <result property="fundCostRateT2" column="fund_cost_rate_t2"/>
+        <result property="fundCostRateT3" column="fund_cost_rate_t3"/>
+        <result property="guaranteedCostRateT0" column="guaranteed_cost_rate_t0"/>
+        <result property="guaranteedCostRateT1" column="guaranteed_cost_rate_t1"/>
+        <result property="guaranteedCostRateT2" column="guaranteed_cost_rate_t2"/>
+        <result property="guaranteedCostRateT3" column="guaranteed_cost_rate_t3"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectCostAccountSummaryVo">
+        select id, scenario_name, accounting_period, design_type, 
+               statutory_reserve_t0, statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3, 
+               fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3, 
+               guaranteed_cost_rate_t0, guaranteed_cost_rate_t1, guaranteed_cost_rate_t2, guaranteed_cost_rate_t3, 
+               remark, create_by, create_time, update_by, update_time, is_del
+        from t_cost_account_summary
+    </sql>
+
+    <select id="selectCostAccountSummaryList" parameterType="com.xl.alm.app.query.CostAccountSummaryQuery" resultMap="CostAccountSummaryResult">
+        <include refid="selectCostAccountSummaryVo"/>
+        <where>
+            is_del = 0
+            <if test="scenarioName != null and scenarioName != ''">
+                AND scenario_name like concat('%', #{scenarioName}, '%')
+            </if>
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectCostAccountSummaryById" parameterType="Long" resultMap="CostAccountSummaryResult">
+        <include refid="selectCostAccountSummaryVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectCostAccountSummaryByKey" resultMap="CostAccountSummaryResult">
+        <include refid="selectCostAccountSummaryVo"/>
+        where scenario_name = #{scenarioName} 
+        and accounting_period = #{accountingPeriod}
+        and design_type = #{designType}
+        and is_del = 0
+        limit 1
+    </select>
+
+    <insert id="insertCostAccountSummary" parameterType="com.xl.alm.app.entity.CostAccountSummaryEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_cost_account_summary (
+            scenario_name, accounting_period, design_type, 
+            statutory_reserve_t0, statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3, 
+            fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3, 
+            guaranteed_cost_rate_t0, guaranteed_cost_rate_t1, guaranteed_cost_rate_t2, guaranteed_cost_rate_t3, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values (
+            #{scenarioName}, #{accountingPeriod}, #{designType}, 
+            #{statutoryReserveT0}, #{statutoryReserveT1}, #{statutoryReserveT2}, #{statutoryReserveT3}, 
+            #{fundCostRateT0}, #{fundCostRateT1}, #{fundCostRateT2}, #{fundCostRateT3}, 
+            #{guaranteedCostRateT0}, #{guaranteedCostRateT1}, #{guaranteedCostRateT2}, #{guaranteedCostRateT3}, 
+            #{remark}, #{createBy}, sysdate(), #{updateBy}, sysdate(), 0
+        )
+    </insert>
+
+    <insert id="batchInsertCostAccountSummary" parameterType="java.util.List">
+        insert into t_cost_account_summary (
+            scenario_name, accounting_period, design_type, 
+            statutory_reserve_t0, statutory_reserve_t1, statutory_reserve_t2, statutory_reserve_t3, 
+            fund_cost_rate_t0, fund_cost_rate_t1, fund_cost_rate_t2, fund_cost_rate_t3, 
+            guaranteed_cost_rate_t0, guaranteed_cost_rate_t1, guaranteed_cost_rate_t2, guaranteed_cost_rate_t3, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.scenarioName}, #{item.accountingPeriod}, #{item.designType}, 
+            #{item.statutoryReserveT0}, #{item.statutoryReserveT1}, #{item.statutoryReserveT2}, #{item.statutoryReserveT3}, 
+            #{item.fundCostRateT0}, #{item.fundCostRateT1}, #{item.fundCostRateT2}, #{item.fundCostRateT3}, 
+            #{item.guaranteedCostRateT0}, #{item.guaranteedCostRateT1}, #{item.guaranteedCostRateT2}, #{item.guaranteedCostRateT3}, 
+            #{item.remark}, #{item.createBy}, sysdate(), #{item.updateBy}, sysdate(), 0
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateCostAccountSummary" parameterType="com.xl.alm.app.entity.CostAccountSummaryEntity">
+        update t_cost_account_summary
+        <set>
+            <if test="scenarioName != null">scenario_name = #{scenarioName},</if>
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="statutoryReserveT0 != null">statutory_reserve_t0 = #{statutoryReserveT0},</if>
+            <if test="statutoryReserveT1 != null">statutory_reserve_t1 = #{statutoryReserveT1},</if>
+            <if test="statutoryReserveT2 != null">statutory_reserve_t2 = #{statutoryReserveT2},</if>
+            <if test="statutoryReserveT3 != null">statutory_reserve_t3 = #{statutoryReserveT3},</if>
+            <if test="fundCostRateT0 != null">fund_cost_rate_t0 = #{fundCostRateT0},</if>
+            <if test="fundCostRateT1 != null">fund_cost_rate_t1 = #{fundCostRateT1},</if>
+            <if test="fundCostRateT2 != null">fund_cost_rate_t2 = #{fundCostRateT2},</if>
+            <if test="fundCostRateT3 != null">fund_cost_rate_t3 = #{fundCostRateT3},</if>
+            <if test="guaranteedCostRateT0 != null">guaranteed_cost_rate_t0 = #{guaranteedCostRateT0},</if>
+            <if test="guaranteedCostRateT1 != null">guaranteed_cost_rate_t1 = #{guaranteedCostRateT1},</if>
+            <if test="guaranteedCostRateT2 != null">guaranteed_cost_rate_t2 = #{guaranteedCostRateT2},</if>
+            <if test="guaranteedCostRateT3 != null">guaranteed_cost_rate_t3 = #{guaranteedCostRateT3},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <update id="deleteCostAccountSummaryById" parameterType="Long">
+        update t_cost_account_summary set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteCostAccountSummaryByIds" parameterType="Long">
+        update t_cost_account_summary set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

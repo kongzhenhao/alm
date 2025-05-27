@@ -293,6 +293,8 @@ CREATE TABLE IF NOT EXISTS `t_minc_risk_item_amount` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`accounting_period`, `item_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='风险项目金额表';
+-- 删除唯一索引
+ALTER TABLE `t_minc_risk_item_amount` DROP INDEX `idx_unique`;
 
 -- 相关系数表 (TB0004)
 CREATE TABLE IF NOT EXISTS `t_minc_correlation_coef` (
@@ -379,3 +381,19 @@ CREATE TABLE IF NOT EXISTS `t_minc_min_capital_by_account` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_unique` (`accounting_period`, `item_code`, `account_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='市场及信用最低资本表';
+
+-- 利率风险对冲率表 (TB0009)
+CREATE TABLE IF NOT EXISTS `t_minc_ir_hedge_ratio` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `accounting_period` varchar(6) NOT NULL COMMENT '账期，格式：YYYYMM（如202306）',
+  `item_name` varchar(100) NOT NULL COMMENT '项目名称，如：利率风险资产敏感度、利率风险负债敏感度、利率风险对冲率',
+  `account_code` varchar(10) NOT NULL COMMENT '账户编码，对应sys_dict_data表中dict_type=''minc_account''的字典项',
+  `sensitivity_rate` decimal(10,4) DEFAULT 0 COMMENT '敏感度或对冲率，百分比格式，如：0.0793表示7.93%',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
+  `is_del` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除，0:否，1:是',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_unique` (`accounting_period`, `item_name`, `account_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='利率风险对冲率表';

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xl.alm.app.mapper.CostAccountEffectiveRateMapper">
+
+    <resultMap type="com.xl.alm.app.entity.CostAccountEffectiveRateEntity" id="CostAccountEffectiveRateResult">
+        <id property="id" column="id"/>
+        <result property="accountingPeriod" column="accounting_period"/>
+        <result property="designType" column="design_type"/>
+        <result property="effectiveCostRate" column="effective_cost_rate"/>
+        <result property="cashFlowSet" column="cash_flow_set"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDel" column="is_del"/>
+    </resultMap>
+
+    <sql id="selectCostAccountEffectiveRateVo">
+        select id, accounting_period, design_type, effective_cost_rate, cash_flow_set, 
+               remark, create_by, create_time, update_by, update_time, is_del
+        from t_cost_account_effective_rate
+    </sql>
+
+    <select id="selectCostAccountEffectiveRateList" parameterType="com.xl.alm.app.query.CostAccountEffectiveRateQuery" resultMap="CostAccountEffectiveRateResult">
+        <include refid="selectCostAccountEffectiveRateVo"/>
+        <where>
+            is_del = 0
+            <if test="accountingPeriod != null and accountingPeriod != ''">
+                AND accounting_period = #{accountingPeriod}
+            </if>
+            <if test="designType != null and designType != ''">
+                AND design_type = #{designType}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectCostAccountEffectiveRateById" parameterType="Long" resultMap="CostAccountEffectiveRateResult">
+        <include refid="selectCostAccountEffectiveRateVo"/>
+        where id = #{id} and is_del = 0
+    </select>
+
+    <select id="selectCostAccountEffectiveRateByKey" resultMap="CostAccountEffectiveRateResult">
+        <include refid="selectCostAccountEffectiveRateVo"/>
+        where accounting_period = #{accountingPeriod} 
+        and design_type = #{designType}
+        and is_del = 0
+        limit 1
+    </select>
+
+    <insert id="insertCostAccountEffectiveRate" parameterType="com.xl.alm.app.entity.CostAccountEffectiveRateEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_cost_account_effective_rate (
+            accounting_period, design_type, effective_cost_rate, cash_flow_set, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values (
+            #{accountingPeriod}, #{designType}, #{effectiveCostRate}, #{cashFlowSet}, 
+            #{remark}, #{createBy}, sysdate(), #{updateBy}, sysdate(), 0
+        )
+    </insert>
+
+    <insert id="batchInsertCostAccountEffectiveRate" parameterType="java.util.List">
+        insert into t_cost_account_effective_rate (
+            accounting_period, design_type, effective_cost_rate, cash_flow_set, 
+            remark, create_by, create_time, update_by, update_time, is_del
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.accountingPeriod}, #{item.designType}, #{item.effectiveCostRate}, #{item.cashFlowSet}, 
+            #{item.remark}, #{item.createBy}, sysdate(), #{item.updateBy}, sysdate(), 0
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateCostAccountEffectiveRate" parameterType="com.xl.alm.app.entity.CostAccountEffectiveRateEntity">
+        update t_cost_account_effective_rate
+        <set>
+            <if test="accountingPeriod != null">accounting_period = #{accountingPeriod},</if>
+            <if test="designType != null">design_type = #{designType},</if>
+            <if test="effectiveCostRate != null">effective_cost_rate = #{effectiveCostRate},</if>
+            <if test="cashFlowSet != null">cash_flow_set = #{cashFlowSet},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id} and is_del = 0
+    </update>
+
+    <update id="deleteCostAccountEffectiveRateById" parameterType="Long">
+        update t_cost_account_effective_rate set is_del = 1 where id = #{id}
+    </update>
+
+    <update id="deleteCostAccountEffectiveRateByIds" parameterType="Long">
+        update t_cost_account_effective_rate set is_del = 1 where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

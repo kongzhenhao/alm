@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -92,9 +93,9 @@ public class MarginalCapitalCalculationServiceImpl implements MarginalCapitalCal
             }
             log.info("项目定义表中共有{}个项目编码", definedItemCodes.size());
 
-            // 步骤4：过滤TB0002中的数据，只保留在TB0005中存在的项目
+            // 步骤4：过滤TB0002中的数据，只保留在TB0005中存在的项目，并去重（取第一个项目的金额）
             log.info("步骤4：过滤风险项目金额数据，只保留在项目定义表中存在的项目");
-            List<MarginalCapitalCalculationEntity> initialDataList = new ArrayList<>();
+            Map<String, MarginalCapitalCalculationEntity> uniqueDataMap = new HashMap<>();
             int filteredCount = 0;
 
             for (Map<String, Object> riskItem : riskItemAmounts) {
@@ -103,26 +104,33 @@ public class MarginalCapitalCalculationServiceImpl implements MarginalCapitalCal
 
                 // 只有在项目定义表中存在的项目才进行处理
                 if (definedItemCodes.contains(itemCode)) {
-                    MarginalCapitalCalculationEntity entity = new MarginalCapitalCalculationEntity();
-                    entity.setAccountingPeriod(accountingPeriod);
-                    entity.setItemCode(itemCode);
-                    entity.setReinsuAfterAmount(reinsuAfterAmount);
-                    entity.setSubRiskMarginalFactor(null); // 初始为空，后续计算
-                    entity.setCompanyMarginalFactor(null); // 初始为空，后续计算
-                    entity.setIsDel(0);
-                    entity.setCreateBy("system");
-                    entity.setCreateTime(new Date());
-                    entity.setUpdateBy("system");
-                    entity.setUpdateTime(new Date());
+                    // 如果已存在相同项目编码，则跳过（只取第一个项目的金额）
+                    if (uniqueDataMap.containsKey(itemCode)) {
+                        log.debug("项目编码{}存在重复，跳过后续记录，保留第一个项目的金额", itemCode);
+                    } else {
+                        MarginalCapitalCalculationEntity entity = new MarginalCapitalCalculationEntity();
+                        entity.setAccountingPeriod(accountingPeriod);
+                        entity.setItemCode(itemCode);
+                        entity.setReinsuAfterAmount(reinsuAfterAmount);
+                        entity.setSubRiskMarginalFactor(null); // 初始为空，后续计算
+                        entity.setCompanyMarginalFactor(null); // 初始为空，后续计算
+                        entity.setIsDel(0);
+                        entity.setCreateBy("system");
+                        entity.setCreateTime(new Date());
+                        entity.setUpdateBy("system");
+                        entity.setUpdateTime(new Date());
 
-                    initialDataList.add(entity);
+                        uniqueDataMap.put(itemCode, entity);
+                        log.debug("添加项目编码{}，金额：{}", itemCode, reinsuAfterAmount);
+                    }
                 } else {
                     filteredCount++;
                     log.debug("项目编码{}不在项目定义表中，跳过处理", itemCode);
                 }
             }
 
-            log.info("过滤完成：TB0002表中{}条记录，项目定义表中存在{}条，过滤掉{}条",
+            List<MarginalCapitalCalculationEntity> initialDataList = new ArrayList<>(uniqueDataMap.values());
+            log.info("过滤完成：TB0002表中{}条记录，去重后{}条，过滤掉{}条",
                     riskItemAmounts.size(), initialDataList.size(), filteredCount);
 
             if (initialDataList.isEmpty()) {
@@ -202,39 +210,43 @@ public class MarginalCapitalCalculationServiceImpl implements MarginalCapitalCal
         }
 
         try {
-            // 步骤1：读取项目定义表中有公司层面公式的项目
-            log.info("步骤1：读取项目定义表中有公司层面公式的项目");
+            int calculatedCount = 0;
+
+            // 步骤1：处理一级风险项目 - 公司层面边际最低资本贡献因子等于子风险层面边际最低资本贡献因子
+            log.info("步骤1：处理一级风险项目，公司层面因子等于子风险层面因子");
+            calculatedCount += processFirstLevelRiskItems(accountingPeriod);
+
+            // 步骤2：读取项目定义表中有公司层面公式的项目
+            log.info("步骤2：读取项目定义表中有公司层面公式的项目");
             List<Map<String, Object>> companyItemDefinitions = marginalCapitalCalculationMapper.selectItemDefinitionsWithCompanyFormula();
 
-            if (companyItemDefinitions == null || companyItemDefinitions.isEmpty()) {
-                log.warn("未找到有公司层面公式的项目定义，跳过计算");
-                return true;
-            }
+            if (companyItemDefinitions != null && !companyItemDefinitions.isEmpty()) {
+                log.info("找到{}个有公司层面公式的项目，开始计算", companyItemDefinitions.size());
 
-            log.info("找到{}个有公司层面公式的项目，开始计算", companyItemDefinitions.size());
+                for (Map<String, Object> itemDef : companyItemDefinitions) {
+                    String itemCode = (String) itemDef.get("item_code");
+                    String formula = (String) itemDef.get("company_factor_formula");
 
-            int calculatedCount = 0;
-            for (Map<String, Object> itemDef : companyItemDefinitions) {
-                String itemCode = (String) itemDef.get("item_code");
-                String formula = (String) itemDef.get("company_factor_formula");
+                    log.info("计算项目{}的公司层面边际最低资本贡献因子，公式：{}", itemCode, formula);
 
-                log.info("计算项目{}的公司层面边际最低资本贡献因子，公式：{}", itemCode, formula);
+                    // 使用Aviator执行公式计算
+                    BigDecimal companyFactor = aviatorFormulaUtil.executeCompanyFactorFormula(formula, accountingPeriod);
 
-                // 使用Aviator执行公式计算
-                BigDecimal companyFactor = aviatorFormulaUtil.executeCompanyFactorFormula(formula, accountingPeriod);
-
-                if (companyFactor != null) {
-                    // 更新计算结果
-                    int updateCount = marginalCapitalCalculationMapper.updateCompanyMarginalFactor(itemCode, accountingPeriod, companyFactor);
-                    if (updateCount > 0) {
-                        calculatedCount++;
-                        log.info("项目{}计算完成，公司层面边际最低资本贡献因子：{}", itemCode, companyFactor);
+                    if (companyFactor != null) {
+                        // 更新计算结果
+                        int updateCount = marginalCapitalCalculationMapper.updateCompanyMarginalFactor(itemCode, accountingPeriod, companyFactor);
+                        if (updateCount > 0) {
+                            calculatedCount++;
+                            log.info("项目{}计算完成，公司层面边际最低资本贡献因子：{}", itemCode, companyFactor);
+                        } else {
+                            log.warn("项目{}更新失败，可能不存在对应的记录", itemCode);
+                        }
                     } else {
-                        log.warn("项目{}更新失败，可能不存在对应的记录", itemCode);
+                        log.error("项目{}计算失败，公式：{}", itemCode, formula);
                     }
-                } else {
-                    log.error("项目{}计算失败，公式：{}", itemCode, formula);
                 }
+            } else {
+                log.info("未找到有公司层面公式的项目定义");
             }
 
             log.info("公司层面边际最低资本贡献率计算完成，账期：{}，成功计算{}个项目", accountingPeriod, calculatedCount);
@@ -243,6 +255,109 @@ public class MarginalCapitalCalculationServiceImpl implements MarginalCapitalCal
         } catch (Exception e) {
             log.error("公司层面边际最低资本贡献率计算失败，账期：{}", accountingPeriod, e);
             throw e; // 重新抛出异常，触发事务回滚
+        }
+    }
+
+    /**
+     * 处理一级风险项目 - 公司层面边际最低资本贡献因子等于子风险层面边际最低资本贡献因子
+     *
+     * @param accountingPeriod 账期
+     * @return 处理的项目数量
+     */
+    private int processFirstLevelRiskItems(String accountingPeriod) {
+        try {
+            // 查询所有一级风险项目（项目编码不包含下划线的项目）
+            List<Map<String, Object>> firstLevelItems = marginalCapitalCalculationMapper.selectFirstLevelRiskItems();
+
+            if (firstLevelItems == null || firstLevelItems.isEmpty()) {
+                log.warn("从项目定义表未找到一级风险项目，使用硬编码的一级风险项目列表");
+                // 使用硬编码的一级风险项目列表
+                String[] hardcodedFirstLevelItems = {"IR001", "NR001", "MR001", "CR001"};
+                return processHardcodedFirstLevelItems(accountingPeriod, hardcodedFirstLevelItems);
+            }
+
+            log.info("找到{}个一级风险项目", firstLevelItems.size());
+            for (Map<String, Object> item : firstLevelItems) {
+                log.info("一级风险项目：{}", item.get("item_code"));
+            }
+            int processedCount = 0;
+
+            for (Map<String, Object> item : firstLevelItems) {
+                String itemCode = (String) item.get("item_code");
+                log.info("处理一级风险项目：{}", itemCode);
+
+                // 查询该项目的子风险层面边际最低资本贡献因子
+                BigDecimal subRiskFactor = marginalCapitalCalculationMapper.selectSubRiskMarginalFactor(itemCode, accountingPeriod);
+                log.info("项目{}的子风险层面边际最低资本贡献因子：{}", itemCode, subRiskFactor);
+
+                if (subRiskFactor != null) {
+                    // 将子风险层面因子直接设置为公司层面因子
+                    log.info("开始更新项目{}的公司层面边际最低资本贡献因子：{}", itemCode, subRiskFactor);
+                    int updateCount = marginalCapitalCalculationMapper.updateCompanyMarginalFactor(itemCode, accountingPeriod, subRiskFactor);
+                    log.info("项目{}更新结果：影响行数 = {}", itemCode, updateCount);
+
+                    if (updateCount > 0) {
+                        processedCount++;
+                        log.info("一级风险项目{}：公司层面因子 = 子风险层面因子 = {}", itemCode, subRiskFactor);
+                    } else {
+                        log.warn("一级风险项目{}更新失败，可能不存在对应的记录", itemCode);
+                    }
+                } else {
+                    log.warn("一级风险项目{}的子风险层面边际最低资本贡献因子为空，跳过", itemCode);
+                }
+            }
+
+            log.info("一级风险项目处理完成，成功处理{}个项目", processedCount);
+            return processedCount;
+
+        } catch (Exception e) {
+            log.error("处理一级风险项目时发生异常", e);
+            throw e;
+        }
+    }
+
+    /**
+     * 处理硬编码的一级风险项目列表
+     *
+     * @param accountingPeriod 账期
+     * @param itemCodes 项目编码数组
+     * @return 处理的项目数量
+     */
+    private int processHardcodedFirstLevelItems(String accountingPeriod, String[] itemCodes) {
+        try {
+            log.info("开始处理硬编码的一级风险项目，共{}个项目", itemCodes.length);
+            int processedCount = 0;
+
+            for (String itemCode : itemCodes) {
+                log.info("处理一级风险项目：{}", itemCode);
+
+                // 查询该项目的子风险层面边际最低资本贡献因子
+                BigDecimal subRiskFactor = marginalCapitalCalculationMapper.selectSubRiskMarginalFactor(itemCode, accountingPeriod);
+                log.info("项目{}的子风险层面边际最低资本贡献因子：{}", itemCode, subRiskFactor);
+
+                if (subRiskFactor != null) {
+                    // 将子风险层面因子直接设置为公司层面因子
+                    log.info("开始更新项目{}的公司层面边际最低资本贡献因子：{}", itemCode, subRiskFactor);
+                    int updateCount = marginalCapitalCalculationMapper.updateCompanyMarginalFactor(itemCode, accountingPeriod, subRiskFactor);
+                    log.info("项目{}更新结果：影响行数 = {}", itemCode, updateCount);
+
+                    if (updateCount > 0) {
+                        processedCount++;
+                        log.info("一级风险项目{}：公司层面因子 = 子风险层面因子 = {}", itemCode, subRiskFactor);
+                    } else {
+                        log.warn("一级风险项目{}更新失败，可能不存在对应的记录", itemCode);
+                    }
+                } else {
+                    log.warn("一级风险项目{}的子风险层面边际最低资本贡献因子为空，跳过", itemCode);
+                }
+            }
+
+            log.info("硬编码一级风险项目处理完成，成功处理{}个项目", processedCount);
+            return processedCount;
+
+        } catch (Exception e) {
+            log.error("处理硬编码一级风险项目时发生异常", e);
+            throw e;
         }
     }
 }

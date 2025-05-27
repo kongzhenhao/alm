@@ -110,8 +110,8 @@ public class BusChannelMappingController extends BaseController {
      * 获取渠道码映射配置导入模板
      */
     @PreAuthorize("@ss.hasPermi('insu:bus:channel:mapping:import')")
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response) {
+    @PostMapping("/exportTemplate")
+    public void exportTemplate(HttpServletResponse response) {
         ExcelUtil<BusChannelMappingDTO> util = new ExcelUtil<>(BusChannelMappingDTO.class);
         util.exportTemplateExcel(response, "渠道码映射配置");
     }
