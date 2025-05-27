@@ -92,7 +92,7 @@ powerjob:
   worker:
     app-name: admin_data
     app-password: ENC(r+ziP5+N8CJr5g5bJXx0ww==)
-    enabled: true
+    enabled: false
     max-appended-wf-context-length: 4096
     max-result-length: 4096
     port: 27777

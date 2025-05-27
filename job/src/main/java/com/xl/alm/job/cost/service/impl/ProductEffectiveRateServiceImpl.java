@@ -11,6 +11,10 @@ import com.xl.alm.job.cost.mapper.ProductEffectiveRateMapper;
 import com.xl.alm.job.cost.query.AccountingReserveDetailQuery;
 import com.xl.alm.job.cost.service.ProductEffectiveRateService;
 import com.xl.alm.job.cost.util.IRRCalculator;
+import com.xl.alm.job.cost.util.FastXirrCalculator;
+import com.xl.alm.job.cost.util.FastXirrWithDatesCalculator;
+import com.xl.alm.job.cost.util.ExcelXirrCalculator;
+import com.xl.alm.job.common.util.XirrCalculator;
 import com.xl.alm.job.dur.entity.LiabilityCashFlowEntity;
 import com.xl.alm.job.dur.mapper.LiabilityCashFlowMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,21 +232,24 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
                     effectiveRate = BigDecimal.ZERO;
                     log.info("产品[{}]未来期间现金流之和为0，有效成本率设置为0%", actuarialCode);
                 } else {
-                    // 构建现金流列表，第一个元素为账面价值的负值（初始投资）
-                    List<BigDecimal> irrCashflows = new ArrayList<>();
-                    irrCashflows.add(bookValue.negate()); // 初始投资为账面价值的负值
+                    // 构建现金流和日期数据，直接转换为XirrCalculator所需格式
+                    Map<String, Object> xirrData = buildXirrData(bookValue, accountingPeriod, netCashflows);
+                    if (xirrData != null) {
+                        double[] payments = (double[]) xirrData.get("payments");
+                        Date[] days = (Date[]) xirrData.get("days");
 
-                    // 添加后续现金流
-                    int maxPeriod = netCashflows.keySet().stream().max(Integer::compareTo).orElse(0);
-                    for (int i = 1; i <= maxPeriod; i++) {
-                        BigDecimal cashflow = netCashflows.getOrDefault(i, BigDecimal.ZERO);
-                        irrCashflows.add(cashflow);
+                        try {
+                            BigDecimal xirrResult = XirrCalculator.Newtons_method(new BigDecimal("0"), payments, days);
+                            effectiveRate = xirrResult;
+                            log.info("产品[{}]XIRR计算结果: {}", actuarialCode, effectiveRate);
+                        } catch (Exception e) {
+                            log.error("产品[{}]XIRR计算异常，设置为0: {}", actuarialCode, e.getMessage());
+                            effectiveRate = BigDecimal.ZERO;
+                        }
+                    } else {
+                        log.error("产品[{}]数据转换失败，有效成本率设置为0", actuarialCode);
+                        effectiveRate = BigDecimal.ZERO;
                     }
-
-                    // 使用内部收益率(IRR)方法计算有效成本率
-                    // 相当于Excel的IFERROR(XIRR(...), 0)函数
-                    effectiveRate = IRRCalculator.calculateIRRWithDefault(irrCashflows);
-                    log.info("产品[{}]IRR计算结果: {}", actuarialCode, effectiveRate);
                 }
 
                 // 创建分产品有效成本率实体
@@ -255,7 +265,17 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
 
                 // 将现金流集合转换为JSON字符串
                 JSONObject cashflowJson = new JSONObject();
-                cashflowJson.put("0", formatBigDecimal(bookValue)); // 初始投资
+
+                // 将账期转换为日期格式（年-月-日）
+                String initialDate = accountingPeriod.substring(0, 4) + "-" + accountingPeriod.substring(4, 6) + "-" +
+                                   getLastDayOfMonth(Integer.parseInt(accountingPeriod.substring(0, 4)),
+                                                    Integer.parseInt(accountingPeriod.substring(4, 6)));
+
+                // 初始投资
+                JSONObject initialEntry = new JSONObject();
+                initialEntry.put("date", initialDate);
+                initialEntry.put("value", formatBigDecimal(bookValue));
+                cashflowJson.put("0", initialEntry);
 
                 // 添加后续现金流
                 int maxPeriod = netCashflows.keySet().stream().max(Integer::compareTo).orElse(0);
@@ -264,7 +284,14 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
 
                 for (int i = 1; i <= maxPeriod; i++) {
                     BigDecimal cashflow = netCashflows.getOrDefault(i, BigDecimal.ZERO);
-                    cashflowJson.put(String.valueOf(i), formatBigDecimal(cashflow));
+
+                    // 计算日期，每期增加一个月
+                    String date = calculateDate(accountingPeriod, i).replace("/", "-");
+
+                    JSONObject entry = new JSONObject();
+                    entry.put("date", date);
+                    entry.put("value", formatBigDecimal(cashflow));
+                    cashflowJson.put(String.valueOf(i), entry);
                 }
                 entity.setCashflowSet(cashflowJson.toString());
 
@@ -374,5 +401,102 @@ public class ProductEffectiveRateServiceImpl implements ProductEffectiveRateServ
         }
         // 使用纯文本格式，避免科学计数法
         return value.toPlainString();
+    }
+
+    /**
+     * 获取月末日期
+     *
+     * @param year 年
+     * @param month 月
+     * @return 月末日期
+     */
+    private int getLastDayOfMonth(int year, int month) {
+        switch (month) {
+            case 2:
+                return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                return 30;
+            default:
+                return 31;
+        }
+    }
+
+    /**
+     * 计算日期
+     *
+     * @param accountingPeriod 账期，格式为YYYYMM
+     * @param addMonths 增加的月数
+     * @return 计算后的日期，格式为YYYY/MM/DD
+     */
+    private String calculateDate(String accountingPeriod, int addMonths) {
+        if (accountingPeriod == null || accountingPeriod.length() != 6) {
+            return "";
+        }
+
+        try {
+            int year = Integer.parseInt(accountingPeriod.substring(0, 4));
+            int month = Integer.parseInt(accountingPeriod.substring(4, 6));
+
+            // 增加月数
+            month += addMonths;
+            while (month > 12) {
+                year++;
+                month -= 12;
+            }
+
+            // 获取月末日期
+            int day = getLastDayOfMonth(year, month);
+
+            return String.format("%04d/%02d/%02d", year, month, day);
+        } catch (Exception e) {
+            log.error("计算日期异常，账期：{}，增加月数：{}", accountingPeriod, addMonths, e);
+            return "";
+        }
+    }
+
+    /**
+     * 构建 XIRR 计算所需的现金流和日期数据
+     * @param bookValue 账面价值（初始投资）
+     * @param accountingPeriod 账期（格式：yyyyMM）
+     * @param netCashflows 净现金流数据
+     * @return 包含payments数组和days数组的Map
+     */
+    private Map<String, Object> buildXirrData(BigDecimal bookValue, String accountingPeriod, Map<Integer, BigDecimal> netCashflows) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            int maxPeriod = netCashflows.keySet().stream().max(Integer::compareTo).orElse(0);
+            int totalPeriods = maxPeriod + 1; // 包括初始期间
+
+            // 初始化数组
+            double[] payments = new double[totalPeriods];
+            Date[] days = new Date[totalPeriods];
+
+            // 设置初始投资（负值）
+            payments[0] = bookValue.doubleValue();
+
+            // 设置初始日期
+            String initialDate = accountingPeriod.substring(0, 4) + "/" + accountingPeriod.substring(4, 6) + "/" +
+                               getLastDayOfMonth(Integer.parseInt(accountingPeriod.substring(0, 4)),
+                                                Integer.parseInt(accountingPeriod.substring(4, 6)));
+            days[0] = sdf.parse(initialDate);
+
+            // 设置后续现金流和日期
+            for (int i = 1; i <= maxPeriod; i++) {
+                payments[i] = netCashflows.getOrDefault(i, BigDecimal.ZERO).doubleValue();
+                String date = calculateDate(accountingPeriod, i);
+                days[i] = sdf.parse(date);
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("payments", payments);
+            result.put("days", days);
+            return result;
+        } catch (ParseException e) {
+            log.error("日期转换异常", e);
+            return null;
+        }
     }
 }
